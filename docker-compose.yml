@@ -1,0 +1,21 @@
+version: "3"
+volumes:
+  geth:
+  ethash:
+
+services:
+  geth:
+    build:
+      context: ./geth
+      dockerfile: Dockerfile
+      args:
+        username: "${GETH_USER}"
+        coinbase: "${COINBASE}"
+        networkid: "${GETH_NETWORK_ID}"
+    command: "geth --mine --minerthreads 2 --etherbase ${COINBASE} --rpc --networkid ${GETH_NETWORK_ID}"
+    ports:
+    - 8545:8545
+    user: "${GETH_USER}"
+    volumes:
+    - geth:/home/${GETH_USER}/.ethereum
+    - ethash:/home/${GETH_USER}/.ethash
