@@ -24,7 +24,8 @@ start-mining:
 	GETH_USER=$(GETH_USER) \
 		GETH_NETWORK_ID=$(GETH_NETWORK_ID) \
 		COINBASE=$(COINBASE) \
-		docker-compose up -d
+		docker-compose up -d && \
+		docker-compose ps
 
 console:
 	GETH_USER=$(GETH_USER) \

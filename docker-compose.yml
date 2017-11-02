@@ -1,4 +1,4 @@
-version: "3"
+version: "2.2"
 volumes:
   geth:
   ethash:
@@ -12,9 +12,13 @@ services:
         username: "${GETH_USER}"
         coinbase: "${COINBASE}"
         networkid: "${GETH_NETWORK_ID}"
-    command: "geth --mine --minerthreads 2 --etherbase ${COINBASE} --rpc --networkid ${GETH_NETWORK_ID}"
+    command: "geth --mine --minerthreads 2 --etherbase ${COINBASE} --rpc --rpcaddr '0.0.0.0' --rpcport 8545 --rpccorsdomain '*' --rpcapi 'eth,net,web3' --networkid ${GETH_NETWORK_ID}"
+    cpus: 1
     ports:
     - 8545:8545
+    - 8546:8546
+    - 6060:6060
+    - 30303:30303
     user: "${GETH_USER}"
     volumes:
     - geth:/home/${GETH_USER}/.ethereum
