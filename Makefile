@@ -33,11 +33,16 @@ console:
 		docker-compose exec geth \
 		geth attach ipc:/home/gustcoin/.ethereum/geth.ipc
 
-build:
+build: build-geth build-block-explorer
+
+build-geth:
 	GETH_USER=$(GETH_USER) \
 		GETH_NETWORK_ID=$(GETH_NETWORK_ID) \
 		COINBASE=$(COINBASE) \
-		docker-compose build
+		docker-compose build geth
+
+build-block-explorer:
+	docker-compose build block-explorer
 
 sh:
 	GETH_USER=$(GETH_USER) \

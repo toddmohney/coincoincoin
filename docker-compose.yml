@@ -15,11 +15,17 @@ services:
     command: "geth --mine --minerthreads 2 --etherbase ${COINBASE} --rpc --rpcaddr '0.0.0.0' --rpcport 8545 --rpccorsdomain '*' --rpcapi 'eth,net,web3' --networkid ${GETH_NETWORK_ID}"
     cpus: 1
     ports:
-    - 8545:8545
-    - 8546:8546
-    - 6060:6060
-    - 30303:30303
+    - "8545-8546:8545-8546"
+    - "6060:6060"
+    - "30303:30303"
     user: "${GETH_USER}"
     volumes:
     - geth:/home/${GETH_USER}/.ethereum
     - ethash:/home/${GETH_USER}/.ethash
+
+  block-explorer:
+    build:
+      context: ./block-explorer
+      dockerfile: Dockerfile
+    network_mode: "host"
+    user: blockexplorer

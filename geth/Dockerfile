@@ -23,7 +23,7 @@ RUN mkdir -p /home/$username/.ethash
 COPY genesis.json /home/$username/genesis.json
 
 EXPOSE 8545
-EXPOSE 8646
+EXPOSE 8546
 EXPOSE 6060
 EXPOSE 30303
 
