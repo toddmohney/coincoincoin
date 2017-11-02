@@ -56,3 +56,14 @@ make console
 eth.accounts
 eth.getBalance("<address>")
 ```
+
+## Testing
+
+```sh
+# test framework
+npm install -g truffle
+# test ethereum server
+npm install -g ethereumjs-testrpc
+# solidity compiler (optional)
+npm install -g solc
+```

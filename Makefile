@@ -47,3 +47,22 @@ build-block-explorer:
 sh: ## Starts a bash session inside of the geth container
 	GETH_USER=$(GETH_USER) \
 		docker-compose run -u $(GETH_USER) --rm geth bash
+
+start-test-rpc-server:
+	testrpc --port 8555 --gasPrice 1
+
+test:
+	cd hello-contract && \
+		truffle migrate --network test && \
+		truffle test --network test
+
+deploy: 
+	cd hello-contract && \
+		truffle migrate --network development
+
+unlock:
+	GETH_USER=$(GETH_USER) \
+		GETH_NETWORK_ID=$(GETH_NETWORK_ID) \
+		COINBASE=$(COINBASE) \
+		docker-compose run -u $(GETH_USER) --rm geth \
+		geth --unlock $(COINBASE)
