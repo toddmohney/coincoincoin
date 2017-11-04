@@ -1,0 +1,15 @@
+{
+  "name": "HelloApp",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Say hello on a blockchain",
+  "repository": "https://github.com/toddmohney/gustcoin",
+  "license": "MIT",
+  "devDependencies": {},
+  "scripts": {},
+  "dependencies": {
+    "express": "^4.16.2",
+    "pug": "^2.0.0-rc.4",
+    "web3": "^1.0.0-beta.24"
+  }
+}

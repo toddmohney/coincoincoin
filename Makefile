@@ -2,10 +2,10 @@
 .DEFAULT_GOAL := help
 
 GETH_USER ?= "gustcoin"
-GETH_NETWORK_ID ?= 1978
+GETH_NETWORK_ID ?= 15
 
 # you're going to want to override this with your own address
-COINBASE ?= "31c552f7045abf6287e38c6eb719550d6b0ec1fc"
+COINBASE ?= "6f466bb3540e96436298c8cb8fb2f07c515f8068"
 
 help:
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -52,12 +52,12 @@ start-test-rpc-server:
 	testrpc --port 8555 --gasPrice 1
 
 test:
-	cd hello-contract && \
+	cd hello-app/contracts && \
 		truffle migrate --network test && \
 		truffle test --network test
 
 deploy: 
-	cd hello-contract && \
+	cd hello-app/contracts && \
 		truffle migrate --network development
 
 unlock:

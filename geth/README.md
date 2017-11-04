@@ -57,6 +57,24 @@ eth.accounts
 eth.getBalance("<address>")
 ```
 
+## Contract deployment
+
+In a terminal run
+
+```sh
+make console
+
+# personal.unlockAccount(<address>, <password>)
+```
+
+In another terminal run
+
+```sh
+# Make sure to record the addresses returned for each of
+# your deployed contracts!
+make deploy
+```
+
 ## Testing
 
 ```sh
