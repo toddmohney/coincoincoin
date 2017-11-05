@@ -211,6 +211,7 @@ pageSubscriptions page =
         Home _ ->
             Sub.batch
                 [ Ports.helloCountReceived (HomeMsg << Home.HelloCountReceived)
+                , Ports.helloTxReceived (HomeMsg << Home.HelloTxReceived)
                 ]
 
 

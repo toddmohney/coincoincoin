@@ -15,6 +15,7 @@ import Web3.Web3 as Web3 exposing (AccountAddress(..))
 type alias Model =
     { helloForm : HelloForm
     , helloCount : Maybe Int
+    , sayHelloResult : Maybe HelloResult
     }
 
 type alias HelloForm =
@@ -23,11 +24,15 @@ type alias HelloForm =
     , errors  : List String
     }
 
+type alias HelloResult =
+    { txHash : Maybe String
+    }
+
 
 init : Task PageLoadError Model
 init =
     Task.succeed
-        <| Model (HelloForm Nothing False []) Nothing
+        <| Model (HelloForm Nothing False []) Nothing Nothing
 
 
 
@@ -39,6 +44,7 @@ view model =
     div [ class "container" ]
         [ renderHelloForm model.helloForm
         , renderHelloCount model.helloCount
+        , renderSayHelloResult model.sayHelloResult
         ]
 
 renderHelloCount : Maybe Int -> Html Msg
@@ -50,6 +56,22 @@ renderHelloCount mCount =
                 []
                 [ text <| "You have said hello to the blockchain " ++ toString ct ++ " times."
                 ]
+
+renderSayHelloResult : Maybe HelloResult -> Html Msg
+renderSayHelloResult mResult =
+    case mResult of
+        Nothing -> div [] []
+        (Just result) ->
+            case result.txHash of
+                Nothing ->
+                    div
+                        [ class "text-danger" ]
+                        [ text "Missing tx hash!" ]
+                (Just txHash) ->
+                    div []
+                        [ div [ class "text-success" ] [ text "Tx received!" ]
+                        , text <| "Tx Hash " ++ txHash
+                        ]
 
 renderHelloForm : HelloForm -> Html Msg
 renderHelloForm form =
@@ -96,6 +118,7 @@ type Msg = AccountAddressInput String
          | GetHelloRequested
          | HelloCountReceived Int
          | SayHelloRequested
+         | HelloTxReceived String
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -125,6 +148,12 @@ update msg model =
         HelloCountReceived ct ->
             let
                 newModel = { model | helloCount = Just ct }
+            in
+                (newModel, Cmd.none)
+
+        HelloTxReceived txHash ->
+            let
+                newModel = { model | sayHelloResult = Just (HelloResult (Just txHash)) }
             in
                 (newModel, Cmd.none)
 
