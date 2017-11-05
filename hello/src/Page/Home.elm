@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Page.Errored as Errored exposing (PageLoadError, pageLoadError)
 import Ports as Ports
 import Task exposing (Task)
+import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
 
 -- MODEL --
@@ -17,15 +18,10 @@ type alias Model =
     }
 
 type alias HelloForm =
-    { address : Maybe Address
+    { address : Maybe AccountAddress
     , isValid : Bool
     , errors  : List String
     }
-
-type Address = Address String
-
-getAddress : Address -> String
-getAddress (Address addr) = addr
 
 
 init : Task PageLoadError Model
@@ -63,8 +59,8 @@ renderHelloForm form =
             [ input
                 [ class "form-control"
                 , type_ "text"
-                , placeholder "Address"
-                , onInput AddressInput
+                , placeholder "AccountAddress"
+                , onInput AccountAddressInput
                 ]
                 []
             , renderFormValidation form
@@ -96,7 +92,7 @@ renderFormValidation form =
 -- UPDATE --
 
 
-type Msg = AddressInput String
+type Msg = AccountAddressInput String
          | GetHelloRequested
          | HelloCountReceived Int
          | SayHelloRequested
@@ -105,10 +101,10 @@ type Msg = AddressInput String
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
     case msg of
-        AddressInput addr ->
+        AccountAddressInput addr ->
             let
                 form = model.helloForm
-                newForm = validateForm { form | address = Just (Address addr) }
+                newForm = validateForm { form | address = Just (Web3.mkAccountAddress addr) }
                 newModel = { model | helloForm = newForm }
             in (newModel, Cmd.none)
 
@@ -117,14 +113,14 @@ update msg model =
                 Nothing ->
                     (model, Cmd.none)
                 (Just addr) ->
-                    (model, Ports.sayHello <| getAddress addr)
+                    (model, Ports.sayHello <| Web3.getAccountAddress addr)
 
         GetHelloRequested ->
             case model.helloForm.address of
                 Nothing ->
                     (model, Cmd.none)
                 (Just addr) ->
-                    (model, Ports.getHelloCount <| getAddress addr)
+                    (model, Ports.getHelloCount <| Web3.getAccountAddress addr)
 
         HelloCountReceived ct ->
             let
@@ -141,18 +137,15 @@ validateForm form =
             , errors = ["Please enter your blockchain address"]
             }
         (Just addr) ->
-            if addrLength addr == addrLength sampleAddr
+            if addrLength addr == addrLength Web3.sampleAccountAddress
                 then
                     { form | isValid = True
                     , errors = []
                     }
                 else
                     { form | isValid = False
-                    , errors = ["Your blockchain address must be " ++ toString (addrLength sampleAddr) ++ " characters long"]
+                    , errors = ["Your blockchain address must be " ++ toString (addrLength Web3.sampleAccountAddress) ++ " characters long"]
                     }
 
-addrLength : Address -> Int
-addrLength (Address addr) = String.length addr
-
-sampleAddr : Address
-sampleAddr = Address "0x0000000000000000000000000000000000000000"
+addrLength : AccountAddress -> Int
+addrLength = String.length << Web3.getAccountAddress
