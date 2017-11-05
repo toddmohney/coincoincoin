@@ -6,6 +6,7 @@ import Navigation exposing (Location)
 import Page.Errored as Errored exposing (PageLoadError)
 import Page.Home as Home
 import Page.NotFound as NotFound
+import Ports as Ports
 import Route exposing (Route)
 import Task
 import Util exposing ((=>))
@@ -93,43 +94,6 @@ viewPage isLoading page =
 
 
 
--- SUBSCRIPTIONS --
--- Note: we aren't currently doing any page subscriptions, but I thought it would
--- be a good idea to put this in here as an example. If I were actually
--- maintaining this in production, I wouldn't bother until I needed this!
-
-
-subscriptions : Model -> Sub Msg
-subscriptions model = Sub.none
-
-
-getPage : PageState -> Page
-getPage pageState =
-    case pageState of
-        Loaded page ->
-            page
-
-        TransitioningFrom page ->
-            page
-
-
-pageSubscriptions : Page -> Sub Msg
-pageSubscriptions page =
-    case page of
-        Blank ->
-            Sub.none
-
-        Errored _ ->
-            Sub.none
-
-        NotFound ->
-            Sub.none
-
-        Home _ ->
-            Sub.none
-
-
-
 -- UPDATE --
 
 
@@ -205,6 +169,49 @@ updatePage page msg model =
         ( _, _ ) ->
             -- Disregard incoming messages that arrived for the wrong page
             model => Cmd.none
+
+
+
+-- SUBSCRIPTIONS --
+
+subscriptions : Model -> Sub Msg
+subscriptions model =
+    Sub.batch
+        [ pageSubscriptions (getPage model.pageState)
+        ]
+
+
+-- sessionChange : Sub (Maybe User)
+-- sessionChange =
+    -- Ports.onSessionChange (Decode.decodeValue User.decoder >> Result.toMaybe)
+
+
+getPage : PageState -> Page
+getPage pageState =
+    case pageState of
+        Loaded page ->
+            page
+
+        TransitioningFrom page ->
+            page
+
+
+pageSubscriptions : Page -> Sub Msg
+pageSubscriptions page =
+    case page of
+        Blank ->
+            Sub.none
+
+        Errored _ ->
+            Sub.none
+
+        NotFound ->
+            Sub.none
+
+        Home _ ->
+            Sub.batch
+                [ Ports.helloCountReceived (HomeMsg << Home.HelloCountReceived)
+                ]
 
 
 

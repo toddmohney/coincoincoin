@@ -56,8 +56,7 @@ app.ports.getHelloCount.subscribe(function(address) {
     from: address
   })
   .then((result) => {
-    console.log("getHellos result");
-    console.log(result)
+    app.ports.helloCountReceived.send(Number(result));
   });
 });
 
@@ -65,10 +64,28 @@ app.ports.sayHello.subscribe(function(address) {
   helloContract.methods.sayHello().send(
     {
       from: address,
-      gasPrice: '20000000000'
+      gasPrice: (20 * 1000000000).toString()
     }
-  ).then((result) => {
-    console.log("sayHello result");
-    console.log(result)
+  )
+  .once('transactionHash', (hash) => {
+    console.log("tx received", hash);
+    console.log("waiting for tx to be mined...");
+    app.ports.helloTxReceived.send(hash);
+  })
+  .once('receipt', (receipt) => {
+    console.log("tx receipt received", receipt);
+    app.ports.helloTxReceiptReceived.send(receipt);
+  })
+  .on('confirmation', (confNumber, receipt) => {
+    console.log("tx confirmed", confNumber, receipt);
+    app.ports.helloTxConfirmed.send(confNumber);
+  })
+  .on('error', (err) => {
+    console.log("error!", err);
+    app.ports.helloTxError.send(err);
+  })
+  .then((result) => {
+    console.log("our block has been mined!", result);
+    app.ports.helloTxMined.send(result);
   });
 });

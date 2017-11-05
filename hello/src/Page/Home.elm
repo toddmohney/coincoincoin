@@ -1,4 +1,4 @@
-module Page.Home exposing (Model, Msg, init, update, view)
+module Page.Home exposing (Model, Msg(..), init, update, view)
 
 import Html exposing (..)
 import Html.Attributes exposing (disabled, class, classList, placeholder, type_, value)
@@ -13,6 +13,7 @@ import Task exposing (Task)
 
 type alias Model =
     { helloForm : HelloForm
+    , helloCount : Maybe Int
     }
 
 type alias HelloForm =
@@ -30,8 +31,7 @@ getAddress (Address addr) = addr
 init : Task PageLoadError Model
 init =
     Task.succeed
-        <| Model
-        <| HelloForm Nothing False []
+        <| Model (HelloForm Nothing False []) Nothing
 
 
 
@@ -42,7 +42,18 @@ view : Model -> Html Msg
 view model =
     div [ class "container" ]
         [ renderHelloForm model.helloForm
+        , renderHelloCount model.helloCount
         ]
+
+renderHelloCount : Maybe Int -> Html Msg
+renderHelloCount mCount =
+    case mCount of
+        Nothing -> div [] []
+        (Just ct) ->
+            div
+                []
+                [ text <| "You have said hello to the blockchain " ++ toString ct ++ " times."
+                ]
 
 renderHelloForm : HelloForm -> Html Msg
 renderHelloForm form =
@@ -86,8 +97,9 @@ renderFormValidation form =
 
 
 type Msg = AddressInput String
-         | SayHelloRequested
          | GetHelloRequested
+         | HelloCountReceived Int
+         | SayHelloRequested
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -113,6 +125,12 @@ update msg model =
                     (model, Cmd.none)
                 (Just addr) ->
                     (model, Ports.getHelloCount <| getAddress addr)
+
+        HelloCountReceived ct ->
+            let
+                newModel = { model | helloCount = Just ct }
+            in
+                (newModel, Cmd.none)
 
 
 validateForm : HelloForm -> HelloForm
