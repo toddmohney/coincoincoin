@@ -1,9 +1,5 @@
-port module Ports exposing (onSessionChange, storeSession)
+port module Ports exposing (getHelloCount, sayHello)
 
-import Json.Encode exposing (Value)
+port getHelloCount : String -> Cmd msg
 
-
-port storeSession : Maybe String -> Cmd msg
-
-
-port onSessionChange : (Value -> msg) -> Sub msg
+port sayHello : String -> Cmd msg

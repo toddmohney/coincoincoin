@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (disabled, class, classList, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Page.Errored as Errored exposing (PageLoadError, pageLoadError)
+import Ports as Ports
 import Task exposing (Task)
 
 
@@ -21,6 +22,9 @@ type alias HelloForm =
     }
 
 type Address = Address String
+
+getAddress : Address -> String
+getAddress (Address addr) = addr
 
 
 init : Task PageLoadError Model
@@ -97,10 +101,18 @@ update msg model =
             in (newModel, Cmd.none)
 
         SayHelloRequested ->
-            (model, Cmd.none)
+            case model.helloForm.address of
+                Nothing ->
+                    (model, Cmd.none)
+                (Just addr) ->
+                    (model, Ports.sayHello <| getAddress addr)
 
         GetHelloRequested ->
-            (model, Cmd.none)
+            case model.helloForm.address of
+                Nothing ->
+                    (model, Cmd.none)
+                (Just addr) ->
+                    (model, Ports.getHelloCount <| getAddress addr)
 
 
 validateForm : HelloForm -> HelloForm

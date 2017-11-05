@@ -1,0 +1,19 @@
+{
+  "name": "Hello",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Say hello on a blockchain",
+  "repository": "https://github.com/toddmohney/gustcoin",
+  "license": "MIT",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-es2017": "^6.24.1",
+    "babelify": "^8.0.0",
+    "browserify": "^14.5.0",
+    "gulp": "^3.9.1"
+  },
+  "scripts": {},
+  "dependencies": {
+    "web3": "^1.0.0-beta.24"
+  }
+}
