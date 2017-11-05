@@ -1,7 +1,8 @@
 module Web3.Web3 exposing
     ( AccountAddress(..)
     , Address(..)
-    , decoder
+    , Tx
+    , txDecoder
     , getAddress
     , getAccountAddress
     , mkAccountAddress
@@ -60,8 +61,8 @@ type alias Tx =
     , transactionIndex  : Int
     }
 
-decoder : Decoder Tx
-decoder =
+txDecoder : Decoder Tx
+txDecoder =
     decode Tx
         |> required "blockHash" blockHashDecoder
         |> required "blockNumber" Decode.int

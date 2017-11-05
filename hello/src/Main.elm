@@ -11,6 +11,7 @@ import Route exposing (Route)
 import Task
 import Util exposing ((=>))
 import Views.Page as Page exposing (ActivePage)
+import Web3.Web3 as Web3
 
 
 -- WARNING: Based on discussions around how asset management features
@@ -212,6 +213,8 @@ pageSubscriptions page =
             Sub.batch
                 [ Ports.helloCountReceived (HomeMsg << Home.HelloCountReceived)
                 , Ports.helloTxReceived (HomeMsg << Home.HelloTxReceived)
+                , Ports.helloTxReceiptReceived (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txDecoder)
+                , Ports.helloTxConfirmed (HomeMsg << Home.HelloTxConfirmed)
                 ]
 
 

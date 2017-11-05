@@ -6,7 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Page.Errored as Errored exposing (PageLoadError, pageLoadError)
 import Ports as Ports
 import Task exposing (Task)
-import Web3.Web3 as Web3 exposing (AccountAddress(..))
+import Web3.Web3 as Web3 exposing (AccountAddress(..), Tx)
 
 
 -- MODEL --
@@ -18,6 +18,45 @@ type alias Model =
     , sayHelloResult : Maybe HelloResult
     }
 
+updateTxHash : Model -> String -> Model
+updateTxHash model txHash =
+    case model.sayHelloResult of
+        Nothing ->
+            let result = { defResult | txHash = Just txHash }
+            in
+                { model | sayHelloResult = Just result }
+
+        (Just helloResult) ->
+            let newResult = { helloResult | txHash = Just txHash }
+            in
+                { model | sayHelloResult = Just newResult }
+
+updateTx : Model -> Tx -> Model
+updateTx model tx =
+    case model.sayHelloResult of
+        Nothing ->
+            let result = { defResult | tx = Just tx }
+            in
+                { model | sayHelloResult = Just result }
+
+        (Just helloResult) ->
+            let newResult = { helloResult | tx = Just tx }
+            in
+                { model | sayHelloResult = Just newResult }
+
+updateTxConfirmations : Model -> Int -> Model
+updateTxConfirmations model ct =
+    case model.sayHelloResult of
+        Nothing ->
+            let result = { defResult | txConfirmations = ct }
+            in
+                { model | sayHelloResult = Just result }
+
+        (Just helloResult) ->
+            let newResult = { helloResult | txConfirmations = ct }
+            in
+                { model | sayHelloResult = Just newResult }
+
 type alias HelloForm =
     { address : Maybe AccountAddress
     , isValid : Bool
@@ -26,7 +65,12 @@ type alias HelloForm =
 
 type alias HelloResult =
     { txHash : Maybe String
+    , tx : Maybe Tx
+    , txConfirmations : Int
     }
+
+defResult : HelloResult
+defResult = HelloResult Nothing Nothing 0
 
 
 init : Task PageLoadError Model
@@ -43,6 +87,7 @@ view : Model -> Html Msg
 view model =
     div [ class "container" ]
         [ renderHelloForm model.helloForm
+        , hr [] []
         , renderHelloCount model.helloCount
         , renderSayHelloResult model.sayHelloResult
         ]
@@ -70,8 +115,21 @@ renderSayHelloResult mResult =
                 (Just txHash) ->
                     div []
                         [ div [ class "text-success" ] [ text "Tx received!" ]
-                        , text <| "Tx Hash " ++ txHash
+                        , div [] [ text <| "Tx Hash " ++ txHash ]
+                        , div [] [ text <| "Tx Confirmations " ++ toString result.txConfirmations ]
+                        , renderTx result.tx
                         ]
+
+renderTx : Maybe Tx -> Html Msg
+renderTx mTx =
+    case mTx of
+        Nothing ->
+            div [ class "text-warning" ] [ text "Waiting for tx to be mined" ]
+        (Just tx) ->
+            div []
+                [ div [] [ text "Tx mined!" ]
+                , pre [] [ text << String.join "\n" << String.split "," <| toString tx ]
+                ]
 
 renderHelloForm : HelloForm -> Html Msg
 renderHelloForm form =
@@ -119,6 +177,8 @@ type Msg = AccountAddressInput String
          | HelloCountReceived Int
          | SayHelloRequested
          | HelloTxReceived String
+         | HelloTxReceiptReceived (Result String Tx)
+         | HelloTxConfirmed Int
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -129,7 +189,8 @@ update msg model =
                 form = model.helloForm
                 newForm = validateForm { form | address = Just (Web3.mkAccountAddress addr) }
                 newModel = { model | helloForm = newForm }
-            in (newModel, Cmd.none)
+            in
+                (newModel, Cmd.none)
 
         SayHelloRequested ->
             case model.helloForm.address of
@@ -146,16 +207,24 @@ update msg model =
                     (model, Ports.getHelloCount <| Web3.getAccountAddress addr)
 
         HelloCountReceived ct ->
-            let
-                newModel = { model | helloCount = Just ct }
-            in
-                (newModel, Cmd.none)
+            let newModel = { model | helloCount = Just ct }
+            in (newModel, Cmd.none)
 
         HelloTxReceived txHash ->
-            let
-                newModel = { model | sayHelloResult = Just (HelloResult (Just txHash)) }
-            in
-                (newModel, Cmd.none)
+            let newModel = updateTxHash model txHash
+            in (newModel, Cmd.none)
+
+        HelloTxConfirmed txCt ->
+            let newModel = updateTxConfirmations model txCt
+            in (newModel, Cmd.none)
+
+        HelloTxReceiptReceived result ->
+            case result of
+                (Err err) ->
+                    Debug.log err (model, Cmd.none)
+                (Ok tx) ->
+                    let newModel = updateTx model tx
+                    in (newModel, Cmd.none)
 
 
 validateForm : HelloForm -> HelloForm
