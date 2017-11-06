@@ -1,12 +1,18 @@
 module Web3.Web3 exposing
     ( AccountAddress(..)
     , Address(..)
+    , TxHash(..)
     , Tx
+    , TxReceipt
     , txDecoder
+    , txReceiptDecoder
     , getAddress
     , getAccountAddress
+    , getTxHash
     , mkAccountAddress
+    , mkTxHash
     , sampleAccountAddress
+    , sampleTxHash
     )
 
 import Json.Decode as Decode exposing (int, string, nullable, Decoder)
@@ -41,13 +47,51 @@ blockHashDecoder = Decode.map BlockAddress addressDecoder
 
 type TxHash = TxHash Address
 
-mkTxhash : String -> TxHash
-mkTxhash = TxHash << Address
+mkTxHash : String -> TxHash
+mkTxHash = TxHash << Address
+
+getTxHash : TxHash -> String
+getTxHash (TxHash addr) = getAddress addr
 
 txHashDecoder : Decoder TxHash
 txHashDecoder = Decode.map TxHash addressDecoder
 
 type alias Tx =
+    { blockHash        : BlockAddress
+    , blockNumber      : Maybe Int
+    , from             : AccountAddress
+    , to               : AccountAddress
+    , gas              : Int
+    , gasPrice         : String
+    , transactionHash  : TxHash
+    , input            : String
+    , nonce            : Int
+    , r                : String
+    , s                : String
+    , v                : String
+    , transactionIndex : Int
+    , value            : String
+    }
+
+txDecoder : Decoder Tx
+txDecoder =
+    decode Tx
+        |> required "blockHash" blockHashDecoder
+        |> required "blockNumber" (nullable Decode.int)
+        |> required "from" accountDecoder
+        |> required "to" accountDecoder
+        |> required "gas" Decode.int
+        |> required "gasPrice" Decode.string
+        |> required "hash" txHashDecoder
+        |> required "input" Decode.string
+        |> required "nonce" Decode.int
+        |> required "r" Decode.string
+        |> required "s" Decode.string
+        |> required "v" Decode.string
+        |> required "transactionIndex" Decode.int
+        |> required "value" Decode.string
+
+type alias TxReceipt =
     { blockHash         : BlockAddress
     , blockNumber       : Int
     , contractAddress   : Maybe String
@@ -61,9 +105,9 @@ type alias Tx =
     , transactionIndex  : Int
     }
 
-txDecoder : Decoder Tx
-txDecoder =
-    decode Tx
+txReceiptDecoder : Decoder TxReceipt
+txReceiptDecoder =
+    decode TxReceipt
         |> required "blockHash" blockHashDecoder
         |> required "blockNumber" Decode.int
         |> required "contractAddress" (nullable string)
@@ -78,3 +122,6 @@ txDecoder =
 
 sampleAccountAddress : AccountAddress
 sampleAccountAddress = mkAccountAddress "0x0000000000000000000000000000000000000000"
+
+sampleTxHash : TxHash
+sampleTxHash = mkTxHash "0x0000000000000000000000000000000000000000000000000000000000000000"

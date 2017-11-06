@@ -1,6 +1,6 @@
 const Web3 = require("web3");
 
-var web3 = new Web3(Web3.givenProvider || 'http://localhost:8545');
+var web3 = new Web3(Web3.givenProvider || 'ws://localhost:8546');
 var helloContractAddr = '0x32c9e197951a3674aab69a5df245a27069fb6e5d';
 var contractAbi = [
   {
@@ -51,6 +51,14 @@ const helloContract = new web3.eth.Contract(contractAbi, helloContractAddr);
 
 const app = Elm.Main.fullscreen(localStorage.session || null);
 
+app.ports.getTx.subscribe((txhash) => {
+  web3.eth.getTransaction(txhash)
+    .then((tx) => {
+      console.log("tx received", tx);
+      app.ports.txReceived.send(tx);
+    });
+});
+
 app.ports.getHelloCount.subscribe(function(address) {
   helloContract.methods.getHellos().call({
     from: address
@@ -60,11 +68,12 @@ app.ports.getHelloCount.subscribe(function(address) {
   });
 });
 
-app.ports.sayHello.subscribe(function(address) {
+app.ports.sayHello.subscribe(function(req) {
+  console.log("sayHello", req);
   helloContract.methods.sayHello().send(
     {
-      from: address,
-      gasPrice: (20 * 1000000000).toString()
+      from: req.address,
+      gasPrice: req.gasPrice.toString()
     }
   )
   .once('transactionHash', (hash) => {

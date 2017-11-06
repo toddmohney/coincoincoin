@@ -1,20 +1,31 @@
 port module Ports exposing
-    ( getHelloCount
+    ( SayHelloRequest
+    , getHelloCount
+    , getTx
     , helloCountReceived
-    , sayHello
-    , helloTxReceived
-    , helloTxReceiptReceived
     , helloTxConfirmed
-    , helloTxMined
     , helloTxError
+    , helloTxMined
+    , helloTxReceiptReceived
+    , helloTxReceived
+    , sayHello
+    , txReceived
     )
 
 import Json.Encode exposing (Value)
 
+type alias SayHelloRequest =
+    { address : String
+    , gasPrice : Int
+    }
+
+port getTx : String -> Cmd msg
+port txReceived : (Value -> msg) -> Sub msg
+
 port getHelloCount : String -> Cmd msg
 port helloCountReceived : (Int -> msg) -> Sub msg
 
-port sayHello : String -> Cmd msg
+port sayHello : SayHelloRequest -> Cmd msg
 port helloTxReceived : (String -> msg) -> Sub msg
 port helloTxReceiptReceived : (Value -> msg) -> Sub msg
 port helloTxConfirmed : (Int -> msg) -> Sub msg

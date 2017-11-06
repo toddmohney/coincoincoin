@@ -213,10 +213,11 @@ pageSubscriptions page =
             Sub.batch
                 [ Ports.helloCountReceived (HomeMsg << Home.HelloCountReceived)
                 , Ports.helloTxReceived (HomeMsg << Home.HelloTxReceived)
-                , Ports.helloTxReceiptReceived (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txDecoder)
-                , Ports.helloTxMined (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txDecoder)
+                , Ports.helloTxReceiptReceived (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
+                , Ports.helloTxMined (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
                 , Ports.helloTxConfirmed (HomeMsg << Home.HelloTxConfirmed)
                 , Ports.helloTxError (HomeMsg << Home.HelloTxError)
+                , Ports.txReceived (HomeMsg << Home.TxReceived << Decode.decodeValue Web3.txDecoder)
                 ]
 
 
