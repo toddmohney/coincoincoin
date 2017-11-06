@@ -214,7 +214,9 @@ pageSubscriptions page =
                 [ Ports.helloCountReceived (HomeMsg << Home.HelloCountReceived)
                 , Ports.helloTxReceived (HomeMsg << Home.HelloTxReceived)
                 , Ports.helloTxReceiptReceived (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txDecoder)
+                , Ports.helloTxMined (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txDecoder)
                 , Ports.helloTxConfirmed (HomeMsg << Home.HelloTxConfirmed)
+                , Ports.helloTxError (HomeMsg << Home.HelloTxError)
                 ]
 
 

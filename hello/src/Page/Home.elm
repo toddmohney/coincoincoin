@@ -3,6 +3,7 @@ module Page.Home exposing (Model, Msg(..), init, update, view)
 import Html exposing (..)
 import Html.Attributes exposing (disabled, class, classList, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Json.Encode exposing (Value)
 import Page.Errored as Errored exposing (PageLoadError, pageLoadError)
 import Ports as Ports
 import Task exposing (Task)
@@ -179,6 +180,7 @@ type Msg = AccountAddressInput String
          | HelloTxReceived String
          | HelloTxReceiptReceived (Result String Tx)
          | HelloTxConfirmed Int
+         | HelloTxError Value
 
 
 update : Msg -> Model -> (Model, Cmd Msg)
@@ -225,6 +227,9 @@ update msg model =
                 (Ok tx) ->
                     let newModel = updateTx model tx
                     in (newModel, Cmd.none)
+
+        HelloTxError err ->
+            Debug.log "Error!" (model, Cmd.none)
 
 
 validateForm : HelloForm -> HelloForm

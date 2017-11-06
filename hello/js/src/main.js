@@ -87,5 +87,9 @@ app.ports.sayHello.subscribe(function(address) {
   .then((result) => {
     console.log("our block has been mined!", result);
     app.ports.helloTxMined.send(result);
+  })
+  .catch((err) => {
+    console.log("error caught!", err);
+    app.ports.helloTxError.send(err);
   });
 });
