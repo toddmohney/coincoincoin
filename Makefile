@@ -52,12 +52,12 @@ start-test-rpc-server:
 	testrpc --port 8555 --gasPrice 1
 
 test:
-	cd hello-app/contracts && \
+	cd hello/contracts && \
 		truffle migrate --network test && \
 		truffle test --network test
 
-deploy: 
-	cd hello-app/contracts && \
+deploy:
+	cd hello/contracts && \
 		truffle migrate --network development
 
 unlock:
