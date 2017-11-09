@@ -11,7 +11,8 @@
     "babelify": "^8.0.0",
     "browserify": "^14.5.0",
     "gulp": "^3.9.1",
-    "q": "^1.5.1"
+    "q": "^1.5.1",
+    "ramda": "^0.25.0"
   },
   "scripts": {},
   "dependencies": {
