@@ -118,11 +118,26 @@ init =
 view : Model -> Html Msg
 view model =
     div [ class "container" ]
+        [ div
+            [ class "row" ]
+            [ renderHelloContainer model
+            , renderTxContainer model
+            ]
+        ]
+
+renderHelloContainer : Model -> Html Msg
+renderHelloContainer model =
+    div [ class "col-md-6" ]
         [ renderHelloForm model.helloForm
         , hr [] []
         , renderHelloCount model.helloCount
         , renderSayHelloResult model.sayHelloResult
-        , renderTxForm model.txForm
+        ]
+
+renderTxContainer : Model -> Html Msg
+renderTxContainer model =
+    div [ class "col-md-6" ]
+        [ renderTxForm model.txForm
         , renderTx model.txResult
         ]
 
