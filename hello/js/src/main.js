@@ -1,53 +1,10 @@
 const Web3 = require("web3");
 
-var web3 = new Web3(Web3.givenProvider || 'ws://localhost:8546');
-var helloContractAddr = '0x32c9e197951a3674aab69a5df245a27069fb6e5d';
-var contractAbi = [
-  {
-    "constant": true,
-    "inputs": [],
-    "name": "getHellos",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "constant": false,
-    "inputs": [],
-    "name": "sayHello",
-    "outputs": [],
-    "payable": false,
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "constant": true,
-    "inputs": [
-      {
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "hellos",
-    "outputs": [
-      {
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "payable": false,
-    "stateMutability": "view",
-    "type": "function"
-  }
-];
+const { helloContract } = require("./helloContract.js");
+const { congressContract } = require("./congressContract.js");
 
-const helloContract = new web3.eth.Contract(contractAbi, helloContractAddr);
+const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8546');
+
 
 const app = Elm.Main.fullscreen(localStorage.session || null);
 
@@ -59,7 +16,7 @@ app.ports.getTx.subscribe((txhash) => {
     });
 });
 
-app.ports.getHelloCount.subscribe(function(address) {
+app.ports.getHelloCount.subscribe((address) => {
   helloContract.methods.getHellos().call({
     from: address
   })
@@ -68,7 +25,7 @@ app.ports.getHelloCount.subscribe(function(address) {
   });
 });
 
-app.ports.sayHello.subscribe(function(req) {
+app.ports.sayHello.subscribe((req) => {
   console.log("sayHello", req);
   helloContract.methods.sayHello().send(
     {
