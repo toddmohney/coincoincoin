@@ -24,7 +24,7 @@ type Page
     = Blank
     | NotFound
     | Errored PageLoadError
-    | Home Home.Model
+    | Home Home.HomePage
 
 
 type PageState
@@ -73,25 +73,25 @@ viewPage isLoading page =
         frame =
             Page.frame isLoading
     in
-    case page of
-        NotFound ->
-            NotFound.view
-                |> frame Page.Other
+        case page of
+            NotFound ->
+                NotFound.view
+                    |> frame Page.Other
 
-        Blank ->
-            -- This is for the very initial page load, while we are loading
-            -- data via HTTP. We could also render a spinner here.
-            Html.text ""
-                |> frame Page.Other
+            Blank ->
+                -- This is for the very initial page load, while we are loading
+                -- data via HTTP. We could also render a spinner here.
+                Html.text ""
+                    |> frame Page.Other
 
-        Errored subModel ->
-            Errored.view subModel
-                |> frame Page.Other
+            Errored subModel ->
+                Errored.view subModel
+                    |> frame Page.Other
 
-        Home subModel ->
-            Home.view subModel
-                |> frame Page.Home
-                |> Html.map HomeMsg
+            Home subModel ->
+                Home.view subModel
+                    |> frame Page.Home
+                    |> Html.map HomeMsg
 
 
 
@@ -100,7 +100,7 @@ viewPage isLoading page =
 
 type Msg
     = SetRoute (Maybe Route)
-    | HomeLoaded (Result PageLoadError Home.Model)
+    | HomeLoaded (Result PageLoadError Home.HomePage)
     | HomeMsg Home.Msg
 
 
@@ -114,12 +114,12 @@ setRoute maybeRoute model =
         errored =
             pageErrored model
     in
-    case maybeRoute of
-        Nothing ->
-            { model | pageState = Loaded NotFound } => Cmd.none
+        case maybeRoute of
+            Nothing ->
+                { model | pageState = Loaded NotFound } => Cmd.none
 
-        Just Route.Home ->
-            transition HomeLoaded Home.init
+            Just Route.Home ->
+                transition HomeLoaded Home.init
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -128,7 +128,7 @@ pageErrored model activePage errorMessage =
         error =
             Errored.pageLoadError activePage errorMessage
     in
-    { model | pageState = Loaded (Errored error) } => Cmd.none
+        { model | pageState = Loaded (Errored error) } => Cmd.none
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -144,36 +144,37 @@ updatePage page msg model =
                 ( newModel, newCmd ) =
                     subUpdate subMsg subModel
             in
-            ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
+                ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
 
         errored =
             pageErrored model
     in
-    case ( msg, page ) of
-        ( SetRoute route, _ ) ->
-            setRoute route model
+        case ( msg, page ) of
+            ( SetRoute route, _ ) ->
+                setRoute route model
 
-        ( HomeLoaded (Ok subModel), _ ) ->
-            { model | pageState = Loaded (Home subModel) } => Cmd.none
+            ( HomeLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (Home subModel) } => Cmd.none
 
-        ( HomeLoaded (Err error), _ ) ->
-            { model | pageState = Loaded (Errored error) } => Cmd.none
+            ( HomeLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
 
-        ( HomeMsg subMsg, Home subModel ) ->
-            toPage Home HomeMsg Home.update subMsg subModel
+            ( HomeMsg subMsg, Home subModel ) ->
+                toPage Home HomeMsg Home.update subMsg subModel
 
-        ( _, NotFound ) ->
-            -- Disregard incoming messages when we're on the
-            -- NotFound page.
-            model => Cmd.none
+            ( _, NotFound ) ->
+                -- Disregard incoming messages when we're on the
+                -- NotFound page.
+                model => Cmd.none
 
-        ( _, _ ) ->
-            -- Disregard incoming messages that arrived for the wrong page
-            model => Cmd.none
+            ( _, _ ) ->
+                -- Disregard incoming messages that arrived for the wrong page
+                model => Cmd.none
 
 
 
 -- SUBSCRIPTIONS --
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -182,9 +183,10 @@ subscriptions model =
         ]
 
 
+
 -- sessionChange : Sub (Maybe User)
 -- sessionChange =
-    -- Ports.onSessionChange (Decode.decodeValue User.decoder >> Result.toMaybe)
+-- Ports.onSessionChange (Decode.decodeValue User.decoder >> Result.toMaybe)
 
 
 getPage : PageState -> Page
