@@ -1,77 +1,108 @@
-module Web3.Web3 exposing
-    ( AccountAddress(..)
-    , Address(..)
-    , TxHash(..)
-    , Tx
-    , TxReceipt
-    , txDecoder
-    , txReceiptDecoder
-    , getAddress
-    , getAccountAddress
-    , getTxHash
-    , mkAccountAddress
-    , mkTxHash
-    , sampleAccountAddress
-    , sampleTxHash
-    )
+module Web3.Web3
+    exposing
+        ( AccountAddress(..)
+        , Address(..)
+        , TxHash(..)
+        , Tx
+        , TxReceipt
+        , txDecoder
+        , txReceiptDecoder
+        , getAddress
+        , getAccountAddress
+        , getTxHash
+        , mkAccountAddress
+        , mkTxHash
+        , sampleAccountAddress
+        , sampleTxHash
+        )
 
 import Json.Decode as Decode exposing (int, string, nullable, Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 
-type Address = Address String
+
+type Address
+    = Address String
+
 
 getAddress : Address -> String
-getAddress (Address addr) = addr
+getAddress (Address addr) =
+    addr
+
 
 addressDecoder : Decoder Address
-addressDecoder = Decode.map Address Decode.string
+addressDecoder =
+    Decode.map Address Decode.string
 
-type AccountAddress = AccountAddress Address
+
+type AccountAddress
+    = AccountAddress Address
+
 
 mkAccountAddress : String -> AccountAddress
-mkAccountAddress = AccountAddress << Address
+mkAccountAddress =
+    AccountAddress << Address
+
 
 getAccountAddress : AccountAddress -> String
-getAccountAddress (AccountAddress addr) = getAddress addr
+getAccountAddress (AccountAddress addr) =
+    getAddress addr
+
 
 accountDecoder : Decoder AccountAddress
-accountDecoder = Decode.map AccountAddress addressDecoder
+accountDecoder =
+    Decode.map AccountAddress addressDecoder
 
-type BlockAddress = BlockAddress Address
+
+type BlockAddress
+    = BlockAddress Address
+
 
 mkBlockhash : String -> BlockAddress
-mkBlockhash = BlockAddress << Address
+mkBlockhash =
+    BlockAddress << Address
+
 
 blockHashDecoder : Decoder BlockAddress
-blockHashDecoder = Decode.map BlockAddress addressDecoder
+blockHashDecoder =
+    Decode.map BlockAddress addressDecoder
 
-type TxHash = TxHash Address
+
+type TxHash
+    = TxHash Address
+
 
 mkTxHash : String -> TxHash
-mkTxHash = TxHash << Address
+mkTxHash =
+    TxHash << Address
+
 
 getTxHash : TxHash -> String
-getTxHash (TxHash addr) = getAddress addr
+getTxHash (TxHash addr) =
+    getAddress addr
+
 
 txHashDecoder : Decoder TxHash
-txHashDecoder = Decode.map TxHash addressDecoder
+txHashDecoder =
+    Decode.map TxHash addressDecoder
+
 
 type alias Tx =
-    { blockHash        : BlockAddress
-    , blockNumber      : Maybe Int
-    , from             : AccountAddress
-    , to               : AccountAddress
-    , gas              : Int
-    , gasPrice         : String
-    , transactionHash  : TxHash
-    , input            : String
-    , nonce            : Int
-    , r                : String
-    , s                : String
-    , v                : String
+    { blockHash : BlockAddress
+    , blockNumber : Maybe Int
+    , from : AccountAddress
+    , to : AccountAddress
+    , gas : Int
+    , gasPrice : String
+    , transactionHash : TxHash
+    , input : String
+    , nonce : Int
+    , r : String
+    , s : String
+    , v : String
     , transactionIndex : Int
-    , value            : String
+    , value : String
     }
+
 
 txDecoder : Decoder Tx
 txDecoder =
@@ -91,19 +122,21 @@ txDecoder =
         |> required "transactionIndex" Decode.int
         |> required "value" Decode.string
 
+
 type alias TxReceipt =
-    { blockHash         : BlockAddress
-    , blockNumber       : Int
-    , contractAddress   : Maybe String
+    { blockHash : BlockAddress
+    , blockNumber : Int
+    , contractAddress : Maybe String
     , cumulativeGasUsed : Int
-    , from              : AccountAddress
-    , gasUsed           : Int
-    , logsBloom         : String
-    , root              : BlockAddress
-    , to                : AccountAddress
-    , transactionHash   : TxHash
-    , transactionIndex  : Int
+    , from : AccountAddress
+    , gasUsed : Int
+    , logsBloom : String
+    , root : BlockAddress
+    , to : AccountAddress
+    , transactionHash : TxHash
+    , transactionIndex : Int
     }
+
 
 txReceiptDecoder : Decoder TxReceipt
 txReceiptDecoder =
@@ -120,8 +153,12 @@ txReceiptDecoder =
         |> required "transactionHash" txHashDecoder
         |> required "transactionIndex" Decode.int
 
+
 sampleAccountAddress : AccountAddress
-sampleAccountAddress = mkAccountAddress "0x0000000000000000000000000000000000000000"
+sampleAccountAddress =
+    mkAccountAddress "0x0000000000000000000000000000000000000000"
+
 
 sampleTxHash : TxHash
-sampleTxHash = mkTxHash "0x0000000000000000000000000000000000000000000000000000000000000000"
+sampleTxHash =
+    mkTxHash "0x0000000000000000000000000000000000000000000000000000000000000000"
