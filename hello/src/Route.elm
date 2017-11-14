@@ -11,12 +11,14 @@ import UrlParser as Url exposing (Parser, oneOf, parseHash, s)
 
 type Route
     = Home
+    | Blockocracy
 
 
 route : Parser (Route -> a) a
 route =
     oneOf
         [ Url.map Home (s "")
+        , Url.map Blockocracy (s "blockocracy")
         ]
 
 
@@ -31,8 +33,11 @@ routeToString page =
             case page of
                 Home ->
                     []
+
+                Blockocracy ->
+                    [ "blockocracy" ]
     in
-    "#/" ++ String.join "/" pieces
+        "#/" ++ String.join "/" pieces
 
 
 

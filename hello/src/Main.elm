@@ -4,6 +4,7 @@ import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
 import Page.Errored as Errored exposing (PageLoadError)
+import Page.Blockocracy as Blockocracy
 import Page.Home as Home
 import Page.NotFound as NotFound
 import Ports as Ports
@@ -25,6 +26,7 @@ type Page
     | NotFound
     | Errored PageLoadError
     | Home Home.HomePage
+    | Blockocracy Blockocracy.BlockocracyPage
 
 
 type PageState
@@ -93,15 +95,22 @@ viewPage isLoading page =
                     |> frame Page.Home
                     |> Html.map HomeMsg
 
+            Blockocracy subModel ->
+                Blockocracy.view subModel
+                    |> frame Page.Blockocracy
+                    |> Html.map BlockocracyMsg
+
 
 
 -- UPDATE --
 
 
 type Msg
-    = SetRoute (Maybe Route)
+    = BlockocracyLoaded (Result PageLoadError Blockocracy.BlockocracyPage)
+    | BlockocracyMsg Blockocracy.Msg
     | HomeLoaded (Result PageLoadError Home.HomePage)
     | HomeMsg Home.Msg
+    | SetRoute (Maybe Route)
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -120,6 +129,9 @@ setRoute maybeRoute model =
 
             Just Route.Home ->
                 transition HomeLoaded Home.init
+
+            Just Route.Blockocracy ->
+                transition BlockocracyLoaded Blockocracy.init
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -161,6 +173,15 @@ updatePage page msg model =
 
             ( HomeMsg subMsg, Home subModel ) ->
                 toPage Home HomeMsg Home.update subMsg subModel
+
+            ( BlockocracyLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (Blockocracy subModel) } => Cmd.none
+
+            ( BlockocracyLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( BlockocracyMsg subMsg, Blockocracy subModel ) ->
+                toPage Blockocracy BlockocracyMsg Blockocracy.update subMsg subModel
 
             ( _, NotFound ) ->
                 -- Disregard incoming messages when we're on the
@@ -221,6 +242,9 @@ pageSubscriptions page =
                 , Ports.helloTxError (HomeMsg << Home.HelloTxError)
                 , Ports.txReceived (HomeMsg << Home.TxReceived << Decode.decodeValue Web3.txDecoder)
                 ]
+
+        Blockocracy _ ->
+            Sub.none
 
 
 
