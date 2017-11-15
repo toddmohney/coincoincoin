@@ -1,4 +1,4 @@
-module Data.Form
+module Forms.Model
     exposing
         ( Form
         , errorsLens

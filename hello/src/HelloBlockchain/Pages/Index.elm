@@ -1,11 +1,11 @@
-module Page.Home exposing (HomePage, Msg(..), init, update, view)
+module HelloBlockchain.Pages.Index exposing (HelloBlockchainPage, Msg(..), init, update, view)
 
+import Errors.Pages.Errored as Errored exposing (PageLoadError, pageLoadError)
+import HelloBlockchain.Ports as Ports exposing (SayHelloRequest)
 import Html exposing (..)
 import Html.Attributes exposing (disabled, class, classList, for, name, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Encode exposing (Value)
-import Page.Errored as Errored exposing (PageLoadError, pageLoadError)
-import Ports as Ports exposing (SayHelloRequest)
 import Task exposing (Task)
 import Web3.Web3 as Web3 exposing (AccountAddress(..), TxHash(..), Tx, TxReceipt)
 
@@ -13,7 +13,7 @@ import Web3.Web3 as Web3 exposing (AccountAddress(..), TxHash(..), Tx, TxReceipt
 -- MODEL --
 
 
-type alias HomePage =
+type alias HelloBlockchainPage =
     { helloForm : HelloForm
     , helloCount : Maybe Int
     , sayHelloResult : Maybe HelloResult
@@ -22,7 +22,7 @@ type alias HomePage =
     }
 
 
-updateTxHash : HomePage -> String -> HomePage
+updateTxHash : HelloBlockchainPage -> String -> HelloBlockchainPage
 updateTxHash model txHash =
     let
         newHelloResult =
@@ -36,7 +36,7 @@ updateTxHash model txHash =
         { model | sayHelloResult = Just newHelloResult }
 
 
-updateHelloResult : HomePage -> TxReceipt -> HomePage
+updateHelloResult : HelloBlockchainPage -> TxReceipt -> HelloBlockchainPage
 updateHelloResult model tx =
     let
         newResult =
@@ -50,7 +50,7 @@ updateHelloResult model tx =
         { model | sayHelloResult = Just newResult }
 
 
-updateTxResult : HomePage -> Tx -> HomePage
+updateTxResult : HelloBlockchainPage -> Tx -> HelloBlockchainPage
 updateTxResult model tx =
     let
         newResult =
@@ -64,7 +64,7 @@ updateTxResult model tx =
         { model | txResult = Just newResult }
 
 
-updateTxConfirmations : HomePage -> Int -> HomePage
+updateTxConfirmations : HelloBlockchainPage -> Int -> HelloBlockchainPage
 updateTxConfirmations model ct =
     let
         newResult =
@@ -120,17 +120,17 @@ type alias TxResult =
     }
 
 
-init : Task PageLoadError HomePage
+init : Task PageLoadError HelloBlockchainPage
 init =
     Task.succeed <|
-        HomePage defHelloForm Nothing Nothing defTxForm Nothing
+        HelloBlockchainPage defHelloForm Nothing Nothing defTxForm Nothing
 
 
 
 -- VIEW --
 
 
-view : HomePage -> Html Msg
+view : HelloBlockchainPage -> Html Msg
 view model =
     div [ class "container" ]
         [ div
@@ -141,7 +141,7 @@ view model =
         ]
 
 
-renderHelloContainer : HomePage -> Html Msg
+renderHelloContainer : HelloBlockchainPage -> Html Msg
 renderHelloContainer model =
     div [ class "col-md-6" ]
         [ renderHelloForm model.helloForm
@@ -151,7 +151,7 @@ renderHelloContainer model =
         ]
 
 
-renderTxContainer : HomePage -> Html Msg
+renderTxContainer : HelloBlockchainPage -> Html Msg
 renderTxContainer model =
     div [ class "col-md-6" ]
         [ renderTxForm model.txForm
@@ -311,7 +311,7 @@ type Msg
     | TxReceived (Result String Tx)
 
 
-update : Msg -> HomePage -> ( HomePage, Cmd Msg )
+update : Msg -> HelloBlockchainPage -> ( HelloBlockchainPage, Cmd Msg )
 update msg model =
     case msg of
         AccountAddressInput addr ->
@@ -322,10 +322,10 @@ update msg model =
                 newForm =
                     validateHelloForm { form | address = Just (Web3.mkAccountAddress addr) }
 
-                newHomePage =
+                newPage =
                     { model | helloForm = newForm }
             in
-                ( newHomePage, Cmd.none )
+                ( newPage, Cmd.none )
 
         GasPriceInput price ->
             let
@@ -340,10 +340,10 @@ update msg model =
                         Ok p ->
                             validateHelloForm { form | gasPrice = p }
 
-                newHomePage =
+                newPage =
                     { model | helloForm = newForm }
             in
-                ( newHomePage, Cmd.none )
+                ( newPage, Cmd.none )
 
         TxAddressInput addr ->
             let
@@ -353,10 +353,10 @@ update msg model =
                 newForm =
                     validateTxForm { form | tx = Just (Web3.mkTxHash addr) }
 
-                newHomePage =
+                newPage =
                     { model | txForm = newForm }
             in
-                ( newHomePage, Cmd.none )
+                ( newPage, Cmd.none )
 
         SayHelloRequested ->
             case model.helloForm.address of
@@ -380,24 +380,24 @@ update msg model =
 
         HelloCountReceived ct ->
             let
-                newHomePage =
+                newPage =
                     { model | helloCount = Just ct }
             in
-                ( newHomePage, Cmd.none )
+                ( newPage, Cmd.none )
 
         HelloTxReceived txHash ->
             let
-                newHomePage =
+                newPage =
                     updateTxHash model txHash
             in
-                ( newHomePage, Cmd.none )
+                ( newPage, Cmd.none )
 
         HelloTxConfirmed txCt ->
             let
-                newHomePage =
+                newPage =
                     updateTxConfirmations model txCt
             in
-                ( newHomePage, Cmd.none )
+                ( newPage, Cmd.none )
 
         HelloTxReceiptReceived result ->
             case result of
@@ -406,10 +406,10 @@ update msg model =
 
                 Ok tx ->
                     let
-                        newHomePage =
+                        newPage =
                             updateHelloResult model tx
                     in
-                        ( newHomePage, Cmd.none )
+                        ( newPage, Cmd.none )
 
         HelloTxError err ->
             Debug.log "Error!" ( model, Cmd.none )
@@ -431,10 +431,10 @@ update msg model =
 
                 Ok tx ->
                     let
-                        newHomePage =
+                        newPage =
                             updateTxResult model tx
                     in
-                        ( newHomePage, Cmd.none )
+                        ( newPage, Cmd.none )
 
 
 validateTxForm : TxForm -> TxForm

@@ -1,11 +1,11 @@
-module Page.Blockocracy exposing (BlockocracyPage, Msg(..), init, update, view)
+module Blockocracy.Pages.Index exposing (BlockocracyPage, Msg(..), init, update, view)
 
-import Data.Form as Form
+import Forms.Model
     exposing
         ( Form
         , errorsLens
         )
-import Data.Proposal as Prop
+import Blockocracy.Proposal as Prop
     exposing
         ( Proposal
         , beneficiaryLens
@@ -17,7 +17,7 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Task exposing (Task)
-import Page.Errored as Errored exposing (PageLoadError, pageLoadError)
+import Errors.Pages.Errored as Errored exposing (PageLoadError, pageLoadError)
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
 

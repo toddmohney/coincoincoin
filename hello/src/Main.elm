@@ -1,13 +1,13 @@
 module Main exposing (main)
 
+import Blockocracy.Pages.Index as Blockocracy
+import Errors.Pages.Errored as Errored exposing (PageLoadError)
+import Errors.Pages.NotFound as NotFound
+import HelloBlockchain.Pages.Index as HBC
+import HelloBlockchain.Ports as Ports
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
-import Page.Errored as Errored exposing (PageLoadError)
-import Page.Blockocracy as Blockocracy
-import Page.Home as Home
-import Page.NotFound as NotFound
-import Ports as Ports
 import Route exposing (Route)
 import Task
 import Util exposing ((=>))
@@ -25,7 +25,7 @@ type Page
     = Blank
     | NotFound
     | Errored PageLoadError
-    | Home Home.HomePage
+    | Home HBC.HelloBlockchainPage
     | Blockocracy Blockocracy.BlockocracyPage
 
 
@@ -91,7 +91,7 @@ viewPage isLoading page =
                     |> frame Page.Other
 
             Home subModel ->
-                Home.view subModel
+                HBC.view subModel
                     |> frame Page.Home
                     |> Html.map HomeMsg
 
@@ -108,8 +108,8 @@ viewPage isLoading page =
 type Msg
     = BlockocracyLoaded (Result PageLoadError Blockocracy.BlockocracyPage)
     | BlockocracyMsg Blockocracy.Msg
-    | HomeLoaded (Result PageLoadError Home.HomePage)
-    | HomeMsg Home.Msg
+    | HomeLoaded (Result PageLoadError HBC.HelloBlockchainPage)
+    | HomeMsg HBC.Msg
     | SetRoute (Maybe Route)
 
 
@@ -128,7 +128,7 @@ setRoute maybeRoute model =
                 { model | pageState = Loaded NotFound } => Cmd.none
 
             Just Route.Home ->
-                transition HomeLoaded Home.init
+                transition HomeLoaded HBC.init
 
             Just Route.Blockocracy ->
                 transition BlockocracyLoaded Blockocracy.init
@@ -172,7 +172,7 @@ updatePage page msg model =
                 { model | pageState = Loaded (Errored error) } => Cmd.none
 
             ( HomeMsg subMsg, Home subModel ) ->
-                toPage Home HomeMsg Home.update subMsg subModel
+                toPage Home HomeMsg HBC.update subMsg subModel
 
             ( BlockocracyLoaded (Ok subModel), _ ) ->
                 { model | pageState = Loaded (Blockocracy subModel) } => Cmd.none
@@ -234,13 +234,13 @@ pageSubscriptions page =
 
         Home _ ->
             Sub.batch
-                [ Ports.helloCountReceived (HomeMsg << Home.HelloCountReceived)
-                , Ports.helloTxReceived (HomeMsg << Home.HelloTxReceived)
-                , Ports.helloTxReceiptReceived (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
-                , Ports.helloTxMined (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
-                , Ports.helloTxConfirmed (HomeMsg << Home.HelloTxConfirmed)
-                , Ports.helloTxError (HomeMsg << Home.HelloTxError)
-                , Ports.txReceived (HomeMsg << Home.TxReceived << Decode.decodeValue Web3.txDecoder)
+                [ Ports.helloCountReceived (HomeMsg << HBC.HelloCountReceived)
+                , Ports.helloTxReceived (HomeMsg << HBC.HelloTxReceived)
+                , Ports.helloTxReceiptReceived (HomeMsg << HBC.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
+                , Ports.helloTxMined (HomeMsg << HBC.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
+                , Ports.helloTxConfirmed (HomeMsg << HBC.HelloTxConfirmed)
+                , Ports.helloTxError (HomeMsg << HBC.HelloTxError)
+                , Ports.txReceived (HomeMsg << HBC.TxReceived << Decode.decodeValue Web3.txDecoder)
                 ]
 
         Blockocracy _ ->

@@ -1,4 +1,4 @@
-module Data.Proposal
+module Blockocracy.Proposal
     exposing
         ( Proposal
         , beneficiaryLens
@@ -8,7 +8,7 @@ module Data.Proposal
         , weiGasPriceLens
         )
 
-import Data.Form exposing (..)
+import Forms.Model exposing (..)
 import Monocle.Lens exposing (..)
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
