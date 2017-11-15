@@ -1,6 +1,8 @@
 module Main exposing (main)
 
 import Blockocracy.Pages.Index as Blockocracy
+import Blockocracy.Admin.Pages.Members as BlockocracyAdmin
+import Blockocracy.Views.Page as BVP
 import Errors.Pages.Errored as Errored exposing (PageLoadError)
 import Errors.Pages.NotFound as NotFound
 import HelloBlockchain.Pages.Index as HBC
@@ -26,7 +28,13 @@ type Page
     | NotFound
     | Errored PageLoadError
     | Home HBC.HelloBlockchainPage
-    | Blockocracy Blockocracy.BlockocracyPage
+    | Blockocracy Blockocracy.Page
+    | BlockocracyAdminMembers BlockocracyAdmin.Page
+
+
+type BlockocracyPage
+    = Index
+    | AdminMembers
 
 
 type PageState
@@ -97,8 +105,15 @@ viewPage isLoading page =
 
             Blockocracy subModel ->
                 Blockocracy.view subModel
+                    |> BVP.frame BVP.Index
                     |> frame Page.Blockocracy
                     |> Html.map BlockocracyMsg
+
+            BlockocracyAdminMembers subModel ->
+                BlockocracyAdmin.view subModel
+                    |> BVP.frame BVP.Admin
+                    |> frame Page.Blockocracy
+                    |> Html.map BlockocracyAdminMembersMsg
 
 
 
@@ -106,8 +121,10 @@ viewPage isLoading page =
 
 
 type Msg
-    = BlockocracyLoaded (Result PageLoadError Blockocracy.BlockocracyPage)
+    = BlockocracyLoaded (Result PageLoadError Blockocracy.Page)
+    | BlockocracyAdminMembersLoaded (Result PageLoadError BlockocracyAdmin.Page)
     | BlockocracyMsg Blockocracy.Msg
+    | BlockocracyAdminMembersMsg BlockocracyAdmin.Msg
     | HomeLoaded (Result PageLoadError HBC.HelloBlockchainPage)
     | HomeMsg HBC.Msg
     | SetRoute (Maybe Route)
@@ -132,6 +149,9 @@ setRoute maybeRoute model =
 
             Just Route.Blockocracy ->
                 transition BlockocracyLoaded Blockocracy.init
+
+            Just Route.BlockocracyAdminMembers ->
+                transition BlockocracyAdminMembersLoaded BlockocracyAdmin.init
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -182,6 +202,15 @@ updatePage page msg model =
 
             ( BlockocracyMsg subMsg, Blockocracy subModel ) ->
                 toPage Blockocracy BlockocracyMsg Blockocracy.update subMsg subModel
+
+            ( BlockocracyAdminMembersLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (BlockocracyAdminMembers subModel) } => Cmd.none
+
+            ( BlockocracyAdminMembersLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( BlockocracyAdminMembersMsg subMsg, BlockocracyAdminMembers subModel ) ->
+                toPage BlockocracyAdminMembers BlockocracyAdminMembersMsg BlockocracyAdmin.update subMsg subModel
 
             ( _, NotFound ) ->
                 -- Disregard incoming messages when we're on the
@@ -238,6 +267,9 @@ pageSubscriptions page =
                 ]
 
         Blockocracy _ ->
+            Sub.none
+
+        BlockocracyAdminMembers _ ->
             Sub.none
 
 

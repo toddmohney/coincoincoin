@@ -1,4 +1,4 @@
-module Blockocracy.Pages.Index exposing (BlockocracyPage, Msg(..), init, update, view)
+module Blockocracy.Pages.Index exposing (Page, Msg(..), init, update, view)
 
 import Forms.Model
     exposing
@@ -22,31 +22,28 @@ import Views.TxForm as TxForm
     exposing
         ( Tx
         , TxFormMsg(..)
-        , senderAddressLens
-        , gasPriceLens
         )
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
 
-type alias BlockocracyPage =
+type alias Page =
     { proposalForm : Form Proposal
     , txForm : Form Tx
     }
 
 
-init : Task PageLoadError BlockocracyPage
+init : Task PageLoadError Page
 init =
     Task.succeed <|
-        BlockocracyPage Prop.defForm TxForm.defForm
+        Page Prop.defForm TxForm.defForm
 
 
-view : BlockocracyPage -> Html Msg
+view : Page -> Html Msg
 view model =
     div [ class "container" ]
         [ div
             [ class "row" ]
             [ renderMembersPanel
-            , renderAdminPanel
             ]
         ]
 
@@ -54,7 +51,7 @@ view model =
 renderMembersPanel : Html Msg
 renderMembersPanel =
     div
-        [ class "col-sm-6" ]
+        [ class "col-sm-12" ]
         [ h2 [] [ text "Submit a Proposal" ]
         , txForm
         , proposalForm
@@ -65,7 +62,8 @@ txForm : Html Msg
 txForm =
     div
         []
-        [ TxForm.render TxFormInputChanged
+        [ h3 [] [ text "Enter your transaction details" ]
+        , TxForm.render TxFormInputChanged
         ]
 
 
@@ -73,7 +71,8 @@ proposalForm : Html Msg
 proposalForm =
     div
         []
-        [ div
+        [ h3 [] [ text "Fill out your proposal" ]
+        , div
             [ class "form-group" ]
             [ label [ for "beneficiary" ] [ text "Beneficiary" ]
             , input
@@ -108,13 +107,6 @@ proposalForm =
         ]
 
 
-renderAdminPanel : Html Msg
-renderAdminPanel =
-    div
-        [ class "col-sm-6" ]
-        [ text "Hi, I'm the admin panel" ]
-
-
 type Msg
     = TxFormInputChanged TxFormMsg String
     | InputChanged InputField String
@@ -127,7 +119,7 @@ type InputField
     | Details
 
 
-update : Msg -> BlockocracyPage -> ( BlockocracyPage, Cmd Msg )
+update : Msg -> Page -> ( Page, Cmd Msg )
 update msg model =
     case msg of
         InputChanged BeneficiaryAddress addr ->
@@ -159,5 +151,5 @@ update msg model =
 
         ProposalSubmitted ->
             ( model
-            , Ports.submitProposal <| Ports.toRequest model.txForm.model model.proposalForm.model
+            , Ports.submitProposal <| Ports.toNewProposalRequest model.txForm.model model.proposalForm.model
             )

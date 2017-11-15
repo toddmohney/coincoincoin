@@ -1,6 +1,7 @@
 module Forms.Model
     exposing
         ( Form
+        , modelLens
         , errorsLens
         )
 
@@ -11,6 +12,21 @@ type alias Form a =
     { model : a
     , errors : List String
     }
+
+
+modelLens : Lens (Form a) a
+modelLens =
+    Lens modelGetter modelSetter
+
+
+modelGetter : Form a -> a
+modelGetter f =
+    f.model
+
+
+modelSetter : a -> Form a -> Form a
+modelSetter m f =
+    { f | model = m }
 
 
 errorsLens : Lens (Form a) (List String)

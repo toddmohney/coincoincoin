@@ -2,12 +2,15 @@ port module Blockocracy.Ports
     exposing
         ( NewProposalRequest
         , submitProposal
-        , toRequest
+        , addMember
+        , removeMember
+        , toNewProposalRequest
+        , toMemberRequest
         )
 
 import Blockocracy.Proposal exposing (Proposal)
 import Views.TxForm exposing (Tx)
-import Web3.Web3 as Web3
+import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
 
 type alias NewProposalRequest =
@@ -19,8 +22,15 @@ type alias NewProposalRequest =
     }
 
 
-toRequest : Tx -> Proposal -> NewProposalRequest
-toRequest tx proposal =
+type alias MemberRequest =
+    { senderAddress : String
+    , gasPrice : Int
+    , memberAddress : String
+    }
+
+
+toNewProposalRequest : Tx -> Proposal -> NewProposalRequest
+toNewProposalRequest tx proposal =
     NewProposalRequest
         (Web3.getAccountAddress tx.senderAddress)
         tx.gasPrice
@@ -29,4 +39,18 @@ toRequest tx proposal =
         proposal.details
 
 
+toMemberRequest : Tx -> AccountAddress -> MemberRequest
+toMemberRequest tx memberAddr =
+    MemberRequest
+        (Web3.getAccountAddress tx.senderAddress)
+        tx.gasPrice
+        (Web3.getAccountAddress memberAddr)
+
+
 port submitProposal : NewProposalRequest -> Cmd msg
+
+
+port addMember : MemberRequest -> Cmd msg
+
+
+port removeMember : MemberRequest -> Cmd msg

@@ -3,7 +3,7 @@ module Route exposing (Route(..), fromLocation, href, modifyUrl)
 import Html exposing (Attribute)
 import Html.Attributes as Attr
 import Navigation exposing (Location)
-import UrlParser as Url exposing (Parser, oneOf, parseHash, s)
+import UrlParser as Url exposing (Parser, (</>), oneOf, parseHash, s)
 
 
 -- ROUTING --
@@ -12,6 +12,7 @@ import UrlParser as Url exposing (Parser, oneOf, parseHash, s)
 type Route
     = Home
     | Blockocracy
+    | BlockocracyAdminMembers
 
 
 route : Parser (Route -> a) a
@@ -19,6 +20,7 @@ route =
     oneOf
         [ Url.map Home (s "")
         , Url.map Blockocracy (s "blockocracy")
+        , Url.map BlockocracyAdminMembers (s "blockocracy" </> s "admin")
         ]
 
 
@@ -36,6 +38,9 @@ routeToString page =
 
                 Blockocracy ->
                     [ "blockocracy" ]
+
+                BlockocracyAdminMembers ->
+                    [ "blockocracy", "admin" ]
     in
         "#/" ++ String.join "/" pieces
 

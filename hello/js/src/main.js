@@ -94,3 +94,68 @@ app.ports.submitProposal.subscribe((req) => {
     console.log("error caught!", err);
   });
 });
+
+app.ports.addMember.subscribe((req) => {
+  console.log("addMember", req);
+
+  const memberAddress = req.memberAddress;
+  const memberName = req.memberName;
+
+  congressContract.methods.addMember(memberAddress, memberName).send(
+    {
+      from: req.senderAddress,
+      gasPrice: req.gasPrice.toString()
+    }
+  )
+  .once('transactionHash', (hash) => {
+    console.log("tx received", hash);
+    console.log("waiting for tx to be mined...");
+  })
+  .once('receipt', (receipt) => {
+    console.log("tx receipt received", receipt);
+  })
+  .on('confirmation', (confNumber, receipt) => {
+    console.log("tx confirmed", confNumber, receipt);
+  })
+  .on('error', (err) => {
+    console.log("error!", err);
+  })
+  .then((result) => {
+    console.log("our block has been mined!", result);
+  })
+  .catch((err) => {
+    console.log("error caught!", err);
+  });
+});
+
+app.ports.removeMember.subscribe((req) => {
+  console.log("removeMember", req);
+
+  const memberAddress = req.memberAddress;
+
+  congressContract.methods.removeMember(memberAddress).send(
+    {
+      from: req.senderAddress,
+      gasPrice: req.gasPrice.toString()
+    }
+  )
+  .once('transactionHash', (hash) => {
+    console.log("tx received", hash);
+    console.log("waiting for tx to be mined...");
+  })
+  .once('receipt', (receipt) => {
+    console.log("tx receipt received", receipt);
+  })
+  .on('confirmation', (confNumber, receipt) => {
+    console.log("tx confirmed", confNumber, receipt);
+  })
+  .on('error', (err) => {
+    console.log("error!", err);
+  })
+  .then((result) => {
+    console.log("our block has been mined!", result);
+  })
+  .catch((err) => {
+    console.log("error caught!", err);
+  });
+});
