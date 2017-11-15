@@ -18,18 +18,26 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
 import Task exposing (Task)
 import Errors.Pages.Errored as Errored exposing (PageLoadError, pageLoadError)
+import Views.TxForm as TxForm
+    exposing
+        ( Tx
+        , TxFormMsg(..)
+        , senderAddressLens
+        , gasPriceLens
+        )
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
 
 type alias BlockocracyPage =
     { proposalForm : Form Proposal
+    , txForm : Form Tx
     }
 
 
 init : Task PageLoadError BlockocracyPage
 init =
     Task.succeed <|
-        BlockocracyPage Prop.defForm
+        BlockocracyPage Prop.defForm TxForm.defForm
 
 
 view : BlockocracyPage -> Html Msg
@@ -49,6 +57,15 @@ renderMembersPanel =
         [ class "col-sm-6" ]
         [ h2 [] [ text "Submit a Proposal" ]
         , proposalForm
+        , txForm
+        ]
+
+
+txForm : Html Msg
+txForm =
+    div
+        []
+        [ TxForm.render TxFormInputChanged
         ]
 
 
@@ -109,7 +126,8 @@ renderAdminPanel =
 
 
 type Msg
-    = InputChanged InputField String
+    = TxFormInputChanged TxFormMsg String
+    | InputChanged InputField String
     | ProposalSubmitted
 
 
@@ -156,6 +174,11 @@ update msg model =
                     ( { model | proposalForm = weiGasPriceLens.set wei model.proposalForm }
                     , Cmd.none
                     )
+
+        TxFormInputChanged msg val ->
+            ( { model | txForm = TxForm.updateForm model.txForm val msg }
+            , Cmd.none
+            )
 
         ProposalSubmitted ->
             ( model, Cmd.none )

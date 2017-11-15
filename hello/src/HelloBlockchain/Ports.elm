@@ -25,16 +25,16 @@ type alias SayHelloRequest =
 port getTx : String -> Cmd msg
 
 
-port txReceived : (Value -> msg) -> Sub msg
-
-
 port getHelloCount : String -> Cmd msg
 
 
-port helloCountReceived : (Int -> msg) -> Sub msg
-
-
 port sayHello : SayHelloRequest -> Cmd msg
+
+
+port txReceived : (Value -> msg) -> Sub msg
+
+
+port helloCountReceived : (Int -> msg) -> Sub msg
 
 
 port helloTxReceived : (String -> msg) -> Sub msg

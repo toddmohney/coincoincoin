@@ -46,11 +46,8 @@ beneficiarySetter addr f =
     let
         proposal =
             f.model
-
-        newProposal =
-            { proposal | beneficiary = addr }
     in
-        { f | model = newProposal }
+        { f | model = { proposal | beneficiary = addr } }
 
 
 etherAmountLens : Lens (Form Proposal) Float
@@ -68,11 +65,8 @@ etherAmountSetter amt f =
     let
         proposal =
             f.model
-
-        newProposal =
-            { proposal | etherAmount = amt }
     in
-        { f | model = newProposal }
+        { f | model = { proposal | etherAmount = amt } }
 
 
 detailsLens : Lens (Form Proposal) String
@@ -90,11 +84,8 @@ detailsSetter details f =
     let
         proposal =
             f.model
-
-        newProposal =
-            { proposal | details = details }
     in
-        { f | model = newProposal }
+        { f | model = { proposal | details = details } }
 
 
 weiGasPriceLens : Lens (Form Proposal) Int
@@ -112,8 +103,5 @@ weiGasPriceSetter weiGasPrice f =
     let
         proposal =
             f.model
-
-        newProposal =
-            { proposal | weiGasPrice = weiGasPrice }
     in
-        { f | model = newProposal }
+        { f | model = { proposal | weiGasPrice = weiGasPrice } }
