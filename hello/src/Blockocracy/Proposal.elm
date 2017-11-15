@@ -5,7 +5,6 @@ module Blockocracy.Proposal
         , defForm
         , detailsLens
         , etherAmountLens
-        , weiGasPriceLens
         )
 
 import Forms.Model exposing (..)
@@ -17,7 +16,6 @@ type alias Proposal =
     { beneficiary : AccountAddress
     , etherAmount : Float
     , details : String
-    , weiGasPrice : Int
     }
 
 
@@ -28,7 +26,7 @@ defForm =
 
 defProposal : Proposal
 defProposal =
-    Proposal (Web3.mkAccountAddress "0x00") 0 "" 0
+    Proposal (Web3.mkAccountAddress "0x00") 0 ""
 
 
 beneficiaryLens : Lens (Form Proposal) AccountAddress
@@ -86,22 +84,3 @@ detailsSetter details f =
             f.model
     in
         { f | model = { proposal | details = details } }
-
-
-weiGasPriceLens : Lens (Form Proposal) Int
-weiGasPriceLens =
-    Lens weiGasPriceGetter weiGasPriceSetter
-
-
-weiGasPriceGetter : Form Proposal -> Int
-weiGasPriceGetter f =
-    f.model.weiGasPrice
-
-
-weiGasPriceSetter : Int -> Form Proposal -> Form Proposal
-weiGasPriceSetter weiGasPrice f =
-    let
-        proposal =
-            f.model
-    in
-        { f | model = { proposal | weiGasPrice = weiGasPrice } }

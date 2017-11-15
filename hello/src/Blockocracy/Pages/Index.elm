@@ -11,8 +11,8 @@ import Blockocracy.Proposal as Prop
         , beneficiaryLens
         , detailsLens
         , etherAmountLens
-        , weiGasPriceLens
         )
+import Blockocracy.Ports as Ports
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onInput)
@@ -56,8 +56,8 @@ renderMembersPanel =
     div
         [ class "col-sm-6" ]
         [ h2 [] [ text "Submit a Proposal" ]
-        , proposalForm
         , txForm
+        , proposalForm
         ]
 
 
@@ -99,16 +99,6 @@ proposalForm =
                 , onInput (InputChanged Details)
                 ]
                 []
-            , label [ for "gasPrice" ] [ text "Gas price (in wei)" ]
-            , input
-                [ class "form-control"
-                , name "gasPrice"
-                , type_ "number"
-                , value "20000000000"
-                , placeholder "Gas price (in Wei)"
-                , onInput (InputChanged GasPrice)
-                ]
-                []
             ]
         , button
             [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
@@ -135,7 +125,6 @@ type InputField
     = BeneficiaryAddress
     | EtherAmount
     | Details
-    | GasPrice
 
 
 update : Msg -> BlockocracyPage -> ( BlockocracyPage, Cmd Msg )
@@ -163,22 +152,12 @@ update msg model =
             , Cmd.none
             )
 
-        InputChanged GasPrice gas ->
-            case String.toInt gas of
-                Err err ->
-                    ( { model | proposalForm = errorsLens.set [ err ] model.proposalForm }
-                    , Cmd.none
-                    )
-
-                Ok wei ->
-                    ( { model | proposalForm = weiGasPriceLens.set wei model.proposalForm }
-                    , Cmd.none
-                    )
-
         TxFormInputChanged msg val ->
             ( { model | txForm = TxForm.updateForm model.txForm val msg }
             , Cmd.none
             )
 
         ProposalSubmitted ->
-            ( model, Cmd.none )
+            ( model
+            , Ports.submitProposal <| Ports.toRequest model.txForm.model model.proposalForm.model
+            )

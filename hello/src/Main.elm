@@ -204,12 +204,6 @@ subscriptions model =
         ]
 
 
-
--- sessionChange : Sub (Maybe User)
--- sessionChange =
--- Ports.onSessionChange (Decode.decodeValue User.decoder >> Result.toMaybe)
-
-
 getPage : PageState -> Page
 getPage pageState =
     case pageState of

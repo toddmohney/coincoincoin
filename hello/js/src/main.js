@@ -59,3 +59,38 @@ app.ports.sayHello.subscribe((req) => {
     app.ports.helloTxError.send(err);
   });
 });
+
+app.ports.submitProposal.subscribe((req) => {
+  console.log("submitProposal", req);
+
+  const beneficiary = req.beneficiary;
+  const amount = req.etherAmount;
+  const details = req.details;
+  const bytecode = web3.utils.fromAscii("");
+
+  congressContract.methods.newProposalInEther(beneficiary, amount, details, bytecode).send(
+    {
+      from: req.senderAddress,
+      gasPrice: req.gasPrice.toString()
+    }
+  )
+  .once('transactionHash', (hash) => {
+    console.log("tx received", hash);
+    console.log("waiting for tx to be mined...");
+  })
+  .once('receipt', (receipt) => {
+    console.log("tx receipt received", receipt);
+  })
+  .on('confirmation', (confNumber, receipt) => {
+    console.log("tx confirmed", confNumber, receipt);
+  })
+  .on('error', (err) => {
+    console.log("error!", err);
+  })
+  .then((result) => {
+    console.log("our block has been mined!", result);
+  })
+  .catch((err) => {
+    console.log("error caught!", err);
+  });
+});
