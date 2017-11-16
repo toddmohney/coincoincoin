@@ -7,6 +7,7 @@ module Blockocracy.Admin.Pages.Members
         , view
         )
 
+import Blockocracy.Members.Model exposing (Member, accountLens, nameLens)
 import Blockocracy.Ports as Ports
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -15,12 +16,12 @@ import Task exposing (Task)
 import Errors.Pages.Errored as Errored exposing (PageLoadError, pageLoadError)
 import Forms.Model as Form exposing (Form, modelLens)
 import Views.TxForm as TxForm exposing (Tx, TxFormMsg(..))
-import Web3.Web3 as Web3 exposing (AccountAddress(..))
+import Web3.Web3 as Web3
 
 
 type alias Page =
     { txForm : Form Tx
-    , memberForm : Form AccountAddress
+    , memberForm : Form Member
     }
 
 
@@ -33,6 +34,7 @@ type Msg
 
 type InputField
     = MemberAddress
+    | MemberName
 
 
 init : Task PageLoadError Page
@@ -40,7 +42,7 @@ init =
     Task.succeed <|
         Page
             TxForm.defForm
-            (Form (Web3.mkAccountAddress "0x00") [])
+            (Form (Member (Web3.mkAccountAddress "0x00") "") [])
 
 
 update : Msg -> Page -> ( Page, Cmd Msg )
@@ -54,7 +56,12 @@ update msg model =
         InputChanged field val ->
             case field of
                 MemberAddress ->
-                    ( { model | memberForm = modelLens.set (Web3.mkAccountAddress val) model.memberForm }
+                    ( { model | memberForm = accountLens.set (Web3.mkAccountAddress val) model.memberForm }
+                    , Cmd.none
+                    )
+
+                MemberName ->
+                    ( { model | memberForm = nameLens.set val model.memberForm }
                     , Cmd.none
                     )
 
@@ -79,7 +86,7 @@ view model =
             [ div
                 [ class "col-sm-12" ]
                 [ h2 [] [ text "Add / Remove a Member" ]
-                , txForm
+                , txForm model.txForm
                 , memberForm
                 ]
             ]
@@ -93,7 +100,16 @@ memberForm =
         [ h3 [] [ text "Enter the Member's Address" ]
         , div
             [ class "form-group" ]
-            [ label [ for "memberAddress" ] [ text "Member address" ]
+            [ label [ for "memberName" ] [ text "Member name" ]
+            , input
+                [ class "form-control"
+                , name "memberName"
+                , type_ "text"
+                , placeholder "Member name"
+                , onInput (InputChanged MemberName)
+                ]
+                []
+            , label [ for "memberAddress" ] [ text "Member address" ]
             , input
                 [ class "form-control"
                 , name "memberAddress"
@@ -116,10 +132,10 @@ memberForm =
         ]
 
 
-txForm : Html Msg
-txForm =
+txForm : Form Tx -> Html Msg
+txForm form =
     div
         []
         [ h3 [] [ text "Enter your transaction details" ]
-        , TxForm.render TxFormInputChanged
+        , TxForm.render form TxFormInputChanged
         ]

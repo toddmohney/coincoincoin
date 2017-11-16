@@ -8,6 +8,7 @@ port module Blockocracy.Ports
         , toMemberRequest
         )
 
+import Blockocracy.Members.Model exposing (Member)
 import Blockocracy.Proposal exposing (Proposal)
 import Views.TxForm exposing (Tx)
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
@@ -26,6 +27,7 @@ type alias MemberRequest =
     { senderAddress : String
     , gasPrice : Int
     , memberAddress : String
+    , memberName : String
     }
 
 
@@ -39,12 +41,13 @@ toNewProposalRequest tx proposal =
         proposal.details
 
 
-toMemberRequest : Tx -> AccountAddress -> MemberRequest
-toMemberRequest tx memberAddr =
+toMemberRequest : Tx -> Member -> MemberRequest
+toMemberRequest tx member =
     MemberRequest
         (Web3.getAccountAddress tx.senderAddress)
         tx.gasPrice
-        (Web3.getAccountAddress memberAddr)
+        (Web3.getAccountAddress member.account)
+        member.name
 
 
 port submitProposal : NewProposalRequest -> Cmd msg

@@ -36,7 +36,7 @@ type alias TxFormMsgWrapper msg =
 defForm : Form Tx
 defForm =
     Form
-        (Tx (Web3.mkAccountAddress "0x00") 0)
+        (Tx (Web3.mkAccountAddress "0x00") 20000000)
         []
 
 
@@ -93,8 +93,8 @@ gasPriceSetter gas f =
         { f | model = { tx | gasPrice = gas } }
 
 
-render : TxFormMsgWrapper msg -> Html msg
-render msgFn =
+render : Form Tx -> TxFormMsgWrapper msg -> Html msg
+render form msgFn =
     div
         [ class "form-group" ]
         [ label [ for "accountAddress" ] [ text "Account address" ]
@@ -111,7 +111,7 @@ render msgFn =
             [ class "form-control"
             , name "gasPrice"
             , type_ "number"
-            , value "20000000000"
+            , value << toString <| gasPriceLens.get form
             , placeholder "Gas price (in Wei)"
             , onInput (msgFn GasPriceInputChanged)
             ]

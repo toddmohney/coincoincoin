@@ -43,27 +43,27 @@ view model =
     div [ class "container" ]
         [ div
             [ class "row" ]
-            [ renderMembersPanel
+            [ renderMembersPanel model
             ]
         ]
 
 
-renderMembersPanel : Html Msg
-renderMembersPanel =
+renderMembersPanel : Page -> Html Msg
+renderMembersPanel model =
     div
         [ class "col-sm-12" ]
         [ h2 [] [ text "Submit a Proposal" ]
-        , txForm
+        , txForm model.txForm
         , proposalForm
         ]
 
 
-txForm : Html Msg
-txForm =
+txForm : Form Tx -> Html Msg
+txForm form =
     div
         []
         [ h3 [] [ text "Enter your transaction details" ]
-        , TxForm.render TxFormInputChanged
+        , TxForm.render form TxFormInputChanged
         ]
 
 
