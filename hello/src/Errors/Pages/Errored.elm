@@ -1,4 +1,4 @@
-module Page.Errored exposing (PageLoadError, pageLoadError, view)
+module Errors.Pages.Errored exposing (PageLoadError, pageLoadError, view)
 
 {-| The page that renders when there was an error trying to load another page,
 for example a Page Not Found error.

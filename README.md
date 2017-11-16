@@ -64,7 +64,7 @@ In a terminal run
 ```sh
 make console
 
-# personal.unlockAccount(<address>, <password>)
+personal.unlockAccount(<address>, <password>)
 ```
 
 In another terminal run

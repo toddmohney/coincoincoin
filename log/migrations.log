@@ -13,7 +13,9 @@ Saving successful migration to network...
   ... 0xb1b48f044229b38796d1143afdcdf79e935fbb529dca04f640978d2f9622dac1
 Saving artifacts...
 
+
 --- take 2 ---
+
 
 Running migration: 1_initial_migration.js
   Deploying Migrations...
@@ -29,4 +31,16 @@ Running migration: 2_add_hellos.js
 Saving successful migration to network...
   ... 0xc05bbd98211b8fb33528be51aab4c139c9997fd24518417461e03ba7f251e28a
 Saving artifacts...
+
+
+
+--- deploying Congress ---
+
+
+Running migration: 3_add_congress.js
+  Deploying Congress...
+  ... 0x87800317327ca593632511a2f1d51ba1405b6191d257c6348111d976a65c1cfc
+  Congress: 0x91cdc7c41c03312efca063acdeb016870e4e8411
+Saving successful migration to network...
+  ... 0x557d55228c2844bfcff7dc549383b77c6c1433f27b614ece853df8a63db617f2
 

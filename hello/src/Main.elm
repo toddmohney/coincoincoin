@@ -1,12 +1,15 @@
 module Main exposing (main)
 
+import Blockocracy.Pages.Index as Blockocracy
+import Blockocracy.Admin.Pages.Members as BlockocracyAdmin
+import Blockocracy.Views.Page as BVP
+import Errors.Pages.Errored as Errored exposing (PageLoadError)
+import Errors.Pages.NotFound as NotFound
+import HelloBlockchain.Pages.Index as HBC
+import HelloBlockchain.Ports as Ports
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
-import Page.Errored as Errored exposing (PageLoadError)
-import Page.Home as Home
-import Page.NotFound as NotFound
-import Ports as Ports
 import Route exposing (Route)
 import Task
 import Util exposing ((=>))
@@ -24,7 +27,14 @@ type Page
     = Blank
     | NotFound
     | Errored PageLoadError
-    | Home Home.Model
+    | Home HBC.HelloBlockchainPage
+    | Blockocracy Blockocracy.Page
+    | BlockocracyAdminMembers BlockocracyAdmin.Page
+
+
+type BlockocracyPage
+    = Index
+    | AdminMembers
 
 
 type PageState
@@ -73,25 +83,37 @@ viewPage isLoading page =
         frame =
             Page.frame isLoading
     in
-    case page of
-        NotFound ->
-            NotFound.view
-                |> frame Page.Other
+        case page of
+            NotFound ->
+                NotFound.view
+                    |> frame Page.Other
 
-        Blank ->
-            -- This is for the very initial page load, while we are loading
-            -- data via HTTP. We could also render a spinner here.
-            Html.text ""
-                |> frame Page.Other
+            Blank ->
+                -- This is for the very initial page load, while we are loading
+                -- data via HTTP. We could also render a spinner here.
+                Html.text ""
+                    |> frame Page.Other
 
-        Errored subModel ->
-            Errored.view subModel
-                |> frame Page.Other
+            Errored subModel ->
+                Errored.view subModel
+                    |> frame Page.Other
 
-        Home subModel ->
-            Home.view subModel
-                |> frame Page.Home
-                |> Html.map HomeMsg
+            Home subModel ->
+                HBC.view subModel
+                    |> frame Page.Home
+                    |> Html.map HomeMsg
+
+            Blockocracy subModel ->
+                Blockocracy.view subModel
+                    |> BVP.frame BVP.Index
+                    |> frame Page.Blockocracy
+                    |> Html.map BlockocracyMsg
+
+            BlockocracyAdminMembers subModel ->
+                BlockocracyAdmin.view subModel
+                    |> BVP.frame BVP.Admin
+                    |> frame Page.Blockocracy
+                    |> Html.map BlockocracyAdminMembersMsg
 
 
 
@@ -99,9 +121,13 @@ viewPage isLoading page =
 
 
 type Msg
-    = SetRoute (Maybe Route)
-    | HomeLoaded (Result PageLoadError Home.Model)
-    | HomeMsg Home.Msg
+    = BlockocracyLoaded (Result PageLoadError Blockocracy.Page)
+    | BlockocracyAdminMembersLoaded (Result PageLoadError BlockocracyAdmin.Page)
+    | BlockocracyMsg Blockocracy.Msg
+    | BlockocracyAdminMembersMsg BlockocracyAdmin.Msg
+    | HomeLoaded (Result PageLoadError HBC.HelloBlockchainPage)
+    | HomeMsg HBC.Msg
+    | SetRoute (Maybe Route)
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -114,12 +140,18 @@ setRoute maybeRoute model =
         errored =
             pageErrored model
     in
-    case maybeRoute of
-        Nothing ->
-            { model | pageState = Loaded NotFound } => Cmd.none
+        case maybeRoute of
+            Nothing ->
+                { model | pageState = Loaded NotFound } => Cmd.none
 
-        Just Route.Home ->
-            transition HomeLoaded Home.init
+            Just Route.Home ->
+                transition HomeLoaded HBC.init
+
+            Just Route.Blockocracy ->
+                transition BlockocracyLoaded Blockocracy.init
+
+            Just Route.BlockocracyAdminMembers ->
+                transition BlockocracyAdminMembersLoaded BlockocracyAdmin.init
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -128,7 +160,7 @@ pageErrored model activePage errorMessage =
         error =
             Errored.pageLoadError activePage errorMessage
     in
-    { model | pageState = Loaded (Errored error) } => Cmd.none
+        { model | pageState = Loaded (Errored error) } => Cmd.none
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -144,47 +176,61 @@ updatePage page msg model =
                 ( newModel, newCmd ) =
                     subUpdate subMsg subModel
             in
-            ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
+                ( { model | pageState = Loaded (toModel newModel) }, Cmd.map toMsg newCmd )
 
         errored =
             pageErrored model
     in
-    case ( msg, page ) of
-        ( SetRoute route, _ ) ->
-            setRoute route model
+        case ( msg, page ) of
+            ( SetRoute route, _ ) ->
+                setRoute route model
 
-        ( HomeLoaded (Ok subModel), _ ) ->
-            { model | pageState = Loaded (Home subModel) } => Cmd.none
+            ( HomeLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (Home subModel) } => Cmd.none
 
-        ( HomeLoaded (Err error), _ ) ->
-            { model | pageState = Loaded (Errored error) } => Cmd.none
+            ( HomeLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
 
-        ( HomeMsg subMsg, Home subModel ) ->
-            toPage Home HomeMsg Home.update subMsg subModel
+            ( HomeMsg subMsg, Home subModel ) ->
+                toPage Home HomeMsg HBC.update subMsg subModel
 
-        ( _, NotFound ) ->
-            -- Disregard incoming messages when we're on the
-            -- NotFound page.
-            model => Cmd.none
+            ( BlockocracyLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (Blockocracy subModel) } => Cmd.none
 
-        ( _, _ ) ->
-            -- Disregard incoming messages that arrived for the wrong page
-            model => Cmd.none
+            ( BlockocracyLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( BlockocracyMsg subMsg, Blockocracy subModel ) ->
+                toPage Blockocracy BlockocracyMsg Blockocracy.update subMsg subModel
+
+            ( BlockocracyAdminMembersLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (BlockocracyAdminMembers subModel) } => Cmd.none
+
+            ( BlockocracyAdminMembersLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( BlockocracyAdminMembersMsg subMsg, BlockocracyAdminMembers subModel ) ->
+                toPage BlockocracyAdminMembers BlockocracyAdminMembersMsg BlockocracyAdmin.update subMsg subModel
+
+            ( _, NotFound ) ->
+                -- Disregard incoming messages when we're on the
+                -- NotFound page.
+                model => Cmd.none
+
+            ( _, _ ) ->
+                -- Disregard incoming messages that arrived for the wrong page
+                model => Cmd.none
 
 
 
 -- SUBSCRIPTIONS --
+
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ pageSubscriptions (getPage model.pageState)
         ]
-
-
--- sessionChange : Sub (Maybe User)
--- sessionChange =
-    -- Ports.onSessionChange (Decode.decodeValue User.decoder >> Result.toMaybe)
 
 
 getPage : PageState -> Page
@@ -211,14 +257,20 @@ pageSubscriptions page =
 
         Home _ ->
             Sub.batch
-                [ Ports.helloCountReceived (HomeMsg << Home.HelloCountReceived)
-                , Ports.helloTxReceived (HomeMsg << Home.HelloTxReceived)
-                , Ports.helloTxReceiptReceived (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
-                , Ports.helloTxMined (HomeMsg << Home.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
-                , Ports.helloTxConfirmed (HomeMsg << Home.HelloTxConfirmed)
-                , Ports.helloTxError (HomeMsg << Home.HelloTxError)
-                , Ports.txReceived (HomeMsg << Home.TxReceived << Decode.decodeValue Web3.txDecoder)
+                [ Ports.helloCountReceived (HomeMsg << HBC.HelloCountReceived)
+                , Ports.helloTxReceived (HomeMsg << HBC.HelloTxReceived)
+                , Ports.helloTxReceiptReceived (HomeMsg << HBC.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
+                , Ports.helloTxMined (HomeMsg << HBC.HelloTxReceiptReceived << Decode.decodeValue Web3.txReceiptDecoder)
+                , Ports.helloTxConfirmed (HomeMsg << HBC.HelloTxConfirmed)
+                , Ports.helloTxError (HomeMsg << HBC.HelloTxError)
+                , Ports.txReceived (HomeMsg << HBC.TxReceived << Decode.decodeValue Web3.txDecoder)
                 ]
+
+        Blockocracy _ ->
+            Sub.none
+
+        BlockocracyAdminMembers _ ->
+            Sub.none
 
 
 

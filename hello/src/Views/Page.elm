@@ -18,6 +18,7 @@ under Other.
 type ActivePage
     = Other
     | Home
+    | Blockocracy
 
 
 {-| Take a page's Html and frame it with a header and footer.
@@ -39,10 +40,28 @@ frame isLoading page content =
 
 viewHeader : ActivePage -> Bool -> Html msg
 viewHeader page isLoading =
-    nav [ class "navbar navbar-light" ]
-        [ div [ class "container" ]
-            [ a [ class "navbar-brand", Route.href Route.Home ]
-                [ text "Hello, blockchain!" ]
+    nav
+        [ classList [ ( "navbar", True ), ( "navbar-default", True ) ] ]
+        [ div
+            [ class "container" ]
+            [ div
+                [ class "navbar-header" ]
+                [ a
+                    [ class "navbar-brand", Route.href Route.Home ]
+                    [ text "Hello, blockchain!" ]
+                ]
+            , div
+                [ classList [ ( "collapse", True ), ( "navbar-collapse", True ) ] ]
+                [ ul
+                    [ classList [ ( "nav", True ), ( "navbar-nav", True ) ] ]
+                    [ li
+                        [ classList [ ( "active", page == Home ) ] ]
+                        [ a [ Route.href Route.Home ] [ text "Hello Blockchain" ] ]
+                    , li
+                        [ classList [ ( "active", page == Blockocracy ) ] ]
+                        [ a [ Route.href Route.Blockocracy ] [ text "Blockocracy" ] ]
+                    ]
+                ]
             ]
         ]
 
