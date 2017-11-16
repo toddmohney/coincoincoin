@@ -36,7 +36,7 @@ type alias TxFormMsgWrapper msg =
 defForm : Form Tx
 defForm =
     Form
-        (Tx (Web3.mkAccountAddress "0x00") 20000000)
+        (Tx (Web3.mkAccountAddress "0x00") 20000000000)
         []
 
 

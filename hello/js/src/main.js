@@ -81,6 +81,10 @@ app.ports.submitProposal.subscribe((req) => {
   .once('receipt', (receipt) => {
     console.log("tx receipt received", receipt);
   })
+  .on('allEvents', (err, evt) => {
+    console.log("Event err", err);
+    console.log("Event evt", evt);
+  })
   .on('confirmation', (confNumber, receipt) => {
     console.log("tx confirmed", confNumber, receipt);
   })
@@ -114,6 +118,10 @@ app.ports.addMember.subscribe((req) => {
   .once('receipt', (receipt) => {
     console.log("tx receipt received", receipt);
   })
+  .on('allEvents', (err, evt) => {
+    console.log("Event err", err);
+    console.log("Event evt", evt);
+  })
   .on('confirmation', (confNumber, receipt) => {
     console.log("tx confirmed", confNumber, receipt);
   })
@@ -145,6 +153,55 @@ app.ports.removeMember.subscribe((req) => {
   })
   .once('receipt', (receipt) => {
     console.log("tx receipt received", receipt);
+  })
+  .on('allEvents', (err, evt) => {
+    console.log("Event err", err);
+    console.log("Event evt", evt);
+  })
+  .on('confirmation', (confNumber, receipt) => {
+    console.log("tx confirmed", confNumber, receipt);
+  })
+  .on('error', (err) => {
+    console.log("error!", err);
+  })
+  .then((result) => {
+    console.log("our block has been mined!", result);
+  })
+  .catch((err) => {
+    console.log("error caught!", err);
+  });
+});
+
+app.ports.submitVote.subscribe((req) => {
+  console.log("submitVote", req);
+
+  const senderAddress = req.senderAddress;
+  const gasPrice = req.gasPrice;
+
+  const proposalNumber = req.proposalNumber;
+  const proposalSupport = req.proposalSupport;
+  const supportJustification = req.supportJustification;
+
+  congressContract.methods.vote(
+    proposalNumber,
+    proposalSupport,
+    supportJustification
+  ).send(
+    {
+      from: req.senderAddress,
+      gasPrice: req.gasPrice.toString()
+    }
+  )
+  .once('transactionHash', (hash) => {
+    console.log("tx received", hash);
+    console.log("waiting for tx to be mined...");
+  })
+  .once('receipt', (receipt) => {
+    console.log("tx receipt received", receipt);
+  })
+  .on('allEvents', (err, evt) => {
+    console.log("Event err", err);
+    console.log("Event evt", evt);
   })
   .on('confirmation', (confNumber, receipt) => {
     console.log("tx confirmed", confNumber, receipt);

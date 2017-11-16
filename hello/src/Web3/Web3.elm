@@ -2,6 +2,7 @@ module Web3.Web3
     exposing
         ( AccountAddress(..)
         , Address(..)
+        , Event
         , TxHash(..)
         , Tx
         , TxReceipt
@@ -16,6 +17,7 @@ module Web3.Web3
         , sampleTxHash
         )
 
+import Dict as Dict exposing (Dict)
 import Json.Decode as Decode exposing (int, string, nullable, Decoder)
 import Json.Decode.Pipeline exposing (decode, required)
 
@@ -133,6 +135,25 @@ type alias TxReceipt =
     , logsBloom : String
     , root : BlockAddress
     , to : AccountAddress
+    , transactionHash : TxHash
+    , transactionIndex : Int
+    }
+
+
+type EventAddress
+    = EventAddress Address
+
+
+type alias Event a =
+    { address : EventAddress
+    , blockHash : BlockAddress
+    , blockNumber : Int
+    , event : String
+    , id : String
+    , logIndex : Int
+    , removed : Bool
+    , returnValues : Dict String a
+    , signature : String
     , transactionHash : TxHash
     , transactionIndex : Int
     }
