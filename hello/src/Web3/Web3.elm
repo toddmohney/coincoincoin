@@ -6,15 +6,16 @@ module Web3.Web3
         , TxHash(..)
         , Tx
         , TxReceipt
-        , txDecoder
-        , txReceiptDecoder
-        , getAddress
+        , accountDecoder
         , getAccountAddress
+        , getAddress
         , getTxHash
         , mkAccountAddress
         , mkTxHash
         , sampleAccountAddress
         , sampleTxHash
+        , txDecoder
+        , txReceiptDecoder
         )
 
 import Dict as Dict exposing (Dict)

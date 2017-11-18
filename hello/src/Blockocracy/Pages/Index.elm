@@ -221,12 +221,12 @@ update msg model =
 
         ProposalSubmitted ->
             ( model
-            , Ports.submitProposal <| Ports.toNewProposalRequest model.txForm.model model.proposalForm.model
+            , Ports.submitProposal <| Prop.toProposalRequest model.txForm.model model.proposalForm.model
             )
 
         VoteSubmitted ->
             ( model
-            , Ports.submitVote <| Ports.toVoteRequest model.txForm.model model.voteForm.model
+            , Ports.submitVote <| Vote.toVoteRequest model.txForm.model model.voteForm.model
             )
 
 

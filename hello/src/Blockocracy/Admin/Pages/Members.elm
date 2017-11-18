@@ -7,7 +7,7 @@ module Blockocracy.Admin.Pages.Members
         , view
         )
 
-import Blockocracy.Members.Model exposing (Member, accountLens, nameLens)
+import Blockocracy.Members.Model as Member exposing (Member, accountLens, nameLens)
 import Blockocracy.Ports as Ports
 import Html exposing (..)
 import Html.Attributes exposing (..)
@@ -68,13 +68,13 @@ update msg model =
         MemberAdded ->
             ( model
             , Ports.addMember <|
-                Ports.toMemberRequest model.txForm.model model.memberForm.model
+                Member.toMemberRequest model.txForm.model model.memberForm.model
             )
 
         MemberRemoved ->
             ( model
             , Ports.removeMember <|
-                Ports.toMemberRequest model.txForm.model model.memberForm.model
+                Member.toMemberRequest model.txForm.model model.memberForm.model
             )
 
 
