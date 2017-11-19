@@ -93,6 +93,7 @@ app.ports.submitProposal.subscribe((req) => {
   })
   .then((result) => {
     console.log("our block has been mined!", result);
+    app.ports.proposalAdded.send(result);
   })
   .catch((err) => {
     console.log("error caught!", err);

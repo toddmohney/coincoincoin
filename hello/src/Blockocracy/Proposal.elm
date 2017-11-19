@@ -2,14 +2,18 @@ module Blockocracy.Proposal
     exposing
         ( Proposal
         , ProposalRequest
+        , ProposalAddedEvent
         , beneficiaryLens
         , defForm
         , detailsLens
         , etherAmountLens
+        , proposalAddedEventDecoder
         , toProposalRequest
         )
 
 import Forms.Model exposing (..)
+import Json.Decode as D exposing (int, string, nullable, Decoder)
+import Json.Decode.Pipeline exposing (decode, required)
 import Monocle.Lens exposing (..)
 import Views.TxForm exposing (Tx)
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
@@ -31,6 +35,14 @@ type alias ProposalRequest =
     }
 
 
+type alias ProposalAddedEvent =
+    { proposalID : Int
+    , recipient : AccountAddress
+    , amount : Int
+    , description : String
+    }
+
+
 toProposalRequest : Tx -> Proposal -> ProposalRequest
 toProposalRequest tx proposal =
     ProposalRequest
@@ -39,6 +51,15 @@ toProposalRequest tx proposal =
         (Web3.getAccountAddress proposal.beneficiary)
         proposal.etherAmount
         proposal.details
+
+
+proposalAddedEventDecoder : Decoder ProposalAddedEvent
+proposalAddedEventDecoder =
+    decode ProposalAddedEvent
+        |> required "proposalID" D.int
+        |> required "recipient" Web3.accountDecoder
+        |> required "amount" D.int
+        |> required "description" D.string
 
 
 defForm : Form Proposal

@@ -19,7 +19,7 @@ module Web3.Web3
         )
 
 import Dict as Dict exposing (Dict)
-import Json.Decode as Decode exposing (int, string, nullable, Decoder)
+import Json.Decode as Decode exposing (int, string, nullable, Decoder, Value)
 import Json.Decode.Pipeline exposing (decode, required)
 
 
@@ -131,6 +131,7 @@ type alias TxReceipt =
     , blockNumber : Int
     , contractAddress : Maybe String
     , cumulativeGasUsed : Int
+    , events : Dict String Event
     , from : AccountAddress
     , gasUsed : Int
     , logsBloom : String
@@ -145,7 +146,12 @@ type EventAddress
     = EventAddress Address
 
 
-type alias Event a =
+eventAddressDecoder : Decoder EventAddress
+eventAddressDecoder =
+    Decode.map EventAddress addressDecoder
+
+
+type alias Event =
     { address : EventAddress
     , blockHash : BlockAddress
     , blockNumber : Int
@@ -153,11 +159,27 @@ type alias Event a =
     , id : String
     , logIndex : Int
     , removed : Bool
-    , returnValues : Dict String a
+    , returnValues : Dict String Value
     , signature : String
     , transactionHash : TxHash
     , transactionIndex : Int
     }
+
+
+eventDecoder : Decoder Event
+eventDecoder =
+    decode Event
+        |> required "address" eventAddressDecoder
+        |> required "blockHash" blockHashDecoder
+        |> required "blockNumber" Decode.int
+        |> required "event" Decode.string
+        |> required "id" Decode.string
+        |> required "logIndex" Decode.int
+        |> required "removed" Decode.bool
+        |> required "returnValues" (Decode.dict Decode.value)
+        |> required "signature" Decode.string
+        |> required "transactionHash" txHashDecoder
+        |> required "transactionIndex" Decode.int
 
 
 txReceiptDecoder : Decoder TxReceipt
@@ -167,6 +189,7 @@ txReceiptDecoder =
         |> required "blockNumber" Decode.int
         |> required "contractAddress" (nullable string)
         |> required "cumulativeGasUsed" Decode.int
+        |> required "events" (Decode.dict eventDecoder)
         |> required "from" accountDecoder
         |> required "gasUsed" Decode.int
         |> required "logsBloom" Decode.string

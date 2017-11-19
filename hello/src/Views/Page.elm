@@ -5,6 +5,7 @@ module Views.Page exposing (ActivePage(..), bodyId, frame)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Json.Encode as Encode
 import Route exposing (Route)
 
 
@@ -30,11 +31,31 @@ isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 
 -}
-frame : Bool -> ActivePage -> Html msg -> Html msg
-frame isLoading page content =
+frame : Bool -> String -> ActivePage -> Html msg -> Html msg
+frame isLoading bannerMsg page content =
     div []
         [ viewHeader page isLoading
+        , banner bannerMsg
         , content
+        ]
+
+
+banner : String -> Html msg
+banner bannerMsg =
+    div
+        [ classList
+            [ ( "alert", True )
+            , ( "alert-info", True )
+            , ( "alert-dismissable", True )
+            ]
+        ]
+        [ button
+            [ type_ "button"
+            , class "close"
+            , property "data-dismiss" (Encode.string "close")
+            ]
+            []
+        , text bannerMsg
         ]
 
 

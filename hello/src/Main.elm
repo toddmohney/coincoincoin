@@ -2,6 +2,7 @@ module Main exposing (main)
 
 import Blockocracy.Pages.Index as Blockocracy
 import Blockocracy.Admin.Pages.Members as BlockocracyAdmin
+import Blockocracy.Events exposing (BlockchainEvent(..))
 import Blockocracy.Views.Page as BVP
 import Errors.Pages.Errored as Errored exposing (PageLoadError)
 import Errors.Pages.NotFound as NotFound
@@ -10,6 +11,7 @@ import HelloBlockchain.Ports as Ports
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
+import Ports as Ports
 import Route exposing (Route)
 import Task
 import Util exposing ((=>))
@@ -48,6 +50,7 @@ type PageState
 
 type alias Model =
     { pageState : PageState
+    , bannerMessage : String
     }
 
 
@@ -55,6 +58,7 @@ init : Value -> Location -> ( Model, Cmd Msg )
 init val location =
     setRoute (Route.fromLocation location)
         { pageState = Loaded initialPage
+        , bannerMessage = ""
         }
 
 
@@ -71,17 +75,17 @@ view : Model -> Html Msg
 view model =
     case model.pageState of
         Loaded page ->
-            viewPage False page
+            viewPage False page model.bannerMessage
 
         TransitioningFrom page ->
-            viewPage True page
+            viewPage True page model.bannerMessage
 
 
-viewPage : Bool -> Page -> Html Msg
-viewPage isLoading page =
+viewPage : Bool -> Page -> String -> Html Msg
+viewPage isLoading page bannerMsg =
     let
         frame =
-            Page.frame isLoading
+            Page.frame isLoading bannerMsg
     in
         case page of
             NotFound ->
@@ -125,6 +129,7 @@ type Msg
     | BlockocracyAdminMembersLoaded (Result PageLoadError BlockocracyAdmin.Page)
     | BlockocracyMsg Blockocracy.Msg
     | BlockocracyAdminMembersMsg BlockocracyAdmin.Msg
+    | BannerMsg BlockchainEvent
     | HomeLoaded (Result PageLoadError HBC.HelloBlockchainPage)
     | HomeMsg HBC.Msg
     | SetRoute (Maybe Route)
@@ -185,6 +190,16 @@ updatePage page msg model =
             ( SetRoute route, _ ) ->
                 setRoute route model
 
+            ( BannerMsg bcEvt, _ ) ->
+                case bcEvt of
+                    ProposalAdded result ->
+                        case result of
+                            Err err ->
+                                ( { model | bannerMessage = err }, Cmd.none )
+
+                            Ok evt ->
+                                ( { model | bannerMessage = "ok!" }, Cmd.none )
+
             ( HomeLoaded (Ok subModel), _ ) ->
                 { model | pageState = Loaded (Home subModel) } => Cmd.none
 
@@ -230,6 +245,7 @@ subscriptions : Model -> Sub Msg
 subscriptions model =
     Sub.batch
         [ pageSubscriptions (getPage model.pageState)
+        , globalSubscriptions
         ]
 
 
@@ -241,6 +257,13 @@ getPage pageState =
 
         TransitioningFrom page ->
             page
+
+
+globalSubscriptions : Sub Msg
+globalSubscriptions =
+    Sub.batch
+        [ Ports.proposalAdded (BannerMsg << ProposalAdded << Decode.decodeValue Web3.txReceiptDecoder)
+        ]
 
 
 pageSubscriptions : Page -> Sub Msg
