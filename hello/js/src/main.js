@@ -77,6 +77,7 @@ app.ports.submitProposal.subscribe((req) => {
   .once('transactionHash', (hash) => {
     console.log("tx received", hash);
     console.log("waiting for tx to be mined...");
+    app.ports.proposalAddedTxHashCreated.send(hash);
   })
   .once('receipt', (receipt) => {
     console.log("tx receipt received", receipt);

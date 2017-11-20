@@ -2,11 +2,13 @@ module Web3.Web3
     exposing
         ( AccountAddress(..)
         , Address(..)
+        , BigNumber
         , Event
         , TxHash(..)
         , Tx
         , TxReceipt
         , accountDecoder
+        , bigNumberDecoder
         , getAccountAddress
         , getAddress
         , getTxHash
@@ -15,12 +17,22 @@ module Web3.Web3
         , sampleAccountAddress
         , sampleTxHash
         , txDecoder
+        , txHashDecoder
         , txReceiptDecoder
         )
 
 import Dict as Dict exposing (Dict)
 import Json.Decode as Decode exposing (int, string, nullable, Decoder, Value)
 import Json.Decode.Pipeline exposing (decode, required)
+
+
+type alias BigNumber =
+    String
+
+
+bigNumberDecoder : Decoder BigNumber
+bigNumberDecoder =
+    Decode.string
 
 
 type Address
@@ -159,7 +171,7 @@ type alias Event =
     , id : String
     , logIndex : Int
     , removed : Bool
-    , returnValues : Dict String Value
+    , returnValues : Value
     , signature : String
     , transactionHash : TxHash
     , transactionIndex : Int
@@ -176,7 +188,7 @@ eventDecoder =
         |> required "id" Decode.string
         |> required "logIndex" Decode.int
         |> required "removed" Decode.bool
-        |> required "returnValues" (Decode.dict Decode.value)
+        |> required "returnValues" (Decode.value)
         |> required "signature" Decode.string
         |> required "transactionHash" txHashDecoder
         |> required "transactionIndex" Decode.int

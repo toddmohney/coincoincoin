@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Blockocracy.Pages.Index as Blockocracy
 import Blockocracy.Admin.Pages.Members as BlockocracyAdmin
-import Blockocracy.Events exposing (BlockchainEvent(..))
+import Blockocracy.Events as BE exposing (BlockchainEvent(..))
 import Blockocracy.Views.Page as BVP
 import Errors.Pages.Errored as Errored exposing (PageLoadError)
 import Errors.Pages.NotFound as NotFound
@@ -191,14 +191,7 @@ updatePage page msg model =
                 setRoute route model
 
             ( BannerMsg bcEvt, _ ) ->
-                case bcEvt of
-                    ProposalAdded result ->
-                        case result of
-                            Err err ->
-                                ( { model | bannerMessage = err }, Cmd.none )
-
-                            Ok evt ->
-                                ( { model | bannerMessage = "ok!" }, Cmd.none )
+                ( { model | bannerMessage = BE.bannerMessage bcEvt }, Cmd.none )
 
             ( HomeLoaded (Ok subModel), _ ) ->
                 { model | pageState = Loaded (Home subModel) } => Cmd.none
@@ -263,6 +256,7 @@ globalSubscriptions : Sub Msg
 globalSubscriptions =
     Sub.batch
         [ Ports.proposalAdded (BannerMsg << ProposalAdded << Decode.decodeValue Web3.txReceiptDecoder)
+        , Ports.proposalAddedTxHashCreated (BannerMsg << ProposalAddedTxHashCreated << Decode.decodeValue Web3.txHashDecoder)
         ]
 
 
