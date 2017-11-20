@@ -76,9 +76,6 @@ viewHeader page isLoading =
                 [ ul
                     [ classList [ ( "nav", True ), ( "navbar-nav", True ) ] ]
                     [ li
-                        [ classList [ ( "active", page == Home ) ] ]
-                        [ a [ Route.href Route.Home ] [ text "Hello Blockchain" ] ]
-                    , li
                         [ classList [ ( "active", page == Blockocracy ) ] ]
                         [ a [ Route.href Route.Blockocracy ] [ text "Blockocracy" ] ]
                     ]
