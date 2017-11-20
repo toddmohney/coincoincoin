@@ -2,22 +2,37 @@ module Web3.Web3
     exposing
         ( AccountAddress(..)
         , Address(..)
+        , BigNumber
+        , Event
         , TxHash(..)
         , Tx
         , TxReceipt
-        , txDecoder
-        , txReceiptDecoder
-        , getAddress
+        , accountDecoder
+        , bigNumberDecoder
         , getAccountAddress
+        , getAddress
         , getTxHash
         , mkAccountAddress
         , mkTxHash
         , sampleAccountAddress
         , sampleTxHash
+        , txDecoder
+        , txHashDecoder
+        , txReceiptDecoder
         )
 
-import Json.Decode as Decode exposing (int, string, nullable, Decoder)
+import Dict as Dict exposing (Dict)
+import Json.Decode as Decode exposing (int, string, nullable, Decoder, Value)
 import Json.Decode.Pipeline exposing (decode, required)
+
+
+type alias BigNumber =
+    String
+
+
+bigNumberDecoder : Decoder BigNumber
+bigNumberDecoder =
+    Decode.string
 
 
 type Address
@@ -128,6 +143,7 @@ type alias TxReceipt =
     , blockNumber : Int
     , contractAddress : Maybe String
     , cumulativeGasUsed : Int
+    , events : Dict String Event
     , from : AccountAddress
     , gasUsed : Int
     , logsBloom : String
@@ -138,6 +154,46 @@ type alias TxReceipt =
     }
 
 
+type EventAddress
+    = EventAddress Address
+
+
+eventAddressDecoder : Decoder EventAddress
+eventAddressDecoder =
+    Decode.map EventAddress addressDecoder
+
+
+type alias Event =
+    { address : EventAddress
+    , blockHash : BlockAddress
+    , blockNumber : Int
+    , event : String
+    , id : String
+    , logIndex : Int
+    , removed : Bool
+    , returnValues : Value
+    , signature : String
+    , transactionHash : TxHash
+    , transactionIndex : Int
+    }
+
+
+eventDecoder : Decoder Event
+eventDecoder =
+    decode Event
+        |> required "address" eventAddressDecoder
+        |> required "blockHash" blockHashDecoder
+        |> required "blockNumber" Decode.int
+        |> required "event" Decode.string
+        |> required "id" Decode.string
+        |> required "logIndex" Decode.int
+        |> required "removed" Decode.bool
+        |> required "returnValues" (Decode.value)
+        |> required "signature" Decode.string
+        |> required "transactionHash" txHashDecoder
+        |> required "transactionIndex" Decode.int
+
+
 txReceiptDecoder : Decoder TxReceipt
 txReceiptDecoder =
     decode TxReceipt
@@ -145,6 +201,7 @@ txReceiptDecoder =
         |> required "blockNumber" Decode.int
         |> required "contractAddress" (nullable string)
         |> required "cumulativeGasUsed" Decode.int
+        |> required "events" (Decode.dict eventDecoder)
         |> required "from" accountDecoder
         |> required "gasUsed" Decode.int
         |> required "logsBloom" Decode.string

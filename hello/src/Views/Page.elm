@@ -5,7 +5,8 @@ module Views.Page exposing (ActivePage(..), bodyId, frame)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Route exposing (Route)
+import Json.Encode as Encode
+import Route as R exposing (Route)
 
 
 {-| Determines which navbar link (if any) will be rendered as active.
@@ -30,11 +31,34 @@ isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 
 -}
-frame : Bool -> ActivePage -> Html msg -> Html msg
-frame isLoading page content =
+frame : Bool -> Html msg -> ActivePage -> Html msg -> Html msg
+frame isLoading bannerMsg page content =
     div []
         [ viewHeader page isLoading
+        , banner bannerMsg
         , content
+        ]
+
+
+banner : Html msg -> Html msg
+banner bannerMsg =
+    div
+        [ class "container" ]
+        [ div
+            [ classList
+                [ ( "alert", True )
+                , ( "alert-info", True )
+                , ( "alert-dismissible", True )
+                ]
+            ]
+            [ button
+                [ type_ "button"
+                , class "close"
+                , property "data-dismiss" (Encode.string "close")
+                ]
+                []
+            , bannerMsg
+            ]
         ]
 
 
@@ -47,7 +71,7 @@ viewHeader page isLoading =
             [ div
                 [ class "navbar-header" ]
                 [ a
-                    [ class "navbar-brand", Route.href Route.Home ]
+                    [ class "navbar-brand", R.href R.Home ]
                     [ text "Hello, blockchain!" ]
                 ]
             , div
@@ -55,11 +79,8 @@ viewHeader page isLoading =
                 [ ul
                     [ classList [ ( "nav", True ), ( "navbar-nav", True ) ] ]
                     [ li
-                        [ classList [ ( "active", page == Home ) ] ]
-                        [ a [ Route.href Route.Home ] [ text "Hello Blockchain" ] ]
-                    , li
                         [ classList [ ( "active", page == Blockocracy ) ] ]
-                        [ a [ Route.href Route.Blockocracy ] [ text "Blockocracy" ] ]
+                        [ a [ R.href (R.Blockocracy R.Vote) ] [ text "Blockocracy" ] ]
                     ]
                 ]
             ]

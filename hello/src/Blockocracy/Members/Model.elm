@@ -1,12 +1,15 @@
 module Blockocracy.Members.Model
     exposing
         ( Member
+        , MemberRequest
         , accountLens
         , nameLens
+        , toMemberRequest
         )
 
 import Monocle.Lens exposing (..)
 import Forms.Model as Form exposing (Form)
+import Views.TxForm exposing (Tx)
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
 
@@ -14,6 +17,23 @@ type alias Member =
     { account : AccountAddress
     , name : String
     }
+
+
+type alias MemberRequest =
+    { senderAddress : String
+    , gasPrice : Int
+    , memberAddress : String
+    , memberName : String
+    }
+
+
+toMemberRequest : Tx -> Member -> MemberRequest
+toMemberRequest tx member =
+    MemberRequest
+        (Web3.getAccountAddress tx.senderAddress)
+        tx.gasPrice
+        (Web3.getAccountAddress member.account)
+        member.name
 
 
 accountLens : Lens (Form Member) AccountAddress

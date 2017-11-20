@@ -6,11 +6,12 @@ module Blockocracy.Views.Page
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Route exposing (Route)
+import Route as R exposing (Route)
 
 
 type ActivePage
-    = Index
+    = Vote
+    | Propose
     | Admin
 
 
@@ -27,15 +28,21 @@ viewHeader page =
     ul
         [ classList [ ( "nav", True ), ( "nav-pills", True ) ] ]
         [ li
-            [ classList [ ( "active", page == Index ) ] ]
+            [ classList [ ( "active", page == Vote ) ] ]
             [ a
-                [ Route.href Route.Blockocracy ]
-                [ text "Index" ]
+                [ R.href (R.Blockocracy R.Vote) ]
+                [ text "Vote" ]
+            ]
+        , li
+            [ classList [ ( "active", page == Propose ) ] ]
+            [ a
+                [ R.href (R.Blockocracy R.Propose) ]
+                [ text "Propose" ]
             ]
         , li
             [ classList [ ( "active", page == Admin ) ] ]
             [ a
-                [ Route.href Route.BlockocracyAdminMembers ]
+                [ R.href (R.Blockocracy R.Admin) ]
                 [ text "Admin" ]
             ]
         ]
