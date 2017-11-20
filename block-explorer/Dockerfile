@@ -7,7 +7,7 @@ USER blockexplorer
 
 WORKDIR /home/blockexplorer
 
-RUN git clone https://github.com/carsenk/explorer
+RUN git clone https://github.com/etherparty/explorer
 
 WORKDIR /home/blockexplorer/explorer
 
