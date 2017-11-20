@@ -1,4 +1,4 @@
-module Blockocracy.Pages.Index exposing (Page, Msg(..), init, update, view)
+module Blockocracy.Pages.Propose exposing (Page, Msg(..), init, update, view)
 
 import Forms.Model
     exposing
@@ -13,13 +13,6 @@ import Blockocracy.Proposal as Prop
         , etherAmountLens
         )
 import Blockocracy.Ports as Ports
-import Blockocracy.Vote as Vote
-    exposing
-        ( Vote
-        , proposalNumberLens
-        , proposalSupportLens
-        , supportJustificationLens
-        )
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck, onInput)
@@ -34,9 +27,8 @@ import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
 
 type alias Page =
-    { proposalForm : Form Proposal
-    , txForm : Form Tx
-    , voteForm : Form Vote
+    { txForm : Form Tx
+    , proposalForm : Form Proposal
     }
 
 
@@ -44,8 +36,6 @@ type Msg
     = TxFormInputChanged TxFormMsg String
     | ProposalInputChanged InputField
     | ProposalSubmitted
-    | VoteInputChanged VoteInputField
-    | VoteSubmitted
 
 
 type InputField
@@ -54,16 +44,10 @@ type InputField
     | Details String
 
 
-type VoteInputField
-    = ProposalNumber String
-    | ProposalSupport Bool
-    | SupportJustification String
-
-
 init : Task PageLoadError Page
 init =
     Task.succeed <|
-        Page Prop.defForm TxForm.defForm Vote.defForm
+        Page TxForm.defForm Prop.defForm
 
 
 view : Page -> Html Msg
@@ -75,8 +59,7 @@ view model =
             ]
         , div
             [ class "row" ]
-            [ renderMembersPanel model
-            , renderVotingPanel model
+            [ renderProposalPanel model
             ]
         ]
 
@@ -90,21 +73,12 @@ renderTxForm model =
         ]
 
 
-renderMembersPanel : Page -> Html Msg
-renderMembersPanel model =
+renderProposalPanel : Page -> Html Msg
+renderProposalPanel model =
     div
         [ class "col-sm-6" ]
         [ h2 [] [ text "Submit a Proposal" ]
         , proposalForm
-        ]
-
-
-renderVotingPanel : Page -> Html Msg
-renderVotingPanel model =
-    div
-        [ class "col-sm-6" ]
-        [ h2 [] [ text "Vote on a Proposal" ]
-        , voteForm model
         ]
 
 
@@ -114,50 +88,6 @@ txForm form =
         []
         [ h3 [] [ text "Enter your transaction details" ]
         , TxForm.render form TxFormInputChanged
-        ]
-
-
-voteForm : Page -> Html Msg
-voteForm model =
-    div
-        []
-        [ h3 [] [ text "Complete your ballot" ]
-        , div
-            [ class "form-group" ]
-            [ label [ for "proposalNumber" ] [ text "Proposal number" ]
-            , input
-                [ class "form-control"
-                , name "proposalNumber"
-                , type_ "numeric"
-                , placeholder "Proposal number"
-                , onInput (VoteInputChanged << ProposalNumber)
-                ]
-                []
-            , div
-                [ class "checkbox" ]
-                [ label
-                    [ for "supportsProposal" ]
-                    [ input
-                        [ name "supportsProposal"
-                        , type_ "checkbox"
-                        , onCheck (VoteInputChanged << ProposalSupport)
-                        ]
-                        []
-                    , text "I support this proposal"
-                    ]
-                ]
-            , label [ for "justification" ] [ text "Justificaiton" ]
-            , textarea
-                [ class "form-control"
-                , onInput (VoteInputChanged << SupportJustification)
-                ]
-                []
-            ]
-        , button
-            [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
-            , onClick VoteSubmitted
-            ]
-            [ text "Submit Ballot" ]
         ]
 
 
@@ -209,11 +139,6 @@ update msg model =
             , Cmd.none
             )
 
-        VoteInputChanged input ->
-            ( { model | voteForm = updateVoteForm model.voteForm input }
-            , Cmd.none
-            )
-
         TxFormInputChanged msg val ->
             ( { model | txForm = TxForm.updateForm model.txForm val msg }
             , Cmd.none
@@ -222,11 +147,6 @@ update msg model =
         ProposalSubmitted ->
             ( model
             , Ports.submitProposal <| Prop.toProposalRequest model.txForm.model model.proposalForm.model
-            )
-
-        VoteSubmitted ->
-            ( model
-            , Ports.submitVote <| Vote.toVoteRequest model.txForm.model model.voteForm.model
             )
 
 
@@ -246,21 +166,3 @@ updateProposalForm form input =
 
         Details val ->
             detailsLens.set val form
-
-
-updateVoteForm : Form Vote -> VoteInputField -> Form Vote
-updateVoteForm form input =
-    case input of
-        ProposalNumber val ->
-            case String.toInt val of
-                Err err ->
-                    errorsLens.set [ err ] form
-
-                Ok num ->
-                    proposalNumberLens.set num form
-
-        ProposalSupport val ->
-            proposalSupportLens.set val form
-
-        SupportJustification val ->
-            supportJustificationLens.set val form

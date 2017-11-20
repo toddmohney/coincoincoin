@@ -1,8 +1,9 @@
 module Main exposing (main)
 
-import Blockocracy.Pages.Index as Blockocracy
+import Blockocracy.Pages.Propose as BP
+import Blockocracy.Pages.Vote as BV
 import Blockocracy.Admin.Pages.Members as BlockocracyAdmin
-import Blockocracy.Events as BE exposing (BlockchainEvent(..))
+import Blockocracy.Events as BE
 import Blockocracy.Views.Page as BVP
 import Errors.Pages.Errored as Errored exposing (PageLoadError)
 import Errors.Pages.NotFound as NotFound
@@ -27,7 +28,8 @@ type Page
     = Blank
     | NotFound
     | Errored PageLoadError
-    | Blockocracy Blockocracy.Page
+    | BlockocracyVote BV.Page
+    | BlockocracyPropose BP.Page
     | BlockocracyAdminMembers BlockocracyAdmin.Page
 
 
@@ -99,11 +101,17 @@ viewPage isLoading page bannerMsg =
                 Errored.view subModel
                     |> frame Page.Other
 
-            Blockocracy subModel ->
-                Blockocracy.view subModel
-                    |> BVP.frame BVP.Index
+            BlockocracyVote subModel ->
+                BV.view subModel
+                    |> BVP.frame BVP.Vote
                     |> frame Page.Blockocracy
-                    |> Html.map BlockocracyMsg
+                    |> Html.map BlockocracyVoteMsg
+
+            BlockocracyPropose subModel ->
+                BP.view subModel
+                    |> BVP.frame BVP.Propose
+                    |> frame Page.Blockocracy
+                    |> Html.map BlockocracyProposeMsg
 
             BlockocracyAdminMembers subModel ->
                 BlockocracyAdmin.view subModel
@@ -117,11 +125,13 @@ viewPage isLoading page bannerMsg =
 
 
 type Msg
-    = BlockocracyLoaded (Result PageLoadError Blockocracy.Page)
+    = BlockocracyVoteLoaded (Result PageLoadError BV.Page)
+    | BlockocracyProposeLoaded (Result PageLoadError BP.Page)
     | BlockocracyAdminMembersLoaded (Result PageLoadError BlockocracyAdmin.Page)
-    | BlockocracyMsg Blockocracy.Msg
+    | BlockocracyVoteMsg BV.Msg
+    | BlockocracyProposeMsg BP.Msg
     | BlockocracyAdminMembersMsg BlockocracyAdmin.Msg
-    | BannerMsg BlockchainEvent
+    | BannerMsg BE.BlockchainEvent
     | SetRoute (Maybe Route)
 
 
@@ -140,12 +150,15 @@ setRoute maybeRoute model =
                 { model | pageState = Loaded NotFound } => Cmd.none
 
             Just Route.Home ->
-                transition BlockocracyLoaded Blockocracy.init
+                transition BlockocracyVoteLoaded BV.init
 
-            Just Route.Blockocracy ->
-                transition BlockocracyLoaded Blockocracy.init
+            Just (Route.Blockocracy Route.Vote) ->
+                transition BlockocracyVoteLoaded BV.init
 
-            Just Route.BlockocracyAdminMembers ->
+            Just (Route.Blockocracy Route.Propose) ->
+                transition BlockocracyProposeLoaded BP.init
+
+            Just (Route.Blockocracy Route.Admin) ->
                 transition BlockocracyAdminMembersLoaded BlockocracyAdmin.init
 
 
@@ -183,14 +196,23 @@ updatePage page msg model =
             ( BannerMsg bcEvt, _ ) ->
                 ( { model | bannerMessage = BE.bannerMessage bcEvt }, Cmd.none )
 
-            ( BlockocracyLoaded (Ok subModel), _ ) ->
-                { model | pageState = Loaded (Blockocracy subModel) } => Cmd.none
+            ( BlockocracyVoteLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (BlockocracyVote subModel) } => Cmd.none
 
-            ( BlockocracyLoaded (Err error), _ ) ->
+            ( BlockocracyVoteLoaded (Err error), _ ) ->
                 { model | pageState = Loaded (Errored error) } => Cmd.none
 
-            ( BlockocracyMsg subMsg, Blockocracy subModel ) ->
-                toPage Blockocracy BlockocracyMsg Blockocracy.update subMsg subModel
+            ( BlockocracyVoteMsg subMsg, BlockocracyVote subModel ) ->
+                toPage BlockocracyVote BlockocracyVoteMsg BV.update subMsg subModel
+
+            ( BlockocracyProposeLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (BlockocracyPropose subModel) } => Cmd.none
+
+            ( BlockocracyProposeLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( BlockocracyProposeMsg subMsg, BlockocracyPropose subModel ) ->
+                toPage BlockocracyPropose BlockocracyProposeMsg BP.update subMsg subModel
 
             ( BlockocracyAdminMembersLoaded (Ok subModel), _ ) ->
                 { model | pageState = Loaded (BlockocracyAdminMembers subModel) } => Cmd.none
@@ -236,8 +258,22 @@ getPage pageState =
 globalSubscriptions : Sub Msg
 globalSubscriptions =
     Sub.batch
-        [ Ports.proposalAdded (BannerMsg << ProposalAdded << Decode.decodeValue Web3.txReceiptDecoder)
-        , Ports.proposalAddedTxHashCreated (BannerMsg << ProposalAddedTxHashCreated << Decode.decodeValue Web3.txHashDecoder)
+        [ Ports.proposalAdded <|
+            BannerMsg
+                << BE.TxReceiptReceived BE.Proposal
+                << Decode.decodeValue Web3.txReceiptDecoder
+        , Ports.proposalAddedTxHashCreated <|
+            BannerMsg
+                << BE.TxHashCreated BE.Proposal
+                << Decode.decodeValue Web3.txHashDecoder
+        , Ports.voted <|
+            BannerMsg
+                << BE.TxReceiptReceived BE.Vote
+                << Decode.decodeValue Web3.txReceiptDecoder
+        , Ports.votedTxHashCreated <|
+            BannerMsg
+                << BE.TxHashCreated BE.Vote
+                << Decode.decodeValue Web3.txHashDecoder
         ]
 
 
@@ -253,7 +289,10 @@ pageSubscriptions page =
         NotFound ->
             Sub.none
 
-        Blockocracy _ ->
+        BlockocracyVote _ ->
+            Sub.none
+
+        BlockocracyPropose _ ->
             Sub.none
 
         BlockocracyAdminMembers _ ->

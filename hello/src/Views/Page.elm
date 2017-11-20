@@ -6,7 +6,7 @@ module Views.Page exposing (ActivePage(..), bodyId, frame)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Json.Encode as Encode
-import Route exposing (Route)
+import Route as R exposing (Route)
 
 
 {-| Determines which navbar link (if any) will be rendered as active.
@@ -43,19 +43,22 @@ frame isLoading bannerMsg page content =
 banner : String -> Html msg
 banner bannerMsg =
     div
-        [ classList
-            [ ( "alert", True )
-            , ( "alert-info", True )
-            , ( "alert-dismissable", True )
+        [ class "container" ]
+        [ div
+            [ classList
+                [ ( "alert", True )
+                , ( "alert-info", True )
+                , ( "alert-dismissible", True )
+                ]
             ]
-        ]
-        [ button
-            [ type_ "button"
-            , class "close"
-            , property "data-dismiss" (Encode.string "close")
+            [ button
+                [ type_ "button"
+                , class "close"
+                , property "data-dismiss" (Encode.string "close")
+                ]
+                []
+            , text bannerMsg
             ]
-            []
-        , text bannerMsg
         ]
 
 
@@ -68,7 +71,7 @@ viewHeader page isLoading =
             [ div
                 [ class "navbar-header" ]
                 [ a
-                    [ class "navbar-brand", Route.href Route.Home ]
+                    [ class "navbar-brand", R.href R.Home ]
                     [ text "Hello, blockchain!" ]
                 ]
             , div
@@ -77,7 +80,7 @@ viewHeader page isLoading =
                     [ classList [ ( "nav", True ), ( "navbar-nav", True ) ] ]
                     [ li
                         [ classList [ ( "active", page == Blockocracy ) ] ]
-                        [ a [ Route.href Route.Blockocracy ] [ text "Blockocracy" ] ]
+                        [ a [ R.href (R.Blockocracy R.Vote) ] [ text "Blockocracy" ] ]
                     ]
                 ]
             ]
