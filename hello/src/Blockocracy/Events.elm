@@ -7,7 +7,9 @@ module Blockocracy.Events
 
 import Blockocracy.Proposals.Events as PE
 import Blockocracy.Votes.Events as VE
-import Web3.Web3 exposing (TxHash, TxReceipt)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Web3.Web3 exposing (Address(..), TxHash(..), TxReceipt)
 
 
 type Context
@@ -20,7 +22,7 @@ type BlockchainEvent
     | TxReceiptReceived Context (Result String TxReceipt)
 
 
-bannerMessage : BlockchainEvent -> String
+bannerMessage : BlockchainEvent -> Html msg
 bannerMessage bcEvt =
     case bcEvt of
         TxHashCreated ctx res ->
@@ -40,26 +42,66 @@ bannerMessage bcEvt =
                     txReceiptMessage VE.parseVotedEvent res
 
 
-txHashCreatedMessage : String -> Result String TxHash -> String
+txHashCreatedMessage : String -> Result String TxHash -> Html msg
 txHashCreatedMessage intro res =
     case res of
         Err err ->
-            err
+            div [] [ text err ]
 
-        Ok txHash ->
-            intro ++ toString txHash ++ " Waiting for the tx to be mined."
+        Ok (TxHash (Address txHash)) ->
+            div
+                []
+                [ a
+                    [ target "_blank"
+                    , href <| "http://localhost:8000/#/transaction/" ++ txHash
+                    ]
+                    [ text <| intro ++ txHash
+                    ]
+                , div
+                    []
+                    [ text " Waiting for the tx to be mined."
+                    ]
+                ]
 
 
-txReceiptMessage : (TxReceipt -> Result String a) -> Result String TxReceipt -> String
+txReceiptMessage : (TxReceipt -> Result String a) -> Result String TxReceipt -> Html msg
 txReceiptMessage eventParserFn res =
     case res of
         Err err ->
-            err
+            div [] [ text err ]
 
         Ok txReceipt ->
             case eventParserFn txReceipt of
                 Err err ->
-                    err
+                    div [] [ text err ]
 
                 Ok evt ->
-                    "Mined! Address: " ++ toString txReceipt.blockHash ++ " Block number" ++ toString txReceipt.blockNumber ++ " Gas used: " ++ toString txReceipt.cumulativeGasUsed ++ " event: " ++ toString evt
+                    div []
+                        [ a
+                            [ target "_blank"
+                            , href <| "http://localhost:8000/#/block/" ++ toString txReceipt.blockNumber
+                            ]
+                            [ text <| "Tx mined in block " ++ toString txReceipt.blockNumber
+                            ]
+                        , div
+                            []
+                            [ text "Tx details"
+                            , renderTx txReceipt evt
+                            ]
+                        ]
+
+
+renderTx : TxReceipt -> a -> Html msg
+renderTx txReceipt evt =
+    pre
+        []
+        [ text <|
+            "Block number"
+                ++ toString txReceipt.blockNumber
+                ++ "\n"
+                ++ "Gas used: "
+                ++ toString txReceipt.cumulativeGasUsed
+                ++ "\n"
+                ++ "Event: "
+                ++ toString evt
+        ]

@@ -31,7 +31,7 @@ isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 
 -}
-frame : Bool -> String -> ActivePage -> Html msg -> Html msg
+frame : Bool -> Html msg -> ActivePage -> Html msg -> Html msg
 frame isLoading bannerMsg page content =
     div []
         [ viewHeader page isLoading
@@ -40,7 +40,7 @@ frame isLoading bannerMsg page content =
         ]
 
 
-banner : String -> Html msg
+banner : Html msg -> Html msg
 banner bannerMsg =
     div
         [ class "container" ]
@@ -57,7 +57,7 @@ banner bannerMsg =
                 , property "data-dismiss" (Encode.string "close")
                 ]
                 []
-            , text bannerMsg
+            , bannerMsg
             ]
         ]
 

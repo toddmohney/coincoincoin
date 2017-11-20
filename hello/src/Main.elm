@@ -49,7 +49,7 @@ type PageState
 
 type alias Model =
     { pageState : PageState
-    , bannerMessage : String
+    , bannerMessage : Html Msg
     }
 
 
@@ -57,7 +57,7 @@ init : Value -> Location -> ( Model, Cmd Msg )
 init val location =
     setRoute (Route.fromLocation location)
         { pageState = Loaded initialPage
-        , bannerMessage = ""
+        , bannerMessage = div [] []
         }
 
 
@@ -80,7 +80,7 @@ view model =
             viewPage True page model.bannerMessage
 
 
-viewPage : Bool -> Page -> String -> Html Msg
+viewPage : Bool -> Page -> Html Msg -> Html Msg
 viewPage isLoading page bannerMsg =
     let
         frame =
@@ -104,20 +104,20 @@ viewPage isLoading page bannerMsg =
             BlockocracyVote subModel ->
                 BV.view subModel
                     |> BVP.frame BVP.Vote
-                    |> frame Page.Blockocracy
                     |> Html.map BlockocracyVoteMsg
+                    |> frame Page.Blockocracy
 
             BlockocracyPropose subModel ->
                 BP.view subModel
                     |> BVP.frame BVP.Propose
-                    |> frame Page.Blockocracy
                     |> Html.map BlockocracyProposeMsg
+                    |> frame Page.Blockocracy
 
             BlockocracyAdminMembers subModel ->
                 BlockocracyAdmin.view subModel
                     |> BVP.frame BVP.Admin
-                    |> frame Page.Blockocracy
                     |> Html.map BlockocracyAdminMembersMsg
+                    |> frame Page.Blockocracy
 
 
 
