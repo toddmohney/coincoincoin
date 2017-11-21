@@ -262,17 +262,17 @@ globalSubscriptions =
             BannerMsg
                 << BE.TxReceiptReceived BE.Proposal
                 << Decode.decodeValue Web3.txReceiptDecoder
-        , Ports.proposalAddedTxHashCreated <|
+        , Ports.proposalAddedTxAddressCreated <|
             BannerMsg
-                << BE.TxHashCreated BE.Proposal
+                << BE.TxAddressCreated BE.Proposal
                 << Decode.decodeValue Web3.txHashDecoder
         , Ports.voted <|
             BannerMsg
                 << BE.TxReceiptReceived BE.Vote
                 << Decode.decodeValue Web3.txReceiptDecoder
-        , Ports.votedTxHashCreated <|
+        , Ports.votedTxAddressCreated <|
             BannerMsg
-                << BE.TxHashCreated BE.Vote
+                << BE.TxAddressCreated BE.Vote
                 << Decode.decodeValue Web3.txHashDecoder
         ]
 

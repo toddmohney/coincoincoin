@@ -4,18 +4,18 @@ module Web3.Web3
         , Address(..)
         , BigNumber
         , Event
-        , TxHash(..)
+        , TxAddress(..)
         , Tx
         , TxReceipt
         , accountDecoder
         , bigNumberDecoder
         , getAccountAddress
         , getAddress
-        , getTxHash
+        , getTxAddress
         , mkAccountAddress
-        , mkTxHash
+        , mkTxAddress
         , sampleAccountAddress
-        , sampleTxHash
+        , sampleTxAddress
         , txDecoder
         , txHashDecoder
         , txReceiptDecoder
@@ -30,13 +30,78 @@ type alias BigNumber =
     String
 
 
+type Address
+    = Address String
+
+
+type AccountAddress
+    = AccountAddress Address
+
+
+type BlockAddress
+    = BlockAddress Address
+
+
+type EventAddress
+    = EventAddress Address
+
+
+type TxAddress
+    = TxAddress Address
+
+
+type alias Event =
+    { address : EventAddress
+    , blockHash : BlockAddress
+    , blockNumber : Int
+    , event : String
+    , id : String
+    , logIndex : Int
+    , removed : Bool
+    , returnValues : Value
+    , signature : String
+    , transactionHash : TxAddress
+    , transactionIndex : Int
+    }
+
+
+type alias TxReceipt =
+    { blockHash : BlockAddress
+    , blockNumber : Int
+    , contractAddress : Maybe String
+    , cumulativeGasUsed : Int
+    , events : Dict String Event
+    , from : AccountAddress
+    , gasUsed : Int
+    , logsBloom : String
+    , root : BlockAddress
+    , to : AccountAddress
+    , transactionHash : TxAddress
+    , transactionIndex : Int
+    }
+
+
+type alias Tx =
+    { blockHash : BlockAddress
+    , blockNumber : Maybe Int
+    , from : AccountAddress
+    , to : AccountAddress
+    , gas : Int
+    , gasPrice : String
+    , transactionHash : TxAddress
+    , input : String
+    , nonce : Int
+    , r : String
+    , s : String
+    , v : String
+    , transactionIndex : Int
+    , value : String
+    }
+
+
 bigNumberDecoder : Decoder BigNumber
 bigNumberDecoder =
     Decode.string
-
-
-type Address
-    = Address String
 
 
 getAddress : Address -> String
@@ -47,10 +112,6 @@ getAddress (Address addr) =
 addressDecoder : Decoder Address
 addressDecoder =
     Decode.map Address Decode.string
-
-
-type AccountAddress
-    = AccountAddress Address
 
 
 mkAccountAddress : String -> AccountAddress
@@ -68,10 +129,6 @@ accountDecoder =
     Decode.map AccountAddress addressDecoder
 
 
-type BlockAddress
-    = BlockAddress Address
-
-
 mkBlockhash : String -> BlockAddress
 mkBlockhash =
     BlockAddress << Address
@@ -82,41 +139,19 @@ blockHashDecoder =
     Decode.map BlockAddress addressDecoder
 
 
-type TxHash
-    = TxHash Address
+mkTxAddress : String -> TxAddress
+mkTxAddress =
+    TxAddress << Address
 
 
-mkTxHash : String -> TxHash
-mkTxHash =
-    TxHash << Address
-
-
-getTxHash : TxHash -> String
-getTxHash (TxHash addr) =
+getTxAddress : TxAddress -> String
+getTxAddress (TxAddress addr) =
     getAddress addr
 
 
-txHashDecoder : Decoder TxHash
+txHashDecoder : Decoder TxAddress
 txHashDecoder =
-    Decode.map TxHash addressDecoder
-
-
-type alias Tx =
-    { blockHash : BlockAddress
-    , blockNumber : Maybe Int
-    , from : AccountAddress
-    , to : AccountAddress
-    , gas : Int
-    , gasPrice : String
-    , transactionHash : TxHash
-    , input : String
-    , nonce : Int
-    , r : String
-    , s : String
-    , v : String
-    , transactionIndex : Int
-    , value : String
-    }
+    Decode.map TxAddress addressDecoder
 
 
 txDecoder : Decoder Tx
@@ -138,44 +173,9 @@ txDecoder =
         |> required "value" Decode.string
 
 
-type alias TxReceipt =
-    { blockHash : BlockAddress
-    , blockNumber : Int
-    , contractAddress : Maybe String
-    , cumulativeGasUsed : Int
-    , events : Dict String Event
-    , from : AccountAddress
-    , gasUsed : Int
-    , logsBloom : String
-    , root : BlockAddress
-    , to : AccountAddress
-    , transactionHash : TxHash
-    , transactionIndex : Int
-    }
-
-
-type EventAddress
-    = EventAddress Address
-
-
 eventAddressDecoder : Decoder EventAddress
 eventAddressDecoder =
     Decode.map EventAddress addressDecoder
-
-
-type alias Event =
-    { address : EventAddress
-    , blockHash : BlockAddress
-    , blockNumber : Int
-    , event : String
-    , id : String
-    , logIndex : Int
-    , removed : Bool
-    , returnValues : Value
-    , signature : String
-    , transactionHash : TxHash
-    , transactionIndex : Int
-    }
 
 
 eventDecoder : Decoder Event
@@ -216,6 +216,6 @@ sampleAccountAddress =
     mkAccountAddress "0x0000000000000000000000000000000000000000"
 
 
-sampleTxHash : TxHash
-sampleTxHash =
-    mkTxHash "0x0000000000000000000000000000000000000000000000000000000000000000"
+sampleTxAddress : TxAddress
+sampleTxAddress =
+    mkTxAddress "0x0000000000000000000000000000000000000000000000000000000000000000"

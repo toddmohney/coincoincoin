@@ -9,7 +9,7 @@ import Blockocracy.Proposals.Events as PE
 import Blockocracy.Votes.Events as VE
 import Html exposing (..)
 import Html.Attributes exposing (..)
-import Web3.Web3 exposing (Address(..), TxHash(..), TxReceipt)
+import Web3.Web3 exposing (Address(..), TxAddress(..), TxReceipt)
 
 
 type Context
@@ -18,14 +18,14 @@ type Context
 
 
 type BlockchainEvent
-    = TxHashCreated Context (Result String TxHash)
+    = TxAddressCreated Context (Result String TxAddress)
     | TxReceiptReceived Context (Result String TxReceipt)
 
 
 bannerMessage : BlockchainEvent -> Html msg
 bannerMessage bcEvt =
     case bcEvt of
-        TxHashCreated ctx res ->
+        TxAddressCreated ctx res ->
             case ctx of
                 Proposal ->
                     txHashCreatedMessage "New proposal tx received " res
@@ -42,13 +42,13 @@ bannerMessage bcEvt =
                     txReceiptMessage VE.parseVotedEvent res
 
 
-txHashCreatedMessage : String -> Result String TxHash -> Html msg
+txHashCreatedMessage : String -> Result String TxAddress -> Html msg
 txHashCreatedMessage intro res =
     case res of
         Err err ->
             div [] [ text err ]
 
-        Ok (TxHash (Address txHash)) ->
+        Ok (TxAddress (Address txHash)) ->
             div
                 []
                 [ a
