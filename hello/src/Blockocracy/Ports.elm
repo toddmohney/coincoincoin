@@ -2,6 +2,8 @@ port module Blockocracy.Ports
     exposing
         ( addMember
         , removeMember
+        , getProposal
+        , proposalReceived
         , submitProposal
         , submitVote
         )
@@ -9,6 +11,13 @@ port module Blockocracy.Ports
 import Blockocracy.Members.Model exposing (MemberRequest)
 import Blockocracy.Proposal exposing (ProposalRequest)
 import Blockocracy.Vote exposing (VoteRequest)
+import Json.Decode exposing (Value)
+
+
+port getProposal : Int -> Cmd msg
+
+
+port proposalReceived : (Value -> msg) -> Sub msg
 
 
 port submitProposal : ProposalRequest -> Cmd msg

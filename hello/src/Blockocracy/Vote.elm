@@ -2,18 +2,14 @@ module Blockocracy.Vote
     exposing
         ( Vote
         , VoteRequest
-        , VotedEvent
         , proposalNumberLens
         , proposalSupportLens
         , supportJustificationLens
         , defForm
         , toVoteRequest
-        , votedEventDecoder
         )
 
 import Forms.Model exposing (..)
-import Json.Decode as D exposing (int, string, nullable, Decoder)
-import Json.Decode.Pipeline exposing (decode, required)
 import Monocle.Lens exposing (..)
 import Views.TxForm exposing (Tx)
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
@@ -35,14 +31,6 @@ type alias VoteRequest =
     }
 
 
-type alias VotedEvent =
-    { proposalID : Int
-    , position : Bool
-    , voter : AccountAddress
-    , justification : String
-    }
-
-
 toVoteRequest : Tx -> Vote -> VoteRequest
 toVoteRequest tx vote =
     VoteRequest
@@ -51,15 +39,6 @@ toVoteRequest tx vote =
         vote.proposalNumber
         vote.proposalSupport
         vote.supportJustification
-
-
-votedEventDecoder : Decoder VotedEvent
-votedEventDecoder =
-    decode VotedEvent
-        |> required "proposalID" D.int
-        |> required "position" D.bool
-        |> required "voter" Web3.accountDecoder
-        |> required "justification" D.string
 
 
 defForm : Form Vote

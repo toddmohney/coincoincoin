@@ -103,5 +103,10 @@ renderTx txReceipt evt =
                 ++ toString txReceipt.cumulativeGasUsed
                 ++ "\n"
                 ++ "Event: "
-                ++ toString evt
+                ++ kindaPrettyPrint evt
         ]
+
+
+kindaPrettyPrint : a -> String
+kindaPrettyPrint =
+    String.join "\n," << String.split "," << toString

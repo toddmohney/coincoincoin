@@ -39,7 +39,7 @@ votedEventDecoder : Decoder VotedEvent
 votedEventDecoder =
     decode VotedEvent
         |> required "proposalID" D.string
-        |> required "position" D.bool
+        |> required "position" (D.map (Maybe.withDefault False) <| nullable D.bool)
         |> required "voter" Web3.accountDecoder
         |> required "justification" D.string
 

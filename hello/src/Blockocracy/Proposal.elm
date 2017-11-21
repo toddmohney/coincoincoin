@@ -2,17 +2,21 @@ module Blockocracy.Proposal
     exposing
         ( Proposal
         , ProposalRequest
+        , ProposalResponse
         , beneficiaryLens
         , defForm
         , detailsLens
         , etherAmountLens
         , toProposalRequest
+        , proposalResponseDecoder
         )
 
 import Forms.Model exposing (..)
+import Json.Decode as Decode exposing (int, string, nullable, Decoder, Value)
+import Json.Decode.Pipeline exposing (decode, required)
 import Monocle.Lens exposing (..)
 import Views.TxForm exposing (Tx)
-import Web3.Web3 as Web3 exposing (AccountAddress(..))
+import Web3.Web3 as Web3 exposing (AccountAddress(..), Address, BigNumber)
 
 
 type alias Proposal =
@@ -29,6 +33,33 @@ type alias ProposalRequest =
     , etherAmount : Float
     , details : String
     }
+
+
+type alias ProposalResponse =
+    { amount : BigNumber
+    , currentResult : Int
+    , description : String
+    , executed : Bool
+    , numberOfVotes : Int
+    , proposalPassed : Bool
+    , proposalHash : Address
+    , recipient : AccountAddress
+    , votingDeadline : Int
+    }
+
+
+proposalResponseDecoder : Decoder ProposalResponse
+proposalResponseDecoder =
+    decode ProposalResponse
+        |> required "amount" Web3.bigNumberDecoder
+        |> required "currentResult" Decode.int
+        |> required "description" Decode.string
+        |> required "executed" Decode.bool
+        |> required "numberOfVotes" Decode.int
+        |> required "proposalPassed" Decode.bool
+        |> required "proposalHash" Web3.addressDecoder
+        |> required "recipient" Web3.accountDecoder
+        |> required "votingDeadline" Decode.int
 
 
 toProposalRequest : Tx -> Proposal -> ProposalRequest
