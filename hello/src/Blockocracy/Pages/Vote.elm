@@ -5,6 +5,7 @@ import Forms.Model
         ( Form
         , errorsLens
         )
+import Blockocracy.Proposal exposing (ProposalResponse)
 import Blockocracy.Ports as Ports
 import Blockocracy.Vote as Vote
     exposing
@@ -24,6 +25,7 @@ import Views.TxForm as TxForm exposing (Tx, TxFormMsg(..))
 type alias Page =
     { txForm : Form Tx
     , voteForm : Form Vote
+    , selectedProposal : Maybe ProposalResponse
     }
 
 
@@ -31,6 +33,7 @@ type Msg
     = TxFormInputChanged TxFormMsg String
     | VoteInputChanged VoteInputField
     | VoteSubmitted
+    | ProposalLoaded (Result String ProposalResponse)
 
 
 type VoteInputField
@@ -42,7 +45,7 @@ type VoteInputField
 init : Task PageLoadError Page
 init =
     Task.succeed <|
-        Page TxForm.defForm Vote.defForm
+        Page TxForm.defForm Vote.defForm Nothing
 
 
 view : Page -> Html Msg
@@ -50,19 +53,25 @@ view model =
     div [ class "container" ]
         [ div
             [ class "row" ]
-            [ renderTxForm model
+            [ renderVotingPanel model
+            , proposalPreview model
             ]
         , div
             [ class "row" ]
-            [ renderVotingPanel model
+            [ renderTxForm model
             ]
+        , button
+            [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
+            , onClick VoteSubmitted
+            ]
+            [ text "Submit Ballot" ]
         ]
 
 
 renderTxForm : Page -> Html Msg
 renderTxForm model =
     div
-        [ class "col-sm-12" ]
+        [ class "col-sm-6" ]
         [ h2 [] [ text "TX Form" ]
         , txForm model.txForm
         ]
@@ -71,10 +80,27 @@ renderTxForm model =
 renderVotingPanel : Page -> Html Msg
 renderVotingPanel model =
     div
-        [ class "col-sm-12" ]
+        [ class "col-sm-6" ]
         [ h2 [] [ text "Vote on a Proposal" ]
         , voteForm model
         ]
+
+
+proposalPreview : Page -> Html Msg
+proposalPreview model =
+    case model.selectedProposal of
+        Nothing ->
+            div [] []
+
+        Just proposal ->
+            div
+                [ class "col-sm-6" ]
+                [ h2 [] [ text "Selected Proposal" ]
+                , pre
+                    []
+                    [ text << String.join "\n," <| String.split "," (toString proposal)
+                    ]
+                ]
 
 
 txForm : Form Tx -> Html Msg
@@ -122,11 +148,6 @@ voteForm model =
                 ]
                 []
             ]
-        , button
-            [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
-            , onClick VoteSubmitted
-            ]
-            [ text "Submit Ballot" ]
         ]
 
 
@@ -135,7 +156,7 @@ update msg model =
     case msg of
         VoteInputChanged input ->
             ( { model | voteForm = updateVoteForm model.voteForm input }
-            , Cmd.none
+            , inputEffects input
             )
 
         TxFormInputChanged msg val ->
@@ -147,6 +168,16 @@ update msg model =
             ( model
             , Ports.submitVote <| Vote.toVoteRequest model.txForm.model model.voteForm.model
             )
+
+        ProposalLoaded result ->
+            case result of
+                Err err ->
+                    ( model, Cmd.none )
+
+                Ok proposalResponse ->
+                    ( { model | selectedProposal = Just proposalResponse }
+                    , Cmd.none
+                    )
 
 
 updateVoteForm : Form Vote -> VoteInputField -> Form Vote
@@ -165,3 +196,18 @@ updateVoteForm form input =
 
         SupportJustification val ->
             supportJustificationLens.set val form
+
+
+inputEffects : VoteInputField -> Cmd Msg
+inputEffects msg =
+    case msg of
+        ProposalNumber val ->
+            case String.toInt val of
+                Err _ ->
+                    Cmd.none
+
+                Ok num ->
+                    Ports.getProposal num
+
+        _ ->
+            Cmd.none

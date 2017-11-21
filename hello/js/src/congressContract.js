@@ -592,3 +592,4 @@ const congressContractAbi = [
   }
 ];
 exports.congressContract = new web3.eth.Contract(congressContractAbi, congressContractAddr);
+exports.congressContractAddr = congressContractAddr;

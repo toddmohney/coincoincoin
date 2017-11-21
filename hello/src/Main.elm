@@ -1,9 +1,11 @@
 module Main exposing (main)
 
-import Blockocracy.Pages.Propose as BP
-import Blockocracy.Pages.Vote as BV
 import Blockocracy.Admin.Pages.Members as BlockocracyAdmin
 import Blockocracy.Events as BE
+import Blockocracy.Pages.Propose as BP
+import Blockocracy.Pages.Vote as BV
+import Blockocracy.Ports as BlockPorts
+import Blockocracy.Proposal as Proposal
 import Blockocracy.Views.Page as BVP
 import Errors.Pages.Errored as Errored exposing (PageLoadError)
 import Errors.Pages.NotFound as NotFound
@@ -290,7 +292,12 @@ pageSubscriptions page =
             Sub.none
 
         BlockocracyVote _ ->
-            Sub.none
+            Sub.batch
+                [ BlockPorts.proposalReceived <|
+                    BlockocracyVoteMsg
+                        << BV.ProposalLoaded
+                        << Decode.decodeValue Proposal.proposalResponseDecoder
+                ]
 
         BlockocracyPropose _ ->
             Sub.none

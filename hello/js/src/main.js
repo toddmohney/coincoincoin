@@ -1,11 +1,35 @@
 const Web3 = require("web3");
 
-const { congressContract } = require("./congressContract.js");
+const { congressContract, congressContractAddr } = require("./congressContract.js");
 
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8546');
 
 
 const app = Elm.Main.fullscreen(localStorage.session || null);
+
+
+app.ports.getProposal.subscribe((proposalNum) => {
+  congressContract.methods.proposals(proposalNum).call({
+    from: congressContractAddr
+  })
+  .then((result) => {
+    console.log("getProposal", result);
+    app.ports.proposalReceived.send({
+      amount: result.amount,
+      currentResult: Number(result.currentResult),
+      description: result.description,
+      executed: result.executed,
+      numberOfVotes: Number(result.numberOfVotes),
+      proposalPassed: result.proposalPassed,
+      proposalHash: result.proposalHash,
+      recipient: result.recipient,
+      votingDeadline: Number(result.votingDeadline)
+    });
+  }).catch(() => {
+    console.error("getProposal", arguments);
+  });
+});
+
 
 app.ports.submitProposal.subscribe((req) => {
   console.log("submitProposal", req);
@@ -130,7 +154,7 @@ app.ports.submitVote.subscribe((req) => {
   const gasPrice = req.gasPrice;
 
   const proposalNumber = req.proposalNumber;
-  const proposalSupport = req.proposalSupport;
+  const proposalSupport = req.proposalSupport || false;
   const supportJustification = req.supportJustification;
 
   congressContract.methods.vote(
@@ -147,7 +171,7 @@ app.ports.submitVote.subscribe((req) => {
     console.log("tx received", hash);
     console.log("waiting for tx to be mined...");
 
-    app.ports.votedTxHashCreated.send(hash);
+    app.ports.votedTxAddressCreated.send(hash);
   })
   .once('receipt', (receipt) => {
     console.log("tx receipt received", receipt);

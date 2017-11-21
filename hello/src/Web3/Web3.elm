@@ -8,6 +8,7 @@ module Web3.Web3
         , Tx
         , TxReceipt
         , accountDecoder
+        , addressDecoder
         , bigNumberDecoder
         , getAccountAddress
         , getAddress
