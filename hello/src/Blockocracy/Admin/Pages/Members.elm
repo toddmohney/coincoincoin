@@ -86,8 +86,18 @@ view model =
             [ div
                 [ class "col-sm-12" ]
                 [ h2 [] [ text "Add / Remove a Member" ]
-                , txForm model.txForm
                 , memberForm
+                , txForm model.txForm
+                , button
+                    [ classList [ ( "pull-left", True ), ( "btn", True ), ( "btn-danger", True ) ]
+                    , onClick MemberRemoved
+                    ]
+                    [ text "Remove Member" ]
+                , button
+                    [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
+                    , onClick MemberAdded
+                    ]
+                    [ text "Add New Member" ]
                 ]
             ]
         ]
@@ -119,16 +129,6 @@ memberForm =
                 ]
                 []
             ]
-        , button
-            [ classList [ ( "pull-left", True ), ( "btn", True ), ( "btn-danger", True ) ]
-            , onClick MemberRemoved
-            ]
-            [ text "Remove Member" ]
-        , button
-            [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
-            , onClick MemberAdded
-            ]
-            [ text "Add New Member" ]
         ]
 
 

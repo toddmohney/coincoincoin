@@ -55,12 +55,17 @@ view model =
     div [ class "container" ]
         [ div
             [ class "row" ]
-            [ renderTxForm model
+            [ renderProposalPanel model
             ]
         , div
             [ class "row" ]
-            [ renderProposalPanel model
+            [ renderTxForm model
             ]
+        , button
+            [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
+            , onClick ProposalSubmitted
+            ]
+            [ text "Submit Proposal" ]
         ]
 
 
@@ -76,7 +81,7 @@ renderTxForm model =
 renderProposalPanel : Page -> Html Msg
 renderProposalPanel model =
     div
-        [ class "col-sm-6" ]
+        [ class "col-sm-12" ]
         [ h2 [] [ text "Submit a Proposal" ]
         , proposalForm
         ]
@@ -123,11 +128,6 @@ proposalForm =
                 ]
                 []
             ]
-        , button
-            [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
-            , onClick ProposalSubmitted
-            ]
-            [ text "Submit Proposal" ]
         ]
 
 
