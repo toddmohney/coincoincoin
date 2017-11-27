@@ -65,7 +65,7 @@ banner bannerMsg =
 viewHeader : ActivePage -> Bool -> Html msg
 viewHeader page isLoading =
     nav
-        [ classList [ ( "navbar", True ), ( "navbar-default", True ) ] ]
+        [ classList [ ( "navbar", True ), ( "navbar-inverse", True ) ] ]
         [ div
             [ class "container" ]
             [ div

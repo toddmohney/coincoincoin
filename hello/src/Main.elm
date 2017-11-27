@@ -7,6 +7,7 @@ import Blockocracy.Pages.Vote as BV
 import Blockocracy.Ports as BlockPorts
 import Blockocracy.Proposal as Proposal
 import Blockocracy.Views.Page as BVP
+import Blockocracy.Vote as Vote
 import Errors.Pages.Errored as Errored exposing (PageLoadError)
 import Errors.Pages.NotFound as NotFound
 import Html exposing (..)
@@ -140,9 +141,9 @@ type Msg
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
 setRoute maybeRoute model =
     let
-        transition toMsg task =
+        transition toMsg task cmds =
             { model | pageState = TransitioningFrom (getPage model.pageState) }
-                => Task.attempt toMsg task
+                => Cmd.batch (Task.attempt toMsg task :: cmds)
 
         errored =
             pageErrored model
@@ -152,16 +153,19 @@ setRoute maybeRoute model =
                 { model | pageState = Loaded NotFound } => Cmd.none
 
             Just Route.Home ->
-                transition BlockocracyVoteLoaded BV.init
+                transition BlockocracyVoteLoaded BV.init []
 
             Just (Route.Blockocracy Route.Vote) ->
-                transition BlockocracyVoteLoaded BV.init
+                transition BlockocracyVoteLoaded BV.init []
 
             Just (Route.Blockocracy Route.Propose) ->
-                transition BlockocracyProposeLoaded BP.init
+                transition BlockocracyProposeLoaded BP.init []
 
             Just (Route.Blockocracy Route.Admin) ->
-                transition BlockocracyAdminMembersLoaded BlockocracyAdmin.init
+                transition
+                    BlockocracyAdminMembersLoaded
+                    BlockocracyAdmin.init
+                    [ BlockPorts.getVotingRules "" ]
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -303,7 +307,12 @@ pageSubscriptions page =
             Sub.none
 
         BlockocracyAdminMembers _ ->
-            Sub.none
+            Sub.batch
+                [ BlockPorts.votingRulesReceived <|
+                    BlockocracyAdminMembersMsg
+                        << BlockocracyAdmin.VotingRulesLoaded
+                        << Decode.decodeValue Vote.votingRulesDecoder
+                ]
 
 
 

@@ -1,4 +1,5 @@
 const Web3 = require("web3");
+const Q = require('q');
 
 const { congressContract, congressContractAddr } = require("./congressContract.js");
 
@@ -6,6 +7,31 @@ const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8546');
 
 
 const app = Elm.Main.fullscreen(localStorage.session || null);
+
+
+app.ports.getVotingRules.subscribe((_) => {
+  Q.all([
+    congressContract.methods.minimumQuorum().call({
+      from: congressContractAddr
+    }),
+    congressContract.methods.debatingPeriodInMinutes().call({
+      from: congressContractAddr
+    }),
+    congressContract.methods.majorityMargin().call({
+      from: congressContractAddr
+    })
+  ])
+  .then((result) => {
+    console.log("getVotingRules", result);
+    app.ports.votingRulesReceived.send({
+      minimumQuorum: Number(result[0]),
+      debatingPeriodInMinutes: Number(result[1]),
+      majorityMargin: Number(result[2])
+    });
+  }).catch(() => {
+    console.error("getVotingRules", arguments);
+  });
+});
 
 
 app.ports.getProposal.subscribe((proposalNum) => {

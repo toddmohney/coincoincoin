@@ -7,8 +7,10 @@ module Blockocracy.Admin.Pages.Members
         , view
         )
 
+import Async exposing (External(..))
 import Blockocracy.Members.Model as Member exposing (Member, accountLens, nameLens)
 import Blockocracy.Ports as Ports
+import Blockocracy.Vote exposing (VotingRules)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
@@ -22,6 +24,7 @@ import Web3.Web3 as Web3
 type alias Page =
     { txForm : Form Tx
     , memberForm : Form Member
+    , votingRules : External VotingRules
     }
 
 
@@ -30,6 +33,7 @@ type Msg
     | InputChanged InputField String
     | MemberAdded
     | MemberRemoved
+    | VotingRulesLoaded (Result String VotingRules)
 
 
 type InputField
@@ -43,6 +47,7 @@ init =
         Page
             TxForm.defForm
             (Form (Member (Web3.mkAccountAddress "0x00") "") [])
+            Loading
 
 
 update : Msg -> Page -> ( Page, Cmd Msg )
@@ -77,6 +82,18 @@ update msg model =
                 Member.toMemberRequest model.txForm.model model.memberForm.model
             )
 
+        VotingRulesLoaded result ->
+            case result of
+                Err err ->
+                    ( { model | votingRules = LoadError err }
+                    , Cmd.none
+                    )
+
+                Ok rules ->
+                    ( { model | votingRules = Loaded rules }
+                    , Cmd.none
+                    )
+
 
 view : Page -> Html Msg
 view model =
@@ -84,23 +101,94 @@ view model =
         [ div
             [ class "row" ]
             [ div
-                [ class "col-sm-12" ]
-                [ h2 [] [ text "Add / Remove a Member" ]
-                , memberForm
-                , txForm model.txForm
-                , button
-                    [ classList [ ( "pull-left", True ), ( "btn", True ), ( "btn-danger", True ) ]
-                    , onClick MemberRemoved
-                    ]
-                    [ text "Remove Member" ]
-                , button
-                    [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
-                    , onClick MemberAdded
-                    ]
-                    [ text "Add New Member" ]
+                [ class "col-sm-6" ]
+                [ renderMemberManagement model
+                ]
+            , div
+                [ class "col-sm-6" ]
+                [ renderCongressVotingRules model
                 ]
             ]
         ]
+
+
+renderMemberManagement : Page -> Html Msg
+renderMemberManagement model =
+    div
+        []
+        [ h2 [] [ text "Add / Remove a Member" ]
+        , memberForm
+        , txForm model.txForm
+        , button
+            [ classList [ ( "pull-left", True ), ( "btn", True ), ( "btn-danger", True ) ]
+            , onClick MemberRemoved
+            ]
+            [ text "Remove Member" ]
+        , button
+            [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
+            , onClick MemberAdded
+            ]
+            [ text "Add New Member" ]
+        ]
+
+
+renderCongressVotingRules : Page -> Html Msg
+renderCongressVotingRules model =
+    case model.votingRules of
+        NotLoaded ->
+            div
+                []
+                [ h2 [] [ text "Voting Rules" ]
+                , div
+                    []
+                    [ text <| "Waiting to load..."
+                    ]
+                ]
+
+        Loading ->
+            div
+                []
+                [ h2 [] [ text "Voting Rules" ]
+                , div
+                    []
+                    [ text <| "Loading..."
+                    ]
+                ]
+
+        LoadError err ->
+            div
+                []
+                [ h2 [] [ text "Voting Rules" ]
+                , div
+                    []
+                    [ text <| "An error occurred:"
+                    , text err
+                    ]
+                ]
+
+        Loaded rules ->
+            div
+                []
+                [ h2 [] [ text "Voting Rules" ]
+                , div
+                    []
+                    [ div
+                        []
+                        [ strong [] [ text "Minimum quorum: " ]
+                        , div [ class "pull-right" ] [ text <| toString rules.minimumQuorum ]
+                        ]
+                    , div
+                        []
+                        [ strong [] [ text "Debate period (minutes): " ]
+                        , div [ class "pull-right" ] [ text <| toString rules.debatingPeriodInMinutes ]
+                        ]
+                    , div
+                        []
+                        [ strong [] [ text "Majority margin required: " ]
+                        , div [ class "pull-right" ] [ text <| toString rules.majorityMargin ]
+                        ]
+                    ]
+                ]
 
 
 memberForm : Html Msg

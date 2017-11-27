@@ -3,9 +3,11 @@ port module Blockocracy.Ports
         ( addMember
         , removeMember
         , getProposal
+        , getVotingRules
         , proposalReceived
         , submitProposal
         , submitVote
+        , votingRulesReceived
         )
 
 import Blockocracy.Members.Model exposing (MemberRequest)
@@ -30,3 +32,9 @@ port addMember : MemberRequest -> Cmd msg
 
 
 port removeMember : MemberRequest -> Cmd msg
+
+
+port getVotingRules : String -> Cmd msg
+
+
+port votingRulesReceived : (Value -> msg) -> Sub msg
