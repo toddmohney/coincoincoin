@@ -3,6 +3,7 @@ module Blockocracy.Votes.Events
         ( VoteEvent
         , VotedEvent
         , parseVotedEvent
+        , parseChangeOfRulesEvent
         )
 
 import Dict as Dict
@@ -15,6 +16,7 @@ import Web3.Web3 as Web3 exposing (AccountAddress(..), BigNumber, Event, TxRecei
 
 type VoteEvent
     = Voted
+    | ChangeOfRules
 
 
 type alias VotedEvent =
@@ -22,6 +24,13 @@ type alias VotedEvent =
     , position : Bool
     , voter : AccountAddress
     , justification : String
+    }
+
+
+type alias VotingRulesChangedEvent =
+    { newMinimumQuorum : Int
+    , newDebatingPeriodInMinutes : Int
+    , newMajorityMargin : Int
     }
 
 
@@ -33,6 +42,16 @@ parseVotedEvent txReceipt =
 
         Just evt ->
             D.decodeValue votedEventDecoder evt.returnValues
+
+
+parseChangeOfRulesEvent : TxReceipt -> Result String VotingRulesChangedEvent
+parseChangeOfRulesEvent txReceipt =
+    case votingRulesChangedEventOpt.getOption txReceipt of
+        Nothing ->
+            Err <| "Event not found: " ++ toString ChangeOfRules
+
+        Just evt ->
+            D.decodeValue votingRulesChangedEventDecoder evt.returnValues
 
 
 votedEventDecoder : Decoder VotedEvent
@@ -58,4 +77,39 @@ votedEventSet : Event -> TxReceipt -> TxReceipt
 votedEventSet evt txReceipt =
     { txReceipt
         | events = Dict.insert (toString Voted) evt txReceipt.events
+    }
+
+
+votingRulesChangedEventDecoder : Decoder VotingRulesChangedEvent
+votingRulesChangedEventDecoder =
+    decode VotingRulesChangedEvent
+        |> required "newMinimumQuorum" (D.string |> D.andThen toIntDecoder)
+        |> required "newDebatingPeriodInMinutes" (D.string |> D.andThen toIntDecoder)
+        |> required "newMajorityMargin" (D.string |> D.andThen toIntDecoder)
+
+
+toIntDecoder : String -> Decoder Int
+toIntDecoder str =
+    case String.toInt str of
+        Err err ->
+            D.fail err
+
+        Ok a ->
+            D.succeed a
+
+
+votingRulesChangedEventOpt : Optional TxReceipt Event
+votingRulesChangedEventOpt =
+    Optional votingRulesChangedEventGet votingRulesChangedEventSet
+
+
+votingRulesChangedEventGet : TxReceipt -> Maybe Event
+votingRulesChangedEventGet txReceipt =
+    Dict.get (toString ChangeOfRules) txReceipt.events
+
+
+votingRulesChangedEventSet : Event -> TxReceipt -> TxReceipt
+votingRulesChangedEventSet evt txReceipt =
+    { txReceipt
+        | events = Dict.insert (toString ChangeOfRules) evt txReceipt.events
     }

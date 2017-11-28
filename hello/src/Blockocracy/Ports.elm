@@ -1,18 +1,19 @@
 port module Blockocracy.Ports
     exposing
         ( addMember
-        , removeMember
         , getProposal
         , getVotingRules
         , proposalReceived
+        , removeMember
         , submitProposal
         , submitVote
+        , updateVotingRules
         , votingRulesReceived
         )
 
 import Blockocracy.Members.Model exposing (MemberRequest)
 import Blockocracy.Proposal exposing (ProposalRequest)
-import Blockocracy.Vote exposing (VoteRequest)
+import Blockocracy.Vote exposing (VoteRequest, VotingRulesRequest)
 import Json.Decode exposing (Value)
 
 
@@ -38,3 +39,6 @@ port getVotingRules : String -> Cmd msg
 
 
 port votingRulesReceived : (Value -> msg) -> Sub msg
+
+
+port updateVotingRules : VotingRulesRequest -> Cmd msg

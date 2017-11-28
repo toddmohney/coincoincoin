@@ -280,6 +280,14 @@ globalSubscriptions =
             BannerMsg
                 << BE.TxAddressCreated BE.Vote
                 << Decode.decodeValue Web3.txHashDecoder
+        , Ports.votingRulesUpdatedTxHashCreated <|
+            BannerMsg
+                << BE.TxAddressCreated BE.VotingRules
+                << Decode.decodeValue Web3.txHashDecoder
+        , Ports.votingRulesUpdated <|
+            BannerMsg
+                << BE.TxReceiptReceived BE.VotingRules
+                << Decode.decodeValue Web3.txReceiptDecoder
         ]
 
 

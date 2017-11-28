@@ -34,6 +34,49 @@ app.ports.getVotingRules.subscribe((_) => {
 });
 
 
+app.ports.updateVotingRules.subscribe((req) => {
+  console.log("updateVotingRules", req);
+
+  congressContract.methods.changeVotingRules(
+    req.minimumQuorum,
+    req.debatingPeriodInMinutes,
+    req.majorityMargin
+  ).send(
+    {
+      from: req.senderAddress,
+      gasPrice: req.gasPrice.toString()
+    }
+  )
+  .once('transactionHash', (hash) => {
+    console.log("tx received", hash);
+    console.log("waiting for tx to be mined...");
+
+    app.ports.votingRulesUpdatedTxHashCreated.send(hash);
+  })
+  .once('receipt', (receipt) => {
+    console.log("tx receipt received", receipt);
+  })
+  .on('allEvents', (err, evt) => {
+    console.log("Event err", err);
+    console.log("Event evt", evt);
+  })
+  .on('confirmation', (confNumber, receipt) => {
+    console.log("tx confirmed", confNumber, receipt);
+  })
+  .on('error', (err) => {
+    console.log("error!", err);
+  })
+  .then((result) => {
+    console.log("our block has been mined!", result);
+
+    app.ports.votingRulesUpdated.send(result);
+  })
+  .catch((err) => {
+    console.log("error caught!", err);
+  });
+});
+
+
 app.ports.getProposal.subscribe((proposalNum) => {
   congressContract.methods.proposals(proposalNum).call({
     from: congressContractAddr

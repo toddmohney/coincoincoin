@@ -7,10 +7,10 @@ import Forms.Model
         )
 import Blockocracy.Proposal exposing (ProposalResponse)
 import Blockocracy.Ports as Ports
-import Blockocracy.Vote as Vote
+import Blockocracy.Vote as Vote exposing (Vote)
+import Blockocracy.Votes.Forms as VoteForm
     exposing
-        ( Vote
-        , proposalNumberLens
+        ( proposalNumberLens
         , proposalSupportLens
         , supportJustificationLens
         )
@@ -45,7 +45,7 @@ type VoteInputField
 init : Task PageLoadError Page
 init =
     Task.succeed <|
-        Page TxForm.defForm Vote.defForm Nothing
+        Page TxForm.defForm VoteForm.defForm Nothing
 
 
 view : Page -> Html Msg

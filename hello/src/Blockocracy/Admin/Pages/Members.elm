@@ -10,7 +10,14 @@ module Blockocracy.Admin.Pages.Members
 import Async exposing (External(..))
 import Blockocracy.Members.Model as Member exposing (Member, accountLens, nameLens)
 import Blockocracy.Ports as Ports
-import Blockocracy.Vote exposing (VotingRules)
+import Blockocracy.Vote as Vote exposing (VotingRules)
+import Blockocracy.Votes.VotingRulesForms as VRF
+    exposing
+        ( minimumQuorumLens
+        , debatingPeriodInMinutesLens
+        , majorityMarginLens
+        )
+import Forms.Model exposing (errorsLens)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
@@ -25,20 +32,25 @@ type alias Page =
     { txForm : Form Tx
     , memberForm : Form Member
     , votingRules : External VotingRules
+    , votingRulesForm : Form VotingRules
     }
 
 
 type Msg
     = TxFormInputChanged TxFormMsg String
-    | InputChanged InputField String
+    | InputChanged InputField
     | MemberAdded
     | MemberRemoved
+    | VotingRulesUpdated
     | VotingRulesLoaded (Result String VotingRules)
 
 
 type InputField
-    = MemberAddress
-    | MemberName
+    = MemberAddress String
+    | MemberName String
+    | MinimumQuorum String
+    | DebatePeriod String
+    | MajorityMargin String
 
 
 init : Task PageLoadError Page
@@ -48,6 +60,7 @@ init =
             TxForm.defForm
             (Form (Member (Web3.mkAccountAddress "0x00") "") [])
             Loading
+            VRF.defForm
 
 
 update : Msg -> Page -> ( Page, Cmd Msg )
@@ -58,17 +71,53 @@ update msg model =
             , Cmd.none
             )
 
-        InputChanged field val ->
+        InputChanged field ->
             case field of
-                MemberAddress ->
+                MemberAddress val ->
                     ( { model | memberForm = accountLens.set (Web3.mkAccountAddress val) model.memberForm }
                     , Cmd.none
                     )
 
-                MemberName ->
+                MemberName val ->
                     ( { model | memberForm = nameLens.set val model.memberForm }
                     , Cmd.none
                     )
+
+                MinimumQuorum val ->
+                    case String.toInt val of
+                        Err err ->
+                            ( { model | votingRulesForm = errorsLens.set [ err ] model.votingRulesForm }
+                            , Cmd.none
+                            )
+
+                        Ok quorum ->
+                            ( { model | votingRulesForm = minimumQuorumLens.set quorum model.votingRulesForm }
+                            , Cmd.none
+                            )
+
+                DebatePeriod val ->
+                    case String.toInt val of
+                        Err err ->
+                            ( { model | votingRulesForm = errorsLens.set [ err ] model.votingRulesForm }
+                            , Cmd.none
+                            )
+
+                        Ok minutes ->
+                            ( { model | votingRulesForm = debatingPeriodInMinutesLens.set minutes model.votingRulesForm }
+                            , Cmd.none
+                            )
+
+                MajorityMargin val ->
+                    case String.toInt val of
+                        Err err ->
+                            ( { model | votingRulesForm = errorsLens.set [ err ] model.votingRulesForm }
+                            , Cmd.none
+                            )
+
+                        Ok margin ->
+                            ( { model | votingRulesForm = majorityMarginLens.set margin model.votingRulesForm }
+                            , Cmd.none
+                            )
 
         MemberAdded ->
             ( model
@@ -80,6 +129,11 @@ update msg model =
             ( model
             , Ports.removeMember <|
                 Member.toMemberRequest model.txForm.model model.memberForm.model
+            )
+
+        VotingRulesUpdated ->
+            ( model
+            , Ports.updateVotingRules <| Vote.toVotingRulesRequest model.txForm.model model.votingRulesForm.model
             )
 
         VotingRulesLoaded result ->
@@ -106,7 +160,8 @@ view model =
                 ]
             , div
                 [ class "col-sm-6" ]
-                [ renderCongressVotingRules model
+                [ renderVotingRules model
+                , renderChangeVotingRulesForm model
                 ]
             ]
         ]
@@ -132,63 +187,84 @@ renderMemberManagement model =
         ]
 
 
-renderCongressVotingRules : Page -> Html Msg
-renderCongressVotingRules model =
-    case model.votingRules of
-        NotLoaded ->
-            div
-                []
-                [ h2 [] [ text "Voting Rules" ]
-                , div
-                    []
-                    [ text <| "Waiting to load..."
-                    ]
+renderChangeVotingRulesForm : Page -> Html Msg
+renderChangeVotingRulesForm model =
+    div
+        []
+        [ h3 [] [ text "Update Voting Rules" ]
+        , div
+            [ class "form-group" ]
+            [ label [ for "minimumQuorum" ] [ text "Minimum quorum" ]
+            , input
+                [ class "form-control"
+                , name "minimumQuorum"
+                , type_ "numeric"
+                , value <| toString model.votingRulesForm.model.minimumQuorum
+                , onInput (InputChanged << MinimumQuorum)
                 ]
+                []
+            , label [ for "debatePeriod" ] [ text "Debate period in minutes" ]
+            , input
+                [ class "form-control"
+                , name "debatePeriod"
+                , type_ "numeric"
+                , value <| toString model.votingRulesForm.model.debatingPeriodInMinutes
+                , onInput (InputChanged << DebatePeriod)
+                ]
+                []
+            , label [ for "majorityMargin" ] [ text "Majority margin required" ]
+            , input
+                [ class "form-control"
+                , name "majorityMargin"
+                , type_ "numeric"
+                , value <| toString model.votingRulesForm.model.majorityMargin
+                , onInput (InputChanged << MajorityMargin)
+                ]
+                []
+            ]
+        , button
+            [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
+            , onClick VotingRulesUpdated
+            ]
+            [ text "Update Voting Rules" ]
+        ]
 
-        Loading ->
-            div
-                []
-                [ h2 [] [ text "Voting Rules" ]
-                , div
-                    []
-                    [ text <| "Loading..."
-                    ]
-                ]
 
-        LoadError err ->
-            div
-                []
-                [ h2 [] [ text "Voting Rules" ]
-                , div
-                    []
-                    [ text <| "An error occurred:"
-                    , text err
-                    ]
-                ]
+renderVotingRules : Page -> Html Msg
+renderVotingRules model =
+    let
+        body =
+            case model.votingRules of
+                NotLoaded ->
+                    div [] [ text <| "Waiting to load..." ]
 
-        Loaded rules ->
-            div
-                []
-                [ h2 [] [ text "Voting Rules" ]
-                , div
-                    []
-                    [ div
+                Loading ->
+                    div [] [ text <| "Loading..." ]
+
+                LoadError err ->
+                    div [] [ text <| "An error occurred:", text err ]
+
+                Loaded rules ->
+                    div
                         []
-                        [ strong [] [ text "Minimum quorum: " ]
-                        , div [ class "pull-right" ] [ text <| toString rules.minimumQuorum ]
+                        [ div
+                            []
+                            [ strong [] [ text "Minimum quorum: " ]
+                            , div [ class "pull-right" ] [ text <| toString rules.minimumQuorum ]
+                            ]
+                        , div
+                            []
+                            [ strong [] [ text "Debate period (minutes): " ]
+                            , div [ class "pull-right" ] [ text <| toString rules.debatingPeriodInMinutes ]
+                            ]
+                        , div
+                            []
+                            [ strong [] [ text "Majority margin required: " ]
+                            , div [ class "pull-right" ] [ text <| toString rules.majorityMargin ]
+                            ]
                         ]
-                    , div
-                        []
-                        [ strong [] [ text "Debate period (minutes): " ]
-                        , div [ class "pull-right" ] [ text <| toString rules.debatingPeriodInMinutes ]
-                        ]
-                    , div
-                        []
-                        [ strong [] [ text "Majority margin required: " ]
-                        , div [ class "pull-right" ] [ text <| toString rules.majorityMargin ]
-                        ]
-                    ]
-                ]
+    in
+        div [] [ h2 [] [ text "Voting Rules" ], body ]
 
 
 memberForm : Html Msg
@@ -204,7 +280,7 @@ memberForm =
                 , name "memberName"
                 , type_ "text"
                 , placeholder "Member name"
-                , onInput (InputChanged MemberName)
+                , onInput (InputChanged << MemberName)
                 ]
                 []
             , label [ for "memberAddress" ] [ text "Member address" ]
@@ -213,7 +289,7 @@ memberForm =
                 , name "memberAddress"
                 , type_ "text"
                 , placeholder "Member address"
-                , onInput (InputChanged MemberAddress)
+                , onInput (InputChanged << MemberAddress)
                 ]
                 []
             ]

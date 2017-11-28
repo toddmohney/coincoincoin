@@ -15,6 +15,7 @@ import Web3.Web3 exposing (Address(..), TxAddress(..), TxReceipt)
 type Context
     = Proposal
     | Vote
+    | VotingRules
 
 
 type BlockchainEvent
@@ -33,6 +34,9 @@ bannerMessage bcEvt =
                 Vote ->
                     txHashCreatedMessage "Vote tx received " res
 
+                VotingRules ->
+                    txHashCreatedMessage "Voting rules update tx received " res
+
         TxReceiptReceived ctx res ->
             case ctx of
                 Proposal ->
@@ -40,6 +44,9 @@ bannerMessage bcEvt =
 
                 Vote ->
                     txReceiptMessage VE.parseVotedEvent res
+
+                VotingRules ->
+                    txReceiptMessage VE.parseChangeOfRulesEvent res
 
 
 txHashCreatedMessage : String -> Result String TxAddress -> Html msg
