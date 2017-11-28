@@ -3,10 +3,10 @@ port module Ports
         ( proposalAdded
         , proposalAddedTxAddressCreated
         , proposalExecuted
-        , proposalExecutedTxHashCreated
+        , proposalExecutedTxAddressCreated
         , voted
         , votedTxAddressCreated
-        , votingRulesUpdatedTxHashCreated
+        , votingRulesUpdatedTxAddressCreated
         , votingRulesUpdated
         )
 
@@ -22,7 +22,7 @@ port proposalAddedTxAddressCreated : (Value -> msg) -> Sub msg
 port proposalExecuted : (Value -> msg) -> Sub msg
 
 
-port proposalExecutedTxHashCreated : (Value -> msg) -> Sub msg
+port proposalExecutedTxAddressCreated : (Value -> msg) -> Sub msg
 
 
 port voted : (Value -> msg) -> Sub msg
@@ -31,7 +31,7 @@ port voted : (Value -> msg) -> Sub msg
 port votedTxAddressCreated : (Value -> msg) -> Sub msg
 
 
-port votingRulesUpdatedTxHashCreated : (Value -> msg) -> Sub msg
+port votingRulesUpdatedTxAddressCreated : (Value -> msg) -> Sub msg
 
 
 port votingRulesUpdated : (Value -> msg) -> Sub msg

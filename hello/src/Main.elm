@@ -271,7 +271,7 @@ globalSubscriptions =
         , Ports.proposalAddedTxAddressCreated <|
             BannerMsg
                 << BE.TxAddressCreated BE.Proposal
-                << Decode.decodeValue Web3.txHashDecoder
+                << Decode.decodeValue Web3.txAddressDecoder
         , Ports.voted <|
             BannerMsg
                 << BE.TxReceiptReceived BE.Vote
@@ -279,11 +279,11 @@ globalSubscriptions =
         , Ports.votedTxAddressCreated <|
             BannerMsg
                 << BE.TxAddressCreated BE.Vote
-                << Decode.decodeValue Web3.txHashDecoder
-        , Ports.votingRulesUpdatedTxHashCreated <|
+                << Decode.decodeValue Web3.txAddressDecoder
+        , Ports.votingRulesUpdatedTxAddressCreated <|
             BannerMsg
                 << BE.TxAddressCreated BE.VotingRules
-                << Decode.decodeValue Web3.txHashDecoder
+                << Decode.decodeValue Web3.txAddressDecoder
         , Ports.votingRulesUpdated <|
             BannerMsg
                 << BE.TxReceiptReceived BE.VotingRules
@@ -292,10 +292,10 @@ globalSubscriptions =
             BannerMsg
                 << BE.TxReceiptReceived BE.ProposalExecution
                 << Decode.decodeValue Web3.txReceiptDecoder
-        , Ports.proposalExecutedTxHashCreated <|
+        , Ports.proposalExecutedTxAddressCreated <|
             BannerMsg
                 << BE.TxAddressCreated BE.ProposalExecution
-                << Decode.decodeValue Web3.txHashDecoder
+                << Decode.decodeValue Web3.txAddressDecoder
         ]
 
 

@@ -18,7 +18,7 @@ module Web3.Web3
         , sampleAccountAddress
         , sampleTxAddress
         , txDecoder
-        , txHashDecoder
+        , txAddressDecoder
         , txReceiptDecoder
         )
 
@@ -150,8 +150,8 @@ getTxAddress (TxAddress addr) =
     getAddress addr
 
 
-txHashDecoder : Decoder TxAddress
-txHashDecoder =
+txAddressDecoder : Decoder TxAddress
+txAddressDecoder =
     Decode.map TxAddress addressDecoder
 
 
@@ -164,7 +164,7 @@ txDecoder =
         |> required "to" accountDecoder
         |> required "gas" Decode.int
         |> required "gasPrice" Decode.string
-        |> required "hash" txHashDecoder
+        |> required "hash" txAddressDecoder
         |> required "input" Decode.string
         |> required "nonce" Decode.int
         |> required "r" Decode.string
@@ -191,7 +191,7 @@ eventDecoder =
         |> required "removed" Decode.bool
         |> required "returnValues" (Decode.value)
         |> required "signature" Decode.string
-        |> required "transactionHash" txHashDecoder
+        |> required "transactionHash" txAddressDecoder
         |> required "transactionIndex" Decode.int
 
 
@@ -208,7 +208,7 @@ txReceiptDecoder =
         |> required "logsBloom" Decode.string
         |> required "root" blockHashDecoder
         |> required "to" accountDecoder
-        |> required "transactionHash" txHashDecoder
+        |> required "transactionHash" txAddressDecoder
         |> required "transactionIndex" Decode.int
 
 

@@ -51,7 +51,7 @@ app.ports.updateVotingRules.subscribe((req) => {
     console.log("tx received", hash);
     console.log("waiting for tx to be mined...");
 
-    app.ports.votingRulesUpdatedTxHashCreated.send(hash);
+    app.ports.votingRulesUpdatedTxAddressCreated.send(hash);
   })
   .once('receipt', (receipt) => {
     console.log("tx receipt received", receipt);
@@ -123,7 +123,7 @@ app.ports.submitProposal.subscribe((req) => {
     console.log("tx received", hash);
     console.log("waiting for tx to be mined...");
 
-    app.ports.proposalAddedTxHashCreated.send(hash);
+    app.ports.proposalAddedTxAddressCreated.send(hash);
   })
   .once('receipt', (receipt) => {
     console.log("tx receipt received", receipt);
@@ -152,7 +152,7 @@ app.ports.submitProposal.subscribe((req) => {
 app.ports.executeProposal.subscribe((req) => {
   console.log("executeProposal", req);
 
-  const proposalID = req.proposalID
+  const proposalID = req.proposalID;
   const bytecode = web3.utils.fromAscii("");
 
   congressContract.methods.executeProposal(
@@ -168,7 +168,7 @@ app.ports.executeProposal.subscribe((req) => {
     console.log("tx received", hash);
     console.log("waiting for tx to be mined...");
 
-    app.ports.proposalExecutedTxHashCreated.send(hash);
+    app.ports.proposalExecutedTxAddressCreated.send(hash);
   })
   .once('receipt', (receipt) => {
     console.log("tx receipt received", receipt);
