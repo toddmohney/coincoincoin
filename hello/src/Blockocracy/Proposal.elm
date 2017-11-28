@@ -3,12 +3,16 @@ module Blockocracy.Proposal
         ( Proposal
         , ProposalRequest
         , ProposalResponse
+        , ProposalExecution
+        , ProposalExecutionRequest
         , beneficiaryLens
         , defForm
         , detailsLens
         , etherAmountLens
         , toProposalRequest
+        , toProposalExecutionRequest
         , proposalResponseDecoder
+        , proposalIDLens
         )
 
 import Forms.Model exposing (..)
@@ -48,6 +52,18 @@ type alias ProposalResponse =
     }
 
 
+type alias ProposalExecution =
+    { proposalID : Int
+    }
+
+
+type alias ProposalExecutionRequest =
+    { senderAddress : String
+    , gasPrice : Int
+    , proposalID : Int
+    }
+
+
 proposalResponseDecoder : Decoder ProposalResponse
 proposalResponseDecoder =
     decode ProposalResponse
@@ -70,6 +86,14 @@ toProposalRequest tx proposal =
         (Web3.getAccountAddress proposal.beneficiary)
         proposal.etherAmount
         proposal.details
+
+
+toProposalExecutionRequest : Tx -> ProposalExecution -> ProposalExecutionRequest
+toProposalExecutionRequest tx proposalExecution =
+    ProposalExecutionRequest
+        (Web3.getAccountAddress tx.senderAddress)
+        tx.gasPrice
+        proposalExecution.proposalID
 
 
 defForm : Form Proposal
@@ -137,3 +161,22 @@ detailsSetter details f =
             f.model
     in
         { f | model = { proposal | details = details } }
+
+
+proposalIDLens : Lens (Form ProposalExecution) Int
+proposalIDLens =
+    Lens proposalIDGetter proposalIDSetter
+
+
+proposalIDGetter : Form ProposalExecution -> Int
+proposalIDGetter f =
+    f.model.proposalID
+
+
+proposalIDSetter : Int -> Form ProposalExecution -> Form ProposalExecution
+proposalIDSetter pID f =
+    let
+        proposalExecution =
+            f.model
+    in
+        { f | model = { proposalExecution | proposalID = pID } }

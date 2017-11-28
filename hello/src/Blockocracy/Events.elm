@@ -14,6 +14,7 @@ import Web3.Web3 exposing (Address(..), TxAddress(..), TxReceipt)
 
 type Context
     = Proposal
+    | ProposalExecution
     | Vote
     | VotingRules
 
@@ -31,6 +32,9 @@ bannerMessage bcEvt =
                 Proposal ->
                     txHashCreatedMessage "New proposal tx received " res
 
+                ProposalExecution ->
+                    txHashCreatedMessage "Proposal execution tx received " res
+
                 Vote ->
                     txHashCreatedMessage "Vote tx received " res
 
@@ -41,6 +45,9 @@ bannerMessage bcEvt =
             case ctx of
                 Proposal ->
                     txReceiptMessage PE.parseProposalAddedEvent res
+
+                ProposalExecution ->
+                    txReceiptMessage PE.parseProposalExecutedEvent res
 
                 Vote ->
                     txReceiptMessage VE.parseVotedEvent res

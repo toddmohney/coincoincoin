@@ -3,6 +3,7 @@ module Blockocracy.Proposals.Events
         ( ProposalEvent
         , ProposalAddedEvent
         , parseProposalAddedEvent
+        , parseProposalExecutedEvent
         )
 
 import Dict as Dict
@@ -15,6 +16,7 @@ import Web3.Web3 as Web3 exposing (AccountAddress(..), BigNumber, Event, TxRecei
 
 type ProposalEvent
     = ProposalAdded
+    | ProposalTallied
 
 
 type alias ProposalAddedEvent =
@@ -22,6 +24,14 @@ type alias ProposalAddedEvent =
     , recipient : AccountAddress
     , amount : BigNumber
     , description : String
+    }
+
+
+type alias ProposalExecutedEvent =
+    { proposalID : Int
+    , result : Int
+    , quorum : Int
+    , active : Bool
     }
 
 
@@ -58,4 +68,60 @@ proposalAddedEventSet : Event -> TxReceipt -> TxReceipt
 proposalAddedEventSet evt txReceipt =
     { txReceipt
         | events = Dict.insert (toString ProposalAdded) evt txReceipt.events
+    }
+
+
+parseProposalExecutedEvent : TxReceipt -> Result String ProposalExecutedEvent
+parseProposalExecutedEvent txReceipt =
+    case proposalExecutedEventOpt.getOption txReceipt of
+        Nothing ->
+            Err <| "Event not found: " ++ toString ProposalTallied
+
+        Just evt ->
+            D.decodeValue proposalExecutedEventDecoder evt.returnValues
+
+
+proposalExecutedEventDecoder : Decoder ProposalExecutedEvent
+proposalExecutedEventDecoder =
+    decode ProposalExecutedEvent
+        |> required "proposalID" (D.string |> D.andThen toIntDecoder)
+        |> required "result" (D.string |> D.andThen toIntDecoder)
+        |> required "quorum" (D.string |> D.andThen toIntDecoder)
+        |> required "active" (nullable D.bool |> D.andThen toBoolDecoder)
+
+
+toIntDecoder : String -> Decoder Int
+toIntDecoder str =
+    case String.toInt str of
+        Err err ->
+            D.fail err
+
+        Ok a ->
+            D.succeed a
+
+
+toBoolDecoder : Maybe Bool -> Decoder Bool
+toBoolDecoder bool =
+    case bool of
+        Nothing ->
+            D.succeed False
+
+        Just b ->
+            D.succeed b
+
+
+proposalExecutedEventOpt : Optional TxReceipt Event
+proposalExecutedEventOpt =
+    Optional proposalExecutedEventGet proposalExecutedEventSet
+
+
+proposalExecutedEventGet : TxReceipt -> Maybe Event
+proposalExecutedEventGet txReceipt =
+    Dict.get (toString ProposalTallied) txReceipt.events
+
+
+proposalExecutedEventSet : Event -> TxReceipt -> TxReceipt
+proposalExecutedEventSet evt txReceipt =
+    { txReceipt
+        | events = Dict.insert (toString ProposalTallied) evt txReceipt.events
     }

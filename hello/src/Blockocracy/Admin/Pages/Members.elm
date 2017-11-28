@@ -10,6 +10,12 @@ module Blockocracy.Admin.Pages.Members
 import Async exposing (External(..))
 import Blockocracy.Members.Model as Member exposing (Member, accountLens, nameLens)
 import Blockocracy.Ports as Ports
+import Blockocracy.Proposal as Proposal
+    exposing
+        ( ProposalExecution
+        , ProposalResponse
+        , proposalIDLens
+        )
 import Blockocracy.Vote as Vote exposing (VotingRules)
 import Blockocracy.Votes.VotingRulesForms as VRF
     exposing
@@ -33,6 +39,8 @@ type alias Page =
     , memberForm : Form Member
     , votingRules : External VotingRules
     , votingRulesForm : Form VotingRules
+    , proposalExecutionForm : Form ProposalExecution
+    , selectedProposal : Maybe ProposalResponse
     }
 
 
@@ -43,6 +51,8 @@ type Msg
     | MemberRemoved
     | VotingRulesUpdated
     | VotingRulesLoaded (Result String VotingRules)
+    | ProposalExecuted
+    | ProposalLoaded (Result String ProposalResponse)
 
 
 type InputField
@@ -51,6 +61,7 @@ type InputField
     | MinimumQuorum String
     | DebatePeriod String
     | MajorityMargin String
+    | ProposalID String
 
 
 init : Task PageLoadError Page
@@ -61,6 +72,8 @@ init =
             (Form (Member (Web3.mkAccountAddress "0x00") "") [])
             Loading
             VRF.defForm
+            (Form (ProposalExecution 0) [])
+            Nothing
 
 
 update : Msg -> Page -> ( Page, Cmd Msg )
@@ -119,6 +132,18 @@ update msg model =
                             , Cmd.none
                             )
 
+                ProposalID val ->
+                    case String.toInt val of
+                        Err err ->
+                            ( { model | proposalExecutionForm = errorsLens.set [ err ] model.proposalExecutionForm }
+                            , Cmd.none
+                            )
+
+                        Ok propId ->
+                            ( { model | proposalExecutionForm = proposalIDLens.set propId model.proposalExecutionForm }
+                            , Ports.getProposal propId
+                            )
+
         MemberAdded ->
             ( model
             , Ports.addMember <|
@@ -148,6 +173,21 @@ update msg model =
                     , Cmd.none
                     )
 
+        ProposalLoaded result ->
+            case result of
+                Err err ->
+                    ( model, Cmd.none )
+
+                Ok proposalResponse ->
+                    ( { model | selectedProposal = Just proposalResponse }
+                    , Cmd.none
+                    )
+
+        ProposalExecuted ->
+            ( model
+            , Ports.executeProposal <| Proposal.toProposalExecutionRequest model.txForm.model model.proposalExecutionForm.model
+            )
+
 
 view : Page -> Html Msg
 view model =
@@ -164,6 +204,56 @@ view model =
                 , renderChangeVotingRulesForm model
                 ]
             ]
+        , div
+            [ class "row" ]
+            [ div
+                [ class "col-sm-6" ]
+                [ renderProposalExecutionForm model
+                ]
+            , proposalPreview model
+            ]
+        ]
+
+
+proposalPreview : Page -> Html Msg
+proposalPreview model =
+    case model.selectedProposal of
+        Nothing ->
+            div [] []
+
+        Just proposal ->
+            div
+                [ class "col-sm-6" ]
+                [ h2 [] [ text "Selected Proposal" ]
+                , pre
+                    []
+                    [ text << String.join "\n," <| String.split "," (toString proposal)
+                    ]
+                ]
+
+
+renderProposalExecutionForm : Page -> Html Msg
+renderProposalExecutionForm model =
+    div
+        [ class "clearfix" ]
+        [ h3 [] [ text "Execute Proposal" ]
+        , div
+            [ class "form-group" ]
+            [ label [ for "proposalNumber" ] [ text "Proposal number" ]
+            , input
+                [ class "form-control"
+                , name "proposalNumber"
+                , type_ "numeric"
+                , value <| toString model.proposalExecutionForm.model.proposalID
+                , onInput (InputChanged << ProposalID)
+                ]
+                []
+            ]
+        , button
+            [ classList [ ( "pull-left", True ), ( "btn", True ), ( "btn-primary", True ) ]
+            , onClick ProposalExecuted
+            ]
+            [ text "Execute Proposal" ]
         ]
 
 

@@ -288,6 +288,14 @@ globalSubscriptions =
             BannerMsg
                 << BE.TxReceiptReceived BE.VotingRules
                 << Decode.decodeValue Web3.txReceiptDecoder
+        , Ports.proposalExecuted <|
+            BannerMsg
+                << BE.TxReceiptReceived BE.ProposalExecution
+                << Decode.decodeValue Web3.txReceiptDecoder
+        , Ports.proposalExecutedTxHashCreated <|
+            BannerMsg
+                << BE.TxAddressCreated BE.ProposalExecution
+                << Decode.decodeValue Web3.txHashDecoder
         ]
 
 
@@ -320,6 +328,10 @@ pageSubscriptions page =
                     BlockocracyAdminMembersMsg
                         << BlockocracyAdmin.VotingRulesLoaded
                         << Decode.decodeValue Vote.votingRulesDecoder
+                , BlockPorts.proposalReceived <|
+                    BlockocracyAdminMembersMsg
+                        << BlockocracyAdmin.ProposalLoaded
+                        << Decode.decodeValue Proposal.proposalResponseDecoder
                 ]
 
 
