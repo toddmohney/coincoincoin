@@ -36,15 +36,15 @@
       "type": "constructor"
     }
   ],
-  "bytecode": "0x6060604052341561000f57600080fd5b336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506101ce8061005e6000396000f30060606040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680638da5cb5b14610051578063f2fde38b146100a6575b600080fd5b341561005c57600080fd5b6100646100df565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34156100b157600080fd5b6100dd600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610104565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561015f57600080fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505600a165627a7a723058202720ee0d0adc2c861def7c71869607b6cbc48ec01ecc3bd09aebc49bf7a95d8b0029",
-  "deployedBytecode": "0x60606040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680638da5cb5b14610051578063f2fde38b146100a6575b600080fd5b341561005c57600080fd5b6100646100df565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34156100b157600080fd5b6100dd600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610104565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561015f57600080fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505600a165627a7a723058202720ee0d0adc2c861def7c71869607b6cbc48ec01ecc3bd09aebc49bf7a95d8b0029",
+  "bytecode": "0x6060604052341561000f57600080fd5b336000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff1602179055506101ce8061005e6000396000f30060606040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680638da5cb5b14610051578063f2fde38b146100a6575b600080fd5b341561005c57600080fd5b6100646100df565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34156100b157600080fd5b6100dd600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610104565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561015f57600080fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505600a165627a7a72305820dccd8a464540cd789f61e28fce35cd95906887dc3058c227edf70a2e965fcf040029",
+  "deployedBytecode": "0x60606040526004361061004c576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff1680638da5cb5b14610051578063f2fde38b146100a6575b600080fd5b341561005c57600080fd5b6100646100df565b604051808273ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200191505060405180910390f35b34156100b157600080fd5b6100dd600480803573ffffffffffffffffffffffffffffffffffffffff16906020019091905050610104565b005b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1681565b6000809054906101000a900473ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff163373ffffffffffffffffffffffffffffffffffffffff1614151561015f57600080fd5b806000806101000a81548173ffffffffffffffffffffffffffffffffffffffff021916908373ffffffffffffffffffffffffffffffffffffffff160217905550505600a165627a7a72305820dccd8a464540cd789f61e28fce35cd95906887dc3058c227edf70a2e965fcf040029",
   "sourceMap": "26:293:0:-;;;74:60;;;;;;;;117:10;109:5;;:18;;;;;;;;;;;;;;;;;;26:293;;;;;;",
   "deployedSourceMap": "26:293:0:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;47:20;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;221:96;;;;;;;;;;;;;;;;;;;;;;;;;;;;47:20;;;;;;;;;;;;;:::o;221:96::-;191:5;;;;;;;;;;;177:19;;:10;:19;;;169:28;;;;;;;;302:8;294:5;;:16;;;;;;;;;;;;;;;;;;221:96;:::o",
   "source": "pragma solidity ^0.4.16;\n\ncontract owned {\n    address public owner;\n\n    function owned()  public {\n        owner = msg.sender;\n    }\n\n    modifier onlyOwner {\n        require(msg.sender == owner);\n        _;\n    }\n\n    function transferOwnership(address newOwner) onlyOwner  public {\n        owner = newOwner;\n    }\n}\n\ncontract tokenRecipient {\n    event receivedEther(address sender, uint amount);\n    event receivedTokens(address _from, uint256 _value, address _token, bytes _extraData);\n\n    function receiveApproval(address _from, uint256 _value, address _token, bytes _extraData) public {\n        Token t = Token(_token);\n        require(t.transferFrom(_from, this, _value));\n        receivedTokens(_from, _value, _token, _extraData);\n    }\n\n    function () payable  public {\n        receivedEther(msg.sender, msg.value);\n    }\n}\n\ninterface Token {\n    function transferFrom(address _from, address _to, uint256 _value) public returns (bool success);\n}\n\ncontract Congress is owned, tokenRecipient {\n    // Contract Variables and events\n    uint public minimumQuorum;\n    uint public debatingPeriodInMinutes;\n    int public majorityMargin;\n    Proposal[] public proposals;\n    uint public numProposals;\n    mapping (address => uint) public memberId;\n    Member[] public members;\n\n    event ProposalAdded(uint proposalID, address recipient, uint amount, string description);\n    event Voted(uint proposalID, bool position, address voter, string justification);\n    event ProposalTallied(uint proposalID, int result, uint quorum, bool active);\n    event MembershipChanged(address member, bool isMember);\n    event ChangeOfRules(uint newMinimumQuorum, uint newDebatingPeriodInMinutes, int newMajorityMargin);\n\n    struct Proposal {\n        address recipient;\n        uint amount;\n        string description;\n        uint votingDeadline;\n        bool executed;\n        bool proposalPassed;\n        uint numberOfVotes;\n        int currentResult;\n        bytes32 proposalHash;\n        Vote[] votes;\n        mapping (address => bool) voted;\n    }\n\n    struct Member {\n        address member;\n        string name;\n        uint memberSince;\n    }\n\n    struct Vote {\n        bool inSupport;\n        address voter;\n        string justification;\n    }\n\n    // Modifier that allows only shareholders to vote and create new proposals\n    modifier onlyMembers {\n        require(memberId[msg.sender] != 0);\n        _;\n    }\n\n    /**\n     * Constructor function\n     */\n    function Congress (\n        uint minimumQuorumForProposals,\n        uint minutesForDebate,\n        int marginOfVotesForMajority\n    )  payable public {\n        changeVotingRules(minimumQuorumForProposals, minutesForDebate, marginOfVotesForMajority);\n        // It’s necessary to add an empty first member\n        addMember(0, \"\");\n        // and let's add the founder, to save a step later\n        addMember(owner, 'founder');\n    }\n\n    /**\n     * Add member\n     *\n     * Make `targetMember` a member named `memberName`\n     *\n     * @param targetMember ethereum address to be added\n     * @param memberName public name for that member\n     */\n    function addMember(address targetMember, string memberName) onlyOwner public {\n        uint id = memberId[targetMember];\n        if (id == 0) {\n            memberId[targetMember] = members.length;\n            id = members.length++;\n        }\n\n        members[id] = Member({member: targetMember, memberSince: now, name: memberName});\n        MembershipChanged(targetMember, true);\n    }\n\n    /**\n     * Remove member\n     *\n     * @notice Remove membership from `targetMember`\n     *\n     * @param targetMember ethereum address to be removed\n     */\n    function removeMember(address targetMember) onlyOwner public {\n        require(memberId[targetMember] != 0);\n\n        for (uint i = memberId[targetMember]; i<members.length-1; i++){\n            members[i] = members[i+1];\n        }\n        delete members[members.length-1];\n        members.length--;\n        MembershipChanged(targetMember, false);\n    }\n\n    /**\n     * Change voting rules\n     *\n     * Make so that proposals need tobe discussed for at least `minutesForDebate/60` hours,\n     * have at least `minimumQuorumForProposals` votes, and have 50% + `marginOfVotesForMajority` votes to be executed\n     *\n     * @param minimumQuorumForProposals how many members must vote on a proposal for it to be executed\n     * @param minutesForDebate the minimum amount of delay between when a proposal is made and when it can be executed\n     * @param marginOfVotesForMajority the proposal needs to have 50% plus this number\n     */\n    function changeVotingRules(\n        uint minimumQuorumForProposals,\n        uint minutesForDebate,\n        int marginOfVotesForMajority\n    ) onlyOwner public {\n        minimumQuorum = minimumQuorumForProposals;\n        debatingPeriodInMinutes = minutesForDebate;\n        majorityMargin = marginOfVotesForMajority;\n\n        ChangeOfRules(minimumQuorum, debatingPeriodInMinutes, majorityMargin);\n    }\n\n    /**\n     * Add Proposal\n     *\n     * Propose to send `weiAmount / 1e18` ether to `beneficiary` for `jobDescription`. `transactionBytecode ? Contains : Does not contain` code.\n     *\n     * @param beneficiary who to send the ether to\n     * @param weiAmount amount of ether to send, in wei\n     * @param jobDescription Description of job\n     * @param transactionBytecode bytecode of transaction\n     */\n    function newProposal(\n        address beneficiary,\n        uint weiAmount,\n        string jobDescription,\n        bytes transactionBytecode\n    )\n        onlyMembers public\n        returns (uint proposalID)\n    {\n        proposalID = proposals.length++;\n        Proposal storage p = proposals[proposalID];\n        p.recipient = beneficiary;\n        p.amount = weiAmount;\n        p.description = jobDescription;\n        p.proposalHash = keccak256(beneficiary, weiAmount, transactionBytecode);\n        p.votingDeadline = now + debatingPeriodInMinutes * 1 minutes;\n        p.executed = false;\n        p.proposalPassed = false;\n        p.numberOfVotes = 0;\n        ProposalAdded(proposalID, beneficiary, weiAmount, jobDescription);\n        numProposals = proposalID+1;\n\n        return proposalID;\n    }\n\n    /**\n     * Add proposal in Ether\n     *\n     * Propose to send `etherAmount` ether to `beneficiary` for `jobDescription`. `transactionBytecode ? Contains : Does not contain` code.\n     * This is a convenience function to use if the amount to be given is in round number of ether units.\n     *\n     * @param beneficiary who to send the ether to\n     * @param etherAmount amount of ether to send\n     * @param jobDescription Description of job\n     * @param transactionBytecode bytecode of transaction\n     */\n    function newProposalInEther(\n        address beneficiary,\n        uint etherAmount,\n        string jobDescription,\n        bytes transactionBytecode\n    )\n        onlyMembers public\n        returns (uint proposalID)\n    {\n        return newProposal(beneficiary, etherAmount * 1 ether, jobDescription, transactionBytecode);\n    }\n\n    /**\n     * Check if a proposal code matches\n     *\n     * @param proposalNumber ID number of the proposal to query\n     * @param beneficiary who to send the ether to\n     * @param weiAmount amount of ether to send\n     * @param transactionBytecode bytecode of transaction\n     */\n    function checkProposalCode(\n        uint proposalNumber,\n        address beneficiary,\n        uint weiAmount,\n        bytes transactionBytecode\n    )\n        constant public\n        returns (bool codeChecksOut)\n    {\n        Proposal storage p = proposals[proposalNumber];\n        return p.proposalHash == keccak256(beneficiary, weiAmount, transactionBytecode);\n    }\n\n    /**\n     * Log a vote for a proposal\n     *\n     * Vote `supportsProposal? in support of : against` proposal #`proposalNumber`\n     *\n     * @param proposalNumber number of proposal\n     * @param supportsProposal either in favor or against it\n     * @param justificationText optional justification text\n     */\n    function vote(\n        uint proposalNumber,\n        bool supportsProposal,\n        string justificationText\n    )\n        onlyMembers public\n        returns (uint voteID)\n    {\n        Proposal storage p = proposals[proposalNumber];         // Get the proposal\n        require(!p.voted[msg.sender]);         // If has already voted, cancel\n        p.voted[msg.sender] = true;                     // Set this voter as having voted\n        p.numberOfVotes++;                              // Increase the number of votes\n        if (supportsProposal) {                         // If they support the proposal\n            p.currentResult++;                          // Increase score\n        } else {                                        // If they don't\n            p.currentResult--;                          // Decrease the score\n        }\n\n        // Create a log of this event\n        Voted(proposalNumber,  supportsProposal, msg.sender, justificationText);\n        return p.numberOfVotes;\n    }\n\n    /**\n     * Finish vote\n     *\n     * Count the votes proposal #`proposalNumber` and execute it if approved\n     *\n     * @param proposalNumber proposal number\n     * @param transactionBytecode optional: if the transaction contained a bytecode, you need to send it\n     */\n    function executeProposal(uint proposalNumber, bytes transactionBytecode) public {\n        Proposal storage p = proposals[proposalNumber];\n\n        require(now > p.votingDeadline                                            // If it is past the voting deadline\n            && !p.executed                                                         // and it has not already been executed\n            && p.proposalHash == keccak256(p.recipient, p.amount, transactionBytecode)  // and the supplied code matches the proposal\n            && p.numberOfVotes >= minimumQuorum);                                  // and a minimum quorum has been reached...\n\n        // ...then execute result\n\n        if (p.currentResult > majorityMargin) {\n            // Proposal passed; execute the transaction\n\n            p.executed = true; // Avoid recursive calling\n            require(p.recipient.call.value(p.amount)(transactionBytecode));\n\n            p.proposalPassed = true;\n        } else {\n            // Proposal failed\n            p.proposalPassed = false;\n        }\n\n        // Fire Events\n        ProposalTallied(proposalNumber, p.currentResult, p.numberOfVotes, p.proposalPassed);\n    }\n}\n\n",
-  "sourcePath": "/home/toddmohney/workspace/personal/gustcoin/hello/contracts/contracts/Congress.sol",
+  "sourcePath": "/home/toddmohney/workspace/personal/coincoincoin/hello/contracts/contracts/Congress.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/home/toddmohney/workspace/personal/gustcoin/hello/contracts/contracts/Congress.sol",
+      "absolutePath": "/home/toddmohney/workspace/personal/coincoincoin/hello/contracts/contracts/Congress.sol",
       "exportedSymbols": {
         "Congress": [
           705
@@ -203,7 +203,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 717,
+                                  "referencedDeclaration": 803,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -283,7 +283,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 720,
+                              "referencedDeclaration": 806,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -324,7 +324,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 717,
+                                      "referencedDeclaration": 803,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -1009,7 +1009,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 720,
+                              "referencedDeclaration": 806,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -1096,7 +1096,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 730,
+                                  "referencedDeclaration": 816,
                                   "type": "contract tokenRecipient",
                                   "value": "this"
                                 },
@@ -1355,7 +1355,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 717,
+                                  "referencedDeclaration": 803,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -1386,7 +1386,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 717,
+                                  "referencedDeclaration": 803,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -2987,7 +2987,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 720,
+                              "referencedDeclaration": 806,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -3052,7 +3052,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 717,
+                                          "referencedDeclaration": 803,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -4051,7 +4051,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 719,
+                                  "referencedDeclaration": 805,
                                   "type": "uint256",
                                   "value": "now"
                                 },
@@ -4292,7 +4292,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 720,
+                              "referencedDeclaration": 806,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -6069,7 +6069,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 711,
+                                  "referencedDeclaration": 797,
                                   "type": "function () pure returns (bytes32)",
                                   "value": "keccak256"
                                 },
@@ -6199,7 +6199,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 719,
+                                  "referencedDeclaration": 805,
                                   "type": "uint256",
                                   "value": "now"
                                 },
@@ -7401,7 +7401,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 711,
+                                  "referencedDeclaration": 797,
                                   "type": "function () pure returns (bytes32)",
                                   "value": "keccak256"
                                 },
@@ -7746,7 +7746,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 720,
+                              "referencedDeclaration": 806,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -7825,7 +7825,7 @@
                                           "overloadedDeclarations": [
                                             null
                                           ],
-                                          "referencedDeclaration": 717,
+                                          "referencedDeclaration": 803,
                                           "type": "msg",
                                           "value": "msg"
                                         },
@@ -7930,7 +7930,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 717,
+                                      "referencedDeclaration": 803,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -8269,7 +8269,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 717,
+                                  "referencedDeclaration": 803,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -8556,7 +8556,7 @@
                               "overloadedDeclarations": [
                                 null
                               ],
-                              "referencedDeclaration": 720,
+                              "referencedDeclaration": 806,
                               "type": "function (bool) pure",
                               "value": "require"
                             },
@@ -8630,7 +8630,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 719,
+                                              "referencedDeclaration": 805,
                                               "type": "uint256",
                                               "value": "now"
                                             },
@@ -8807,7 +8807,7 @@
                                               "overloadedDeclarations": [
                                                 null
                                               ],
-                                              "referencedDeclaration": 711,
+                                              "referencedDeclaration": 797,
                                               "type": "function () pure returns (bytes32)",
                                               "value": "keccak256"
                                             },
@@ -9154,7 +9154,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 720,
+                                      "referencedDeclaration": 806,
                                       "type": "function (bool) pure",
                                       "value": "require"
                                     },
@@ -9682,5 +9682,5 @@
   },
   "networks": {},
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-11-09T19:03:44.349Z"
+  "updatedAt": "2017-11-28T21:42:19.384Z"
 }

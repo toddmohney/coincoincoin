@@ -1,7 +1,7 @@
 const Web3 = require("web3");
 const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8546');
 
-const helloContractAddr = '0x32c9e197951a3674aab69a5df245a27069fb6e5d';
+const helloContractAddr = '0x0ed41af5ecc84a9a4a46127e255c56c6f27f89fd';
 const helloContractAbi = [
   {
     "constant": true,
