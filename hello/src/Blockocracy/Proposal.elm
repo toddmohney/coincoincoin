@@ -15,6 +15,7 @@ module Blockocracy.Proposal
         , proposalIDLens
         )
 
+import Date exposing (Date)
 import Forms.Model exposing (..)
 import Json.Decode as Decode exposing (int, string, nullable, Decoder, Value)
 import Json.Decode.Pipeline exposing (decode, required)
@@ -48,7 +49,7 @@ type alias ProposalResponse =
     , proposalPassed : Bool
     , proposalHash : Address
     , recipient : AccountAddress
-    , votingDeadline : Int
+    , votingDeadline : Date
     }
 
 
@@ -75,7 +76,7 @@ proposalResponseDecoder =
         |> required "proposalPassed" Decode.bool
         |> required "proposalHash" Web3.addressDecoder
         |> required "recipient" Web3.accountDecoder
-        |> required "votingDeadline" Decode.int
+        |> required "votingDeadline" (Decode.int |> Decode.andThen (Decode.succeed << Date.fromTime << toFloat))
 
 
 toProposalRequest : Tx -> Proposal -> ProposalRequest
