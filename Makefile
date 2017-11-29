@@ -33,13 +33,17 @@ console: ## Begins a Geth console session
 		docker-compose exec geth \
 		geth attach ipc:/home/gustcoin/.ethereum/geth.ipc
 
-build: build-geth build-block-explorer ## Builds all docker images
+build: build-geth build-dapp build-block-explorer ## Builds all docker images
 
 build-geth:
 	GETH_USER=$(GETH_USER) \
 		GETH_NETWORK_ID=$(GETH_NETWORK_ID) \
 		COINBASE=$(COINBASE) \
 		docker-compose build geth
+
+build-dapp:
+	cd hello && \
+	  make build
 
 build-block-explorer:
 	docker-compose build block-explorer

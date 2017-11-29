@@ -49,6 +49,8 @@ http://localhost:8000
 
 Try looking up the address you created in the `make create-account` step.
 
+An Ethereum distributed application (DApp) is now running at [http://localhost:4567](http://localhost:4567). Install MetaMask and give it a try! (MetaMask installation instructions to follow)
+
 ## Contract deployment
 
 In a terminal run

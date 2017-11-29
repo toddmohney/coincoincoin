@@ -23,6 +23,14 @@ services:
     - geth:/home/${GETH_USER}/.ethereum
     - ethash:/home/${GETH_USER}/.ethash
 
+  dapp:
+    build:
+      context: ./hello
+      dockerfile: Dockerfile
+    network_mode: "host"
+    ports:
+    - "4567:4567"
+
   block-explorer:
     build:
       context: ./block-explorer
