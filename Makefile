@@ -1,7 +1,7 @@
 .PHONY: help create-account
 .DEFAULT_GOAL := help
 
-GETH_USER ?= "gustcoin"
+GETH_USER ?= "coincoincoin"
 GETH_NETWORK_ID ?= 15
 
 # you're going to want to override this with your own address
@@ -31,7 +31,7 @@ console: ## Begins a Geth console session
 	GETH_USER=$(GETH_USER) \
 		GETH_NETWORK_ID=$(GETH_NETWORK_ID) \
 		docker-compose exec geth \
-		geth attach ipc:/home/gustcoin/.ethereum/geth.ipc
+		geth attach ipc:/home/coincoincoin/.ethereum/geth.ipc
 
 build: build-geth build-dapp build-block-explorer ## Builds all docker images
 

@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.0",
   "description": "Say hello on a blockchain",
-  "repository": "https://github.com/toddmohney/gustcoin",
+  "repository": "https://github.com/toddmohney/coincoincoin",
   "license": "MIT",
   "devDependencies": {
     "babel-core": "^6.26.0",
