@@ -77,7 +77,7 @@ Running migration: 2_add_congress.js
   Congress: 0x321d5513c291de3a2fb63bf4b6e711c34f57ba28
 ```
 
-Open up `./hello/js/src/congressContract.js` and replace the value set for `congressContractAddr` with `0x321d5513c291de3a2fb63bf4b6e711c34f57ba28` in this case.
+There are bits of our Javascript code that depend on knowing the location of the `Congress` contract so that our interface my interact with the contract. Open up `./hello/js/src/congressContract.js` and replace the value set for `congressContractAddr` with `0x321d5513c291de3a2fb63bf4b6e711c34f57ba28`.
 
 ## Testing
 
