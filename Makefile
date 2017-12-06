@@ -43,7 +43,8 @@ build-geth:
 
 build-dapp:
 	cd hello && \
-	  make build
+	  make build && \
+	  docker-compose build dapp
 
 build-block-explorer:
 	docker-compose build block-explorer
