@@ -7,6 +7,8 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Json.Encode as Encode
 import Route as R exposing (Route)
+import Session exposing (Session)
+import Web3.Web3 as Web3
 
 
 {-| Determines which navbar link (if any) will be rendered as active.
@@ -31,10 +33,10 @@ isLoading is for determining whether we should show a loading spinner
 in the header. (This comes up during slow page transitions.)
 
 -}
-frame : Bool -> Html msg -> ActivePage -> Html msg -> Html msg
-frame isLoading bannerMsg page content =
+frame : Maybe Session -> Bool -> Html msg -> ActivePage -> Html msg -> Html msg
+frame session isLoading bannerMsg page content =
     div []
-        [ viewHeader page isLoading
+        [ viewHeader session page isLoading
         , banner bannerMsg
         , content
         ]
@@ -62,8 +64,8 @@ banner bannerMsg =
         ]
 
 
-viewHeader : ActivePage -> Bool -> Html msg
-viewHeader page isLoading =
+viewHeader : Maybe Session -> ActivePage -> Bool -> Html msg
+viewHeader session page isLoading =
     nav
         [ classList [ ( "navbar", True ), ( "navbar-inverse", True ) ] ]
         [ div
@@ -82,9 +84,25 @@ viewHeader page isLoading =
                         [ classList [ ( "active", page == Blockocracy ) ] ]
                         [ a [ R.href (R.Blockocracy R.Vote) ] [ text "Blockocracy" ] ]
                     ]
+                , ul
+                    [ classList [ ( "nav", True ), ( "navbar-nav", True ), ( "navbar-right", True ) ] ]
+                    [ li
+                        []
+                        [ sessionName session ]
+                    ]
                 ]
             ]
         ]
+
+
+sessionName : Maybe Session -> Html msg
+sessionName mSession =
+    case mSession of
+        Nothing ->
+            a [ R.href (R.Blockocracy R.Vote) ] [ text "You are not signed in" ]
+
+        Just session ->
+            a [ R.href (R.Blockocracy R.Vote) ] [ text <| Web3.getAccountAddress session.accountAddress ]
 
 
 {-| This id comes from index.html.

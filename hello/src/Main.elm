@@ -15,10 +15,11 @@ import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
 import Ports as Ports
 import Route exposing (Route)
+import Session exposing (Session)
 import Task
 import Util exposing ((=>))
 import Views.Page as Page exposing (ActivePage)
-import Web3.Web3 as Web3
+import Web3.Web3 as Web3 exposing (AccountAddress)
 
 
 -- WARNING: Based on discussions around how asset management features
@@ -53,6 +54,7 @@ type PageState
 type alias Model =
     { pageState : PageState
     , bannerMessage : Html Msg
+    , session : Maybe Session
     }
 
 
@@ -61,6 +63,7 @@ init val location =
     setRoute (Route.fromLocation location)
         { pageState = Loaded initialPage
         , bannerMessage = div [] []
+        , session = Nothing
         }
 
 
@@ -77,17 +80,17 @@ view : Model -> Html Msg
 view model =
     case model.pageState of
         Loaded page ->
-            viewPage False page model.bannerMessage
+            viewPage model.session False page model.bannerMessage
 
         TransitioningFrom page ->
-            viewPage True page model.bannerMessage
+            viewPage model.session True page model.bannerMessage
 
 
-viewPage : Bool -> Page -> Html Msg -> Html Msg
-viewPage isLoading page bannerMsg =
+viewPage : Maybe Session -> Bool -> Page -> Html Msg -> Html Msg
+viewPage session isLoading page bannerMsg =
     let
         frame =
-            Page.frame isLoading bannerMsg
+            Page.frame session isLoading bannerMsg
     in
         case page of
             NotFound ->
@@ -136,6 +139,7 @@ type Msg
     | BlockocracyAdminMembersMsg BlockocracyAdmin.Msg
     | BannerMsg BE.BlockchainEvent
     | SetRoute (Maybe Route)
+    | SessionLoaded (Result String (Maybe AccountAddress))
 
 
 setRoute : Maybe Route -> Model -> ( Model, Cmd Msg )
@@ -152,20 +156,28 @@ setRoute maybeRoute model =
             Nothing ->
                 { model | pageState = Loaded NotFound } => Cmd.none
 
-            Just Route.Home ->
-                transition BlockocracyVoteLoaded BV.init []
+            Just rte ->
+                case model.session of
+                    Nothing ->
+                        -- TODO: send to a not-logged-in page
+                        { model | pageState = Loaded NotFound } => Cmd.none
 
-            Just (Route.Blockocracy Route.Vote) ->
-                transition BlockocracyVoteLoaded BV.init []
+                    Just session ->
+                        case rte of
+                            Route.Home ->
+                                transition BlockocracyVoteLoaded (BV.init session) []
 
-            Just (Route.Blockocracy Route.Propose) ->
-                transition BlockocracyProposeLoaded BP.init []
+                            Route.Blockocracy Route.Vote ->
+                                transition BlockocracyVoteLoaded (BV.init session) []
 
-            Just (Route.Blockocracy Route.Admin) ->
-                transition
-                    BlockocracyAdminMembersLoaded
-                    BlockocracyAdmin.init
-                    [ BlockPorts.getVotingRules "" ]
+                            Route.Blockocracy Route.Propose ->
+                                transition BlockocracyProposeLoaded (BP.init session) []
+
+                            Route.Blockocracy Route.Admin ->
+                                transition
+                                    BlockocracyAdminMembersLoaded
+                                    (BlockocracyAdmin.init session)
+                                    [ BlockPorts.getVotingRules "" ]
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -196,6 +208,14 @@ updatePage page msg model =
             pageErrored model
     in
         case ( msg, page ) of
+            ( SessionLoaded result, _ ) ->
+                case result of
+                    Err err ->
+                        Debug.log err ( model, Cmd.none )
+
+                    Ok mAcct ->
+                        ( { model | session = Maybe.map Session mAcct }, Cmd.none )
+
             ( SetRoute route, _ ) ->
                 setRoute route model
 
@@ -296,6 +316,9 @@ globalSubscriptions =
             BannerMsg
                 << BE.TxAddressCreated BE.ProposalExecution
                 << Decode.decodeValue Web3.txAddressDecoder
+        , Ports.sessionLoaded <|
+            SessionLoaded
+                << Decode.decodeValue (Decode.nullable Web3.accountDecoder)
         ]
 
 

@@ -10,6 +10,7 @@ module Web3.Web3
         , accountDecoder
         , addressDecoder
         , bigNumberDecoder
+        , defaultGasPrice
         , getAccountAddress
         , getAddress
         , getTxAddress
@@ -98,6 +99,11 @@ type alias Tx =
     , transactionIndex : Int
     , value : String
     }
+
+
+defaultGasPrice : Int
+defaultGasPrice =
+    20000000000
 
 
 bigNumberDecoder : Decoder BigNumber

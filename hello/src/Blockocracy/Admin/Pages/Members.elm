@@ -30,23 +30,23 @@ import Html.Events exposing (onInput, onClick)
 import Task exposing (Task)
 import Errors.Pages.Errored as Errored exposing (PageLoadError, pageLoadError)
 import Forms.Model as Form exposing (Form, modelLens)
-import Views.TxForm as TxForm exposing (Tx, TxFormMsg(..))
+import Session exposing (Session)
+import Views.TxForm as TxForm exposing (Tx)
 import Web3.Web3 as Web3
 
 
 type alias Page =
-    { txForm : Form Tx
-    , memberForm : Form Member
+    { memberForm : Form Member
     , votingRules : External VotingRules
     , votingRulesForm : Form VotingRules
     , proposalExecutionForm : Form ProposalExecution
     , selectedProposal : Maybe ProposalResponse
+    , session : Session
     }
 
 
 type Msg
-    = TxFormInputChanged TxFormMsg String
-    | InputChanged InputField
+    = InputChanged InputField
     | MemberAdded
     | MemberRemoved
     | VotingRulesUpdated
@@ -64,26 +64,21 @@ type InputField
     | ProposalID String
 
 
-init : Task PageLoadError Page
-init =
+init : Session -> Task PageLoadError Page
+init session =
     Task.succeed <|
         Page
-            TxForm.defForm
             (Form (Member (Web3.mkAccountAddress "0x00") "") [])
             Loading
             VRF.defForm
             (Form (ProposalExecution 0) [])
             Nothing
+            session
 
 
 update : Msg -> Page -> ( Page, Cmd Msg )
 update msg model =
     case msg of
-        TxFormInputChanged msg val ->
-            ( { model | txForm = TxForm.updateForm model.txForm val msg }
-            , Cmd.none
-            )
-
         InputChanged field ->
             case field of
                 MemberAddress val ->
@@ -147,18 +142,25 @@ update msg model =
         MemberAdded ->
             ( model
             , Ports.addMember <|
-                Member.toMemberRequest model.txForm.model model.memberForm.model
+                Member.toMemberRequest
+                    (Tx model.session.accountAddress Web3.defaultGasPrice)
+                    model.memberForm.model
             )
 
         MemberRemoved ->
             ( model
             , Ports.removeMember <|
-                Member.toMemberRequest model.txForm.model model.memberForm.model
+                Member.toMemberRequest
+                    (Tx model.session.accountAddress Web3.defaultGasPrice)
+                    model.memberForm.model
             )
 
         VotingRulesUpdated ->
             ( model
-            , Ports.updateVotingRules <| Vote.toVotingRulesRequest model.txForm.model model.votingRulesForm.model
+            , Ports.updateVotingRules <|
+                Vote.toVotingRulesRequest
+                    (Tx model.session.accountAddress Web3.defaultGasPrice)
+                    model.votingRulesForm.model
             )
 
         VotingRulesLoaded result ->
@@ -185,7 +187,10 @@ update msg model =
 
         ProposalExecuted ->
             ( model
-            , Ports.executeProposal <| Proposal.toProposalExecutionRequest model.txForm.model model.proposalExecutionForm.model
+            , Ports.executeProposal <|
+                Proposal.toProposalExecutionRequest
+                    (Tx model.session.accountAddress Web3.defaultGasPrice)
+                    model.proposalExecutionForm.model
             )
 
 
@@ -263,7 +268,6 @@ renderMemberManagement model =
         []
         [ h2 [] [ text "Add / Remove a Member" ]
         , memberForm
-        , txForm model.txForm
         , button
             [ classList [ ( "pull-left", True ), ( "btn", True ), ( "btn-danger", True ) ]
             , onClick MemberRemoved
@@ -383,13 +387,4 @@ memberForm =
                 ]
                 []
             ]
-        ]
-
-
-txForm : Form Tx -> Html Msg
-txForm form =
-    div
-        []
-        [ h3 [] [ text "Enter your transaction details" ]
-        , TxForm.render form TxFormInputChanged
         ]

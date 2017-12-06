@@ -17,21 +17,22 @@ import Blockocracy.Votes.Forms as VoteForm
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck, onInput)
+import Session exposing (Session)
 import Task exposing (Task)
 import Errors.Pages.Errored as Errored exposing (PageLoadError)
-import Views.TxForm as TxForm exposing (Tx, TxFormMsg(..))
+import Views.TxForm as TxForm exposing (Tx)
+import Web3.Web3 as Web3
 
 
 type alias Page =
-    { txForm : Form Tx
-    , voteForm : Form Vote
+    { voteForm : Form Vote
     , selectedProposal : Maybe ProposalResponse
+    , session : Session
     }
 
 
 type Msg
-    = TxFormInputChanged TxFormMsg String
-    | VoteInputChanged VoteInputField
+    = VoteInputChanged VoteInputField
     | VoteSubmitted
     | ProposalLoaded (Result String ProposalResponse)
 
@@ -42,10 +43,10 @@ type VoteInputField
     | SupportJustification String
 
 
-init : Task PageLoadError Page
-init =
+init : Session -> Task PageLoadError Page
+init session =
     Task.succeed <|
-        Page TxForm.defForm VoteForm.defForm Nothing
+        Page VoteForm.defForm Nothing session
 
 
 view : Page -> Html Msg
@@ -56,24 +57,11 @@ view model =
             [ renderVotingPanel model
             , proposalPreview model
             ]
-        , div
-            [ class "row" ]
-            [ renderTxForm model
-            ]
         , button
             [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
             , onClick VoteSubmitted
             ]
             [ text "Submit Ballot" ]
-        ]
-
-
-renderTxForm : Page -> Html Msg
-renderTxForm model =
-    div
-        [ class "col-sm-6" ]
-        [ h2 [] [ text "TX Form" ]
-        , txForm model.txForm
         ]
 
 
@@ -101,15 +89,6 @@ proposalPreview model =
                     [ text << String.join "\n," <| String.split "," (toString proposal)
                     ]
                 ]
-
-
-txForm : Form Tx -> Html Msg
-txForm form =
-    div
-        []
-        [ h3 [] [ text "Enter your transaction details" ]
-        , TxForm.render form TxFormInputChanged
-        ]
 
 
 voteForm : Page -> Html Msg
@@ -159,14 +138,12 @@ update msg model =
             , inputEffects input
             )
 
-        TxFormInputChanged msg val ->
-            ( { model | txForm = TxForm.updateForm model.txForm val msg }
-            , Cmd.none
-            )
-
         VoteSubmitted ->
             ( model
-            , Ports.submitVote <| Vote.toVoteRequest model.txForm.model model.voteForm.model
+            , Ports.submitVote <|
+                Vote.toVoteRequest
+                    (Tx model.session.accountAddress Web3.defaultGasPrice)
+                    model.voteForm.model
             )
 
         ProposalLoaded result ->

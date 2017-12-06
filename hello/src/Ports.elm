@@ -4,6 +4,7 @@ port module Ports
         , proposalAddedTxAddressCreated
         , proposalExecuted
         , proposalExecutedTxAddressCreated
+        , sessionLoaded
         , voted
         , votedTxAddressCreated
         , votingRulesUpdatedTxAddressCreated
@@ -35,3 +36,6 @@ port votingRulesUpdatedTxAddressCreated : (Value -> msg) -> Sub msg
 
 
 port votingRulesUpdated : (Value -> msg) -> Sub msg
+
+
+port sessionLoaded : (Value -> msg) -> Sub msg

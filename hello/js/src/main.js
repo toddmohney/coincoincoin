@@ -3,11 +3,29 @@ const Q = require('q');
 
 const { congressContract, congressContractAddr } = require("./congressContract.js");
 
-const web3 = new Web3(Web3.givenProvider || 'ws://localhost:8546');
-
+// web3 is injected into the page by MetaMask
+var web3js;
 
 const app = Elm.Main.fullscreen(localStorage.session || null);
 
+const loadSession = (accts) => {
+  console.log("loadSession", accts);
+
+  if(accts.length !== 0) {
+    app.ports.sessionLoaded.send(accts[0]);
+  }
+}
+
+$(document).ready(() => {
+  // Checking if Web3 has been injected by the browser (Mist/MetaMask)
+  if (typeof web3 !== 'undefined') {
+    // Use the browser's ethereum provider
+    web3js = new Web3(web3.currentProvider);
+    web3js.eth.getAccounts().then(loadSession);
+  } else {
+    console.log('No web3? You should consider trying MetaMask!')
+  }
+});
 
 app.ports.getVotingRules.subscribe((_) => {
   Q.all([
@@ -106,7 +124,7 @@ app.ports.submitProposal.subscribe((req) => {
   const beneficiary = req.beneficiary;
   const amount = req.etherAmount;
   const details = req.details;
-  const bytecode = web3.utils.fromAscii("");
+  const bytecode = web3js.utils.fromAscii("");
 
   congressContract.methods.newProposalInEther(
     beneficiary,
@@ -153,7 +171,7 @@ app.ports.executeProposal.subscribe((req) => {
   console.log("executeProposal", req);
 
   const proposalID = req.proposalID;
-  const bytecode = web3.utils.fromAscii("");
+  const bytecode = web3js.utils.fromAscii("");
 
   congressContract.methods.executeProposal(
     proposalID,

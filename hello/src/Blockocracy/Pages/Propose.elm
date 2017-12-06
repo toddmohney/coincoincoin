@@ -18,23 +18,19 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (onClick, onCheck, onInput)
 import Task exposing (Task)
 import Errors.Pages.Errored as Errored exposing (PageLoadError, pageLoadError)
-import Views.TxForm as TxForm
-    exposing
-        ( Tx
-        , TxFormMsg(..)
-        )
+import Session exposing (Session)
+import Views.TxForm as TxForm exposing (Tx)
 import Web3.Web3 as Web3 exposing (AccountAddress(..))
 
 
 type alias Page =
-    { txForm : Form Tx
-    , proposalForm : Form Proposal
+    { proposalForm : Form Proposal
+    , session : Session
     }
 
 
 type Msg
-    = TxFormInputChanged TxFormMsg String
-    | ProposalInputChanged InputField
+    = ProposalInputChanged InputField
     | ProposalSubmitted
 
 
@@ -44,10 +40,10 @@ type InputField
     | Details String
 
 
-init : Task PageLoadError Page
-init =
+init : Session -> Task PageLoadError Page
+init session =
     Task.succeed <|
-        Page TxForm.defForm Prop.defForm
+        Page Prop.defForm session
 
 
 view : Page -> Html Msg
@@ -57,24 +53,11 @@ view model =
             [ class "row" ]
             [ renderProposalPanel model
             ]
-        , div
-            [ class "row" ]
-            [ renderTxForm model
-            ]
         , button
             [ classList [ ( "btn", True ), ( "btn-primary", True ) ]
             , onClick ProposalSubmitted
             ]
             [ text "Submit Proposal" ]
-        ]
-
-
-renderTxForm : Page -> Html Msg
-renderTxForm model =
-    div
-        [ class "col-sm-12" ]
-        [ h2 [] [ text "TX Form" ]
-        , txForm model.txForm
         ]
 
 
@@ -84,15 +67,6 @@ renderProposalPanel model =
         [ class "col-sm-12" ]
         [ h2 [] [ text "Submit a Proposal" ]
         , proposalForm
-        ]
-
-
-txForm : Form Tx -> Html Msg
-txForm form =
-    div
-        []
-        [ h3 [] [ text "Enter your transaction details" ]
-        , TxForm.render form TxFormInputChanged
         ]
 
 
@@ -139,14 +113,12 @@ update msg model =
             , Cmd.none
             )
 
-        TxFormInputChanged msg val ->
-            ( { model | txForm = TxForm.updateForm model.txForm val msg }
-            , Cmd.none
-            )
-
         ProposalSubmitted ->
             ( model
-            , Ports.submitProposal <| Prop.toProposalRequest model.txForm.model model.proposalForm.model
+            , Ports.submitProposal <|
+                Prop.toProposalRequest
+                    (Tx model.session.accountAddress Web3.defaultGasPrice)
+                    model.proposalForm.model
             )
 
 
