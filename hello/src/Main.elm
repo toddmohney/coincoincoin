@@ -214,7 +214,7 @@ updatePage page msg model =
                         Debug.log err ( model, Cmd.none )
 
                     Ok mAcct ->
-                        ( { model | session = Maybe.map Session mAcct }, Cmd.none )
+                        ( { model | session = Maybe.map Session mAcct }, Route.modifyUrl (Route.Blockocracy Route.Vote) )
 
             ( SetRoute route, _ ) ->
                 setRoute route model
