@@ -13,6 +13,8 @@ import Errors.Pages.NotFound as NotFound
 import Html exposing (..)
 import Json.Decode as Decode exposing (Value)
 import Navigation exposing (Location)
+import NodeDiagnostics.NodeDiagnostics as ND
+import NodeDiagnostics.Pages.Overview as ND
 import Ports as Ports
 import Route exposing (Route)
 import Session exposing (Session)
@@ -35,6 +37,7 @@ type Page
     | BlockocracyVote BV.Page
     | BlockocracyPropose BP.Page
     | BlockocracyAdminMembers BlockocracyAdmin.Page
+    | NodeDiagnostics ND.Page
 
 
 type BlockocracyPage
@@ -125,6 +128,11 @@ viewPage session isLoading page bannerMsg =
                     |> Html.map BlockocracyAdminMembersMsg
                     |> frame Page.Blockocracy
 
+            NodeDiagnostics subModel ->
+                ND.view subModel
+                    |> Html.map NodeDiagnosticsMsg
+                    |> frame Page.NodeDiagnostics
+
 
 
 -- UPDATE --
@@ -134,10 +142,12 @@ type Msg
     = BlockocracyVoteLoaded (Result PageLoadError BV.Page)
     | BlockocracyProposeLoaded (Result PageLoadError BP.Page)
     | BlockocracyAdminMembersLoaded (Result PageLoadError BlockocracyAdmin.Page)
+    | NodeDiagnosticsLoaded (Result PageLoadError ND.Page)
     | BlockocracyVoteMsg BV.Msg
     | BlockocracyProposeMsg BP.Msg
     | BlockocracyAdminMembersMsg BlockocracyAdmin.Msg
     | BannerMsg BE.BlockchainEvent
+    | NodeDiagnosticsMsg ND.Msg
     | SetRoute (Maybe Route)
     | SessionLoaded (Result String (Maybe AccountAddress))
 
@@ -178,6 +188,9 @@ setRoute maybeRoute model =
                                     BlockocracyAdminMembersLoaded
                                     (BlockocracyAdmin.init session)
                                     [ BlockPorts.getVotingRules "" ]
+
+                            Route.NodeDiagnostics ->
+                                transition NodeDiagnosticsLoaded (ND.init session) []
 
 
 pageErrored : Model -> ActivePage -> String -> ( Model, Cmd msg )
@@ -248,6 +261,15 @@ updatePage page msg model =
 
             ( BlockocracyAdminMembersMsg subMsg, BlockocracyAdminMembers subModel ) ->
                 toPage BlockocracyAdminMembers BlockocracyAdminMembersMsg BlockocracyAdmin.update subMsg subModel
+
+            ( NodeDiagnosticsLoaded (Ok subModel), _ ) ->
+                { model | pageState = Loaded (NodeDiagnostics subModel) } => Cmd.none
+
+            ( NodeDiagnosticsLoaded (Err error), _ ) ->
+                { model | pageState = Loaded (Errored error) } => Cmd.none
+
+            ( NodeDiagnosticsMsg subMsg, NodeDiagnostics subModel ) ->
+                toPage NodeDiagnostics NodeDiagnosticsMsg ND.update subMsg subModel
 
             ( _, NotFound ) ->
                 -- Disregard incoming messages when we're on the
@@ -355,6 +377,14 @@ pageSubscriptions page =
                     BlockocracyAdminMembersMsg
                         << BlockocracyAdmin.ProposalLoaded
                         << Decode.decodeValue Proposal.proposalResponseDecoder
+                ]
+
+        NodeDiagnostics _ ->
+            Sub.batch
+                [ Ports.nodeDiagnosticsLoaded <|
+                    NodeDiagnosticsMsg
+                        << ND.DiagnosticsLoaded
+                        << Decode.decodeValue ND.nodeDiagnosticsDecoder
                 ]
 
 

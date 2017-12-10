@@ -22,10 +22,33 @@ $(document).ready(() => {
     // Use the browser's ethereum provider
     web3js = new Web3(web3.currentProvider);
     web3js.eth.getAccounts().then(loadSession);
+    window.setInterval(sendNodeDiagnostics, 3000);
   } else {
     console.log('No web3? You should consider trying MetaMask!')
   }
 });
+
+const sendNodeDiagnostics = () => {
+  Q.all([
+    web3js.eth.getCoinbase(),
+    web3js.eth.isMining(),
+    web3js.eth.getHashrate(),
+    web3js.eth.getGasPrice(),
+    web3js.eth.isSyncing(),
+    web3js.eth.getBlockNumber(),
+    web3js.eth.getAccounts()
+  ]).then((results) => {
+    app.ports.nodeDiagnosticsLoaded.send({
+      coinbase: results[0],
+      isMining: results[1],
+      hashrate: results[2],
+      gasPrice: results[3],
+      isSyncing: results[4],
+      blockNumber: results[5],
+      accounts: results[6]
+    });
+  });
+}
 
 app.ports.getVotingRules.subscribe((_) => {
   Q.all([

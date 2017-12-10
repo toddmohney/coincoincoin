@@ -22,6 +22,7 @@ type ActivePage
     = Other
     | Home
     | Blockocracy
+    | NodeDiagnostics
 
 
 {-| Take a page's Html and frame it with a header and footer.
@@ -83,6 +84,9 @@ viewHeader session page isLoading =
                     [ li
                         [ classList [ ( "active", page == Blockocracy ) ] ]
                         [ a [ R.href (R.Blockocracy R.Vote) ] [ text "Blockocracy" ] ]
+                    , li
+                        [ classList [ ( "active", page == NodeDiagnostics ) ] ]
+                        [ a [ R.href R.NodeDiagnostics ] [ text "Node Diagnostics" ] ]
                     ]
                 , ul
                     [ classList [ ( "nav", True ), ( "navbar-nav", True ), ( "navbar-right", True ) ] ]
@@ -102,7 +106,12 @@ sessionName mSession =
             a [ R.href (R.Blockocracy R.Vote) ] [ text "You are not signed in" ]
 
         Just session ->
-            a [ R.href (R.Blockocracy R.Vote) ] [ text <| Web3.getAccountAddress session.accountAddress ]
+            a [ R.href (R.Blockocracy R.Vote) ] [ text << truncateAddress <| Web3.getAccountAddress session.accountAddress ]
+
+
+truncateAddress : String -> String
+truncateAddress addr =
+    String.left 6 addr ++ "..." ++ String.right 4 addr
 
 
 {-| This id comes from index.html.

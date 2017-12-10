@@ -1,6 +1,7 @@
 port module Ports
     exposing
-        ( proposalAdded
+        ( nodeDiagnosticsLoaded
+        , proposalAdded
         , proposalAddedTxAddressCreated
         , proposalExecuted
         , proposalExecutedTxAddressCreated
@@ -12,6 +13,9 @@ port module Ports
         )
 
 import Json.Encode exposing (Value)
+
+
+port nodeDiagnosticsLoaded : (Value -> msg) -> Sub msg
 
 
 port proposalAdded : (Value -> msg) -> Sub msg

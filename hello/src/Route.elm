@@ -12,6 +12,7 @@ import UrlParser as Url exposing (Parser, (</>), oneOf, parseHash, s)
 type Route
     = Home
     | Blockocracy BlockocracySubRoute
+    | NodeDiagnostics
 
 
 type BlockocracySubRoute
@@ -27,6 +28,7 @@ route =
         , Url.map (Blockocracy Vote) (s "blockocracy" </> s "vote")
         , Url.map (Blockocracy Propose) (s "blockocracy" </> s "propose")
         , Url.map (Blockocracy Admin) (s "blockocracy" </> s "admin")
+        , Url.map NodeDiagnostics (s "node")
         ]
 
 
@@ -50,6 +52,9 @@ routeToString page =
 
                 Blockocracy Admin ->
                     [ "blockocracy", "admin" ]
+
+                NodeDiagnostics ->
+                    [ "node" ]
     in
         "#/" ++ String.join "/" pieces
 
