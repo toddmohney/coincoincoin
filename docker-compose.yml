@@ -23,6 +23,15 @@ services:
     - geth:/home/${GETH_USER}/.ethereum
     - ethash:/home/${GETH_USER}/.ethash
 
+  node-listener:
+    build:
+      context: ./node-listener
+      dockerfile: Dockerfile
+    command: "node app.js"
+    depends_on:
+      - geth
+    network_mode: "host"
+
   dapp:
     build:
       context: ./hello
