@@ -1,10 +1,11 @@
 const Web3 = require("web3");
 const Q = require('q');
 
-const { congressContract, congressContractAddr } = require("./congressContract.js");
+const { congressContractAbi, congressContractAddr } = require("./congressContract.js");
 
 // web3 is injected into the page by MetaMask
-var web3js;
+let w3;
+let blockNum = 0;
 
 const app = Elm.Main.fullscreen(localStorage.session || null);
 
@@ -20,8 +21,8 @@ $(document).ready(() => {
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
   if (typeof web3 !== 'undefined') {
     // Use the browser's ethereum provider
-    web3js = new Web3(web3.currentProvider);
-    web3js.eth.getAccounts().then(loadSession);
+    w3 = new Web3(web3.currentProvider);
+    w3.eth.getAccounts().then(loadSession);
     window.setInterval(sendNodeDiagnostics, 3000);
   } else {
     console.log('No web3? You should consider trying MetaMask!')
@@ -30,13 +31,13 @@ $(document).ready(() => {
 
 const sendNodeDiagnostics = () => {
   Q.all([
-    web3js.eth.getCoinbase(),
-    web3js.eth.isMining(),
-    web3js.eth.getHashrate(),
-    web3js.eth.getGasPrice(),
-    web3js.eth.isSyncing(),
-    web3js.eth.getBlockNumber(),
-    web3js.eth.getAccounts()
+    w3.eth.getCoinbase(),
+    w3.eth.isMining(),
+    w3.eth.getHashrate(),
+    w3.eth.getGasPrice(),
+    w3.eth.isSyncing(),
+    w3.eth.getBlockNumber(),
+    w3.eth.getAccounts()
   ]).then((results) => {
     app.ports.nodeDiagnosticsLoaded.send({
       coinbase: results[0],
@@ -51,6 +52,8 @@ const sendNodeDiagnostics = () => {
 }
 
 app.ports.getVotingRules.subscribe((_) => {
+  const congressContract = new w3.eth.Contract(congressContractAbi, congressContractAddr);
+
   Q.all([
     congressContract.methods.minimumQuorum().call({
       from: congressContractAddr
@@ -77,6 +80,7 @@ app.ports.getVotingRules.subscribe((_) => {
 
 app.ports.updateVotingRules.subscribe((req) => {
   console.log("updateVotingRules", req);
+  const congressContract = new w3.eth.Contract(congressContractAbi, congressContractAddr);
 
   congressContract.methods.changeVotingRules(
     req.minimumQuorum,
@@ -119,6 +123,8 @@ app.ports.updateVotingRules.subscribe((req) => {
 
 
 app.ports.getProposal.subscribe((proposalNum) => {
+  const congressContract = new w3.eth.Contract(congressContractAbi, congressContractAddr);
+
   congressContract.methods.proposals(proposalNum).call({
     from: congressContractAddr
   })
@@ -144,10 +150,11 @@ app.ports.getProposal.subscribe((proposalNum) => {
 app.ports.submitProposal.subscribe((req) => {
   console.log("submitProposal", req);
 
+  const congressContract = new w3.eth.Contract(congressContractAbi, congressContractAddr);
   const beneficiary = req.beneficiary;
   const amount = req.etherAmount;
   const details = req.details;
-  const bytecode = web3js.utils.fromAscii("");
+  const bytecode = w3.utils.fromAscii("");
 
   congressContract.methods.newProposalInEther(
     beneficiary,
@@ -193,8 +200,9 @@ app.ports.submitProposal.subscribe((req) => {
 app.ports.executeProposal.subscribe((req) => {
   console.log("executeProposal", req);
 
+  const congressContract = new w3.eth.Contract(congressContractAbi, congressContractAddr);
   const proposalID = req.proposalID;
-  const bytecode = web3js.utils.fromAscii("");
+  const bytecode = w3.utils.fromAscii("");
 
   congressContract.methods.executeProposal(
     proposalID,
@@ -237,6 +245,7 @@ app.ports.executeProposal.subscribe((req) => {
 app.ports.addMember.subscribe((req) => {
   console.log("addMember", req);
 
+  const congressContract = new w3.eth.Contract(congressContractAbi, congressContractAddr);
   const memberAddress = req.memberAddress;
   const memberName = req.memberName;
 
@@ -274,6 +283,7 @@ app.ports.addMember.subscribe((req) => {
 app.ports.removeMember.subscribe((req) => {
   console.log("removeMember", req);
 
+  const congressContract = new w3.eth.Contract(congressContractAbi, congressContractAddr);
   const memberAddress = req.memberAddress;
 
   congressContract.methods.removeMember(memberAddress).send(
@@ -310,6 +320,7 @@ app.ports.removeMember.subscribe((req) => {
 app.ports.submitVote.subscribe((req) => {
   console.log("submitVote", req);
 
+  const congressContract = new w3.eth.Contract(congressContractAbi, congressContractAddr);
   const senderAddress = req.senderAddress;
   const gasPrice = req.gasPrice;
 

@@ -591,5 +591,5 @@ const congressContractAbi = [
     "type": "event"
   }
 ];
-exports.congressContract = new web3.eth.Contract(congressContractAbi, congressContractAddr);
+exports.congressContractAbi = congressContractAbi;
 exports.congressContractAddr = congressContractAddr;
