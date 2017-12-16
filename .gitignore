@@ -1,11 +1,11 @@
 hello-app/app-bak/node_modules
-hello-app/node_modules
 hello/dist
 hello/elm-stuff
 hello/node_modules
 public/*
 .sekretz
 
+node_modules
 *.log
 *.pid
 .stack-work/
