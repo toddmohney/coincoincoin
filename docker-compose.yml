@@ -2,6 +2,9 @@ version: "2.2"
 volumes:
   geth:
   ethash:
+  kafka:
+  zookeeper_conf:
+  zookeeper_data:
 
 services:
   geth:
@@ -23,6 +26,15 @@ services:
     - geth:/home/${GETH_USER}/.ethereum
     - ethash:/home/${GETH_USER}/.ethash
 
+  node-event-producer:
+    build:
+      context: ./node-event-producer
+      dockerfile: Dockerfile
+    command: "node app.js"
+    depends_on:
+      - geth
+      - kafka
+
   dapp:
     build:
       context: ./hello
@@ -37,3 +49,27 @@ services:
       dockerfile: Dockerfile
     network_mode: "host"
     user: blockexplorer
+
+  zookeeper:
+    image: wurstmeister/zookeeper:3.4.6
+    ports:
+    - "2181:2181"
+    volumes:
+    - zookeeper_conf:/opt/zookeeper-3.4.9/conf"
+    - zookeeper_data:/opt/zookeeper-3.4.9/data
+
+  kafka:
+    image: wurstmeister/kafka:1.0.0
+    depends_on:
+    - zookeeper
+    ports:
+    - "9092-9094:9092-9094"
+    environment:
+      KAFKA_ADVERTISED_HOST_NAME: kafka
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_BROKER_ID: 1
+      KAFKA_CREATE_TOPICS: "CongressContractEvent:1:1"
+    volumes:
+    - /var/run/docker.sock:/var/run/docker.sock
+    - kafka:/kafka

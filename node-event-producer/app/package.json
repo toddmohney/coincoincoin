@@ -1,0 +1,17 @@
+{
+  "name": "NodeListener",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Listen to the blockchain",
+  "repository": "https://github.com/toddmohney/coincoincoin",
+  "license": "MIT",
+  "devDependencies": {},
+  "scripts": {},
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "node-rdkafka": "^2.2.1",
+    "q": "^1.5.1",
+    "sleep": "^5.1.1",
+    "web3": "^1.0.0-beta.26"
+  }
+}
