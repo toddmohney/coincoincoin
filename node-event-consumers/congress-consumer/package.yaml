@@ -1,0 +1,70 @@
+name:                congress-consumer
+version:             0.1.0.0
+
+author:              Todd Mohney
+category:            Blockchain
+copyright:           2017 Todd Mohney
+description:         Example blockchain application
+github:              toddmohney/coincoincoin
+license:             MIT
+maintainer:          toddmohney@gmail.com
+synopsis:            Example blockchain application
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+default-extensions:
+- DeriveGeneric
+- FlexibleContexts
+- FlexibleInstances
+- GeneralizedNewtypeDeriving
+- LambdaCase
+- OverloadedStrings
+- Rank2Types
+- RecordWildCards
+
+ghc-options:
+- -Wall
+- -Werror
+- -fno-warn-warnings-deprecations
+- -freverse-errors
+- -fwarn-unused-binds
+- -fwarn-unused-imports
+- -fwarn-unused-matches
+
+dependencies:
+- aeson
+- base >= 4.7 && < 5
+- bytestring
+- containers
+- exceptions
+- monad-logger
+- mtl
+- text
+- time
+
+library:
+  source-dirs: src
+
+executables:
+  congress-consumer:
+    main:                Main.hs
+    source-dirs:         app
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - congress-consumer
+
+tests:
+  congress-consumer-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - congress-consumer

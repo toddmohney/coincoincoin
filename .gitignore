@@ -5,3 +5,7 @@ hello/elm-stuff
 hello/node_modules
 public/*
 .sekretz
+
+*.log
+*.pid
+.stack-work/

@@ -1,0 +1,17 @@
+resolver: lts-9.18
+
+packages:
+- congress-consumer
+
+extra-deps:
+- milena-0.5.1.0
+- shared-lib
+
+flags: {}
+
+extra-package-dbs: []
+
+image:
+  container:
+    name: coincoincoin/base
+    base: fpco/stack-build:lts-9.10
