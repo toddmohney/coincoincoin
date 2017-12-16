@@ -620,14 +620,14 @@ const getEvents = () => {
   .then((events) => {
     _.forEach(events, (evt) => {
       console.log(evt);
-      produceMessage(producer, evt);
+      produceCongressContractMessage(producer, evt);
       blockNum = events[events.length - 1].blockNumber + 1;
     });
   });
 }
 
-const produceMessage = (producer, event) => {
-  const topic = event.event;
+const produceCongressContractMessage = (producer, event) => {
+  const topic = 'CongressContractEvent;
   const partition = 1;
   const message = new Buffer(JSON.stringify(event))
   const partitionKey = event.address;

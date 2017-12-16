@@ -69,7 +69,7 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
       KAFKA_BROKER_ID: 1
-      KAFKA_CREATE_TOPICS: "ProposalAdded:1:1,Voted:1:1,ProposalTallied:1:1,MembershipChanged:1:1,ChangeOfRules:1:1"
+      KAFKA_CREATE_TOPICS: "CongressContractEvent:1:1"
     volumes:
     - /var/run/docker.sock:/var/run/docker.sock
     - kafka:/kafka
