@@ -1,0 +1,86 @@
+-- This file has been generated from package.yaml by hpack version 0.17.1.
+--
+-- see: https://github.com/sol/hpack
+
+name:           shared-lib
+version:        0.1.0.0
+synopsis:       Shared library
+description:    Shared library
+category:       Web
+homepage:       https://github.com/toddmohney/servant-template#readme
+bug-reports:    https://github.com/toddmohney/servant-template/issues
+author:         Todd Mohney
+maintainer:     toddmohney@gmail.com
+copyright:      2017 Todd Mohney
+license:        MIT
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/toddmohney/servant-template
+
+library
+  hs-source-dirs:
+      src
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , monad-logger
+    , mtl
+    , text
+    , time
+    , aeson
+    , async
+    , exceptions
+    , hstatsd
+    , lens
+    , lens-aeson
+    , milena
+    , network
+    , persistent
+    , persistent-postgresql
+    , uuid
+    , vector
+  exposed-modules:
+      CoinCoinCoin.Class
+      CoinCoinCoin.Database.Config
+      CoinCoinCoin.Environment
+      CoinCoinCoin.Errors
+      CoinCoinCoin.Logging
+      CoinCoinCoin.MessageQueue
+      CoinCoinCoin.Time
+  other-modules:
+      CoinCoinCoin.MessageQueue.Adapters.Kafka
+      CoinCoinCoin.MessageQueue.Class
+      CoinCoinCoin.MessageQueue.Job
+      CoinCoinCoin.MessageQueue.Types
+      CoinCoinCoin.StatsD
+      CoinCoinCoin.UUID
+      Paths_shared_lib
+  default-language: Haskell2010
+
+test-suite shared-lib-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      test
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches -fno-warn-orphans -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      base >=4.7 && <5
+    , bytestring
+    , monad-logger
+    , mtl
+    , text
+    , time
+    , aeson
+    , file-embed
+    , hspec
+    , shared-lib
+  default-language: Haskell2010
