@@ -26,9 +26,9 @@ services:
     - geth:/home/${GETH_USER}/.ethereum
     - ethash:/home/${GETH_USER}/.ethash
 
-  node-listener:
+  node-event-producer:
     build:
-      context: ./node-listener
+      context: ./node-event-producer
       dockerfile: Dockerfile
     command: "node app.js"
     depends_on:

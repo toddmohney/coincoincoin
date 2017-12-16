@@ -33,7 +33,7 @@ console: ## Begins a Geth console session
 		docker-compose exec geth \
 		geth attach ipc:/home/coincoincoin/.ethereum/geth.ipc
 
-build: build-geth build-dapp build-node-listener build-block-explorer ## Builds all docker images
+build: build-geth build-dapp build-node-event-producer build-block-explorer ## Builds all docker images
 
 build-geth:
 	GETH_USER=$(GETH_USER) \
@@ -49,8 +49,8 @@ build-dapp:
 build-block-explorer:
 	docker-compose build block-explorer
 
-build-node-listener:
-	docker-compose build node-listener
+build-node-event-producer:
+	docker-compose build node-event-producer
 
 sh: ## Starts a bash session inside of the geth container
 	GETH_USER=$(GETH_USER) \
