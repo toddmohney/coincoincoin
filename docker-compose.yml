@@ -35,6 +35,16 @@ services:
       - geth
       - kafka
 
+  congress-event-consumer:
+    image: coincoincoin/coincoincoin
+    command: congress-consumer
+    env_file:
+    - node-event-consumers/congress-consumer/env/development.env
+    links:
+    - kafka
+    - postgres
+    restart: always
+
   dapp:
     build:
       context: ./hello

@@ -1,5 +1,8 @@
 .DEFAULT_GOAL := help
 
+IMAGE_NAME=coincoincoin/coincoincoin
+BASE_IMAGE_NAME=coincoincoin/base
+
 .PHONY: help
 help: ## Helps
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
@@ -27,3 +30,9 @@ stylish-haskell: ## Runs a Haskell auto-formatter across source code directories
 .PHONY: lint
 lint:
 	hlint .
+
+image: ## Builds a new image containing all project executables
+	stack image container --build && \
+		docker tag \
+			$(BASE_IMAGE_NAME):latest \
+			$(IMAGE_NAME)
