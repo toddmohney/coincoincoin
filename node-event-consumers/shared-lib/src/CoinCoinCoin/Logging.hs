@@ -3,17 +3,13 @@ module CoinCoinCoin.Logging
     , runLogging'
     ) where
 
-import           Control.Monad.IO.Class (MonadIO)
-import           Control.Monad.Logger
-    ( LogLevel (..)
-    , LogSource
-    , LoggingT (..)
-    )
-import qualified Control.Monad.Logger   as L
-import           Data.Monoid            ((<>))
-import           Data.Time.Clock        (getCurrentTime)
+import Control.Monad.IO.Class (MonadIO)
+import Control.Monad.Logger (LogLevel(..), LogSource, LoggingT(..))
+import qualified Control.Monad.Logger as L
+import Data.Monoid ((<>))
+import Data.Time.Clock (getCurrentTime)
 
-import CoinCoinCoin.Environment (Environment (..))
+import CoinCoinCoin.Environment (Environment(..))
 
 runLogging :: (MonadIO m) => Bool -> Environment -> LoggingT m a -> m a
 runLogging isDebugging env =

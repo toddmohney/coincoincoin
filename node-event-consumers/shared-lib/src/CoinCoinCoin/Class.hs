@@ -5,9 +5,9 @@ module CoinCoinCoin.Class
     , module CoinCoinCoin.StatsD
     ) where
 
-import           Control.Monad.IO.Class (MonadIO)
-import           Data.Time.Clock        (UTCTime)
-import qualified Data.Time.Clock        as Time
+import Control.Monad.IO.Class (MonadIO)
+import Data.Time.Clock (UTCTime)
+import qualified Data.Time.Clock as Time
 
 import CoinCoinCoin.StatsD
 

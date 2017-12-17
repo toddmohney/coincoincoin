@@ -2,17 +2,14 @@ module CoinCoinCoin.Database.Config
   ( makePool
   ) where
 
-import Control.Monad.Logger        (runNoLoggingT)
-import Data.ByteString.Char8       (pack)
+import Control.Monad.Logger (runNoLoggingT)
+import Data.ByteString.Char8 (pack)
 import Database.Persist.Postgresql
-    ( ConnectionPool
-    , ConnectionString
-    , createPostgresqlPool
-    )
-import System.Environment          (getEnv)
+    (ConnectionPool, ConnectionString, createPostgresqlPool)
+import System.Environment (getEnv)
 
 import CoinCoinCoin.Environment
-import CoinCoinCoin.Logging     (runLogging)
+import CoinCoinCoin.Logging (runLogging)
 
 data DbConnectionString =
   DbConnectionString { dbname   :: String

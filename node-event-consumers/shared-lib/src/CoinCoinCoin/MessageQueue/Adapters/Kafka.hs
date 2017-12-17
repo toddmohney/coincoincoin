@@ -3,33 +3,21 @@ module CoinCoinCoin.MessageQueue.Adapters.Kafka
     , runKafkaT
     ) where
 
-import           Control.Monad.Except
-import           Control.Monad.Reader
-import qualified Data.Aeson             as AE
-import qualified Data.ByteString.Char8  as BS
-import qualified Data.ByteString.Lazy   as LBS
-import           Network.Kafka
-    ( KafkaClientError
-    , KafkaState
-    , TopicAndMessage (..)
-    )
-import qualified Network.Kafka          as K
+import Control.Monad.Except
+import Control.Monad.Reader
+import qualified Data.Aeson as AE
+import qualified Data.ByteString.Char8 as BS
+import qualified Data.ByteString.Lazy as LBS
+import Network.Kafka (KafkaClientError, KafkaState, TopicAndMessage(..))
+import qualified Network.Kafka as K
 import qualified Network.Kafka.Consumer as K
 import qualified Network.Kafka.Producer as K
-import           Network.Kafka.Protocol
-    ( KafkaString (..)
-    , Message (..)
-    , ProduceResponse
-    , TopicName (..)
-    )
+import Network.Kafka.Protocol
+    (KafkaString(..), Message(..), ProduceResponse, TopicName(..))
 
 import CoinCoinCoin.MessageQueue.Class
 import CoinCoinCoin.MessageQueue.Job
-    ( Enqueueable (..)
-    , Job (..)
-    , PartitionKey (..)
-    , Topic
-    )
+    (Enqueueable(..), Job(..), PartitionKey(..), Topic)
 
 newtype KafkaT m a = KafkaT { unKafkaT :: ReaderT KafkaState (ExceptT KafkaClientError m) a }
     deriving ( Functor

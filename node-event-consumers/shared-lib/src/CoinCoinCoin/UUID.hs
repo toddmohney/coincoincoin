@@ -6,5 +6,5 @@ module CoinCoinCoin.UUID
     , module Data.UUID.V4
     ) where
 
-import           Data.UUID        (UUID, fromString)
-import           Data.UUID.V4
+import Data.UUID (UUID, fromString)
+import Data.UUID.V4

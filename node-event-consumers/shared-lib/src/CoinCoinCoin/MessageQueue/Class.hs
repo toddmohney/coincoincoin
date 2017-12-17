@@ -2,10 +2,10 @@ module CoinCoinCoin.MessageQueue.Class
     ( MonadMessageQueue(..)
     ) where
 
-import Network.Kafka          (TopicAndMessage)
+import Network.Kafka (TopicAndMessage)
 import Network.Kafka.Protocol (Offset, Partition, ProduceResponse, TopicName)
 
-import CoinCoinCoin.MessageQueue.Job (Enqueueable (..), Job (..))
+import CoinCoinCoin.MessageQueue.Job (Enqueueable(..), Job(..))
 
 class (Monad m) => MonadMessageQueue m where
     -- | Produces a batch of messages
