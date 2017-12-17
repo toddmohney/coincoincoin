@@ -57,6 +57,8 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - congress-consumer
+    - milena
+    - shared-lib
 
 tests:
   congress-consumer-test:

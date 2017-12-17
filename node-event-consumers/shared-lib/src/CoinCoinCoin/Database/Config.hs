@@ -1,5 +1,6 @@
 module CoinCoinCoin.Database.Config
-  ( makePool
+  ( ConnectionPool
+  , mkPool
   ) where
 
 import Control.Monad.Logger (runNoLoggingT)
@@ -19,11 +20,11 @@ data DbConnectionString =
                      , port     :: Int
                      } deriving (Show)
 
-makePool :: Environment -> IO ConnectionPool
-makePool Test = do
+mkPool :: Environment -> IO ConnectionPool
+mkPool Test = do
     connStr <- dbConnectionString
     runNoLoggingT $ createPostgresqlPool connStr 1
-makePool env = do
+mkPool env = do
     connStr  <- dbConnectionString
     poolSize <- read <$> getEnv "DB_POOL_SIZE"
     runLogging False env $ createPostgresqlPool connStr poolSize
