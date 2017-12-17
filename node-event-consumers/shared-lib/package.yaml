@@ -51,17 +51,13 @@ library:
   - CoinCoinCoin.Time
   dependencies:
   - aeson
-  - async
   - exceptions
   - hstatsd
-  - lens
-  - lens-aeson
   - milena
   - network
   - persistent
   - persistent-postgresql
   - uuid
-  - vector
 
 tests:
   shared-lib-test:
@@ -74,7 +70,5 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - aeson
-    - file-embed
     - hspec
     - shared-lib

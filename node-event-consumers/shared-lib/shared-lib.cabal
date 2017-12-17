@@ -1,6 +1,8 @@
--- This file has been generated from package.yaml by hpack version 0.17.1.
+-- This file has been generated from package.yaml by hpack version 0.20.0.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: ed1c44d4f1cb0559e17bcee986627177f9cfa301d836d7a2f043c92756ffcd94
 
 name:           shared-lib
 version:        0.1.0.0
@@ -29,24 +31,20 @@ library
   default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
   ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
     , bytestring
-    , monad-logger
-    , mtl
-    , text
-    , time
-    , aeson
-    , async
     , exceptions
     , hstatsd
-    , lens
-    , lens-aeson
     , milena
+    , monad-logger
+    , mtl
     , network
     , persistent
     , persistent-postgresql
+    , text
+    , time
     , uuid
-    , vector
   exposed-modules:
       CoinCoinCoin.Class
       CoinCoinCoin.Database.Config
@@ -75,12 +73,12 @@ test-suite shared-lib-test
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , hspec
     , monad-logger
     , mtl
+    , shared-lib
     , text
     , time
-    , aeson
-    , file-embed
-    , hspec
-    , shared-lib
+  other-modules:
+      Paths_shared_lib
   default-language: Haskell2010

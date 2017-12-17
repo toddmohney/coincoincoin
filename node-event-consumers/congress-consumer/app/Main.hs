@@ -1,6 +1,9 @@
 module Main where
 
-import Lib
-
 main :: IO ()
-main = someFunc
+main = putStrLn "hi"
+{- do -}
+    {- cfg <- mkAppConfig -}
+    {- forever $ do -}
+        {- runAppT cfg doIt -}
+        {- threadDelay (pollInterval cfg) -}
