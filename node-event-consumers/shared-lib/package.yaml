@@ -48,6 +48,7 @@ library:
   - CoinCoinCoin.Errors
   - CoinCoinCoin.Logging
   - CoinCoinCoin.MessageQueue
+  - CoinCoinCoin.MessageQueue.Adapters.Kafka
   - CoinCoinCoin.Time
   dependencies:
   - aeson

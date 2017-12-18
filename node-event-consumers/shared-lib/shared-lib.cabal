@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: ed1c44d4f1cb0559e17bcee986627177f9cfa301d836d7a2f043c92756ffcd94
+-- hash: 8e973e8f03a0626a68047ef7a98c597905a401bfc8e1c81fb1e526c7d2b84bb4
 
 name:           shared-lib
 version:        0.1.0.0
@@ -52,9 +52,9 @@ library
       CoinCoinCoin.Errors
       CoinCoinCoin.Logging
       CoinCoinCoin.MessageQueue
+      CoinCoinCoin.MessageQueue.Adapters.Kafka
       CoinCoinCoin.Time
   other-modules:
-      CoinCoinCoin.MessageQueue.Adapters.Kafka
       CoinCoinCoin.MessageQueue.Class
       CoinCoinCoin.MessageQueue.Job
       CoinCoinCoin.MessageQueue.Types
