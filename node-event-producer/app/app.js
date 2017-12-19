@@ -604,7 +604,7 @@ let producerIsReady = false;
 
 const getEvents = () => {
   if (!producerIsReady) {
-    console("Waiting for producer to be ready.");
+    console.log("Waiting for producer to be ready.");
     return;
   }
 
@@ -627,7 +627,7 @@ const getEvents = () => {
 }
 
 const produceCongressContractMessage = (producer, event) => {
-  const topic = 'CongressContractEventReceived;
+  const topic = 'CongressContractEventReceived';
   const partition = 1;
   const message = new Buffer(JSON.stringify(event))
   const partitionKey = event.address;
