@@ -4,7 +4,6 @@ module AppConfig
     ) where
 
 import qualified Data.ByteString.Char8  as BS
-import           Data.Text (Text)
 import qualified Data.Text          as T
 import           Network.Kafka          (KafkaState)
 import qualified Network.Kafka          as K
@@ -13,12 +12,13 @@ import           Network.Kafka.Protocol (Host (..), KafkaString (..),
 import           System.Environment (getEnv)
 
 import CoinCoinCoin.Database.Config (ConnectionPool, mkPool)
+import CoinCoinCoin.Database.Models (KafkaClientId(..))
 import CoinCoinCoin.Environment     (Environment (..))
 
 data AppConfig = AppConfig
     { appEnv        :: Environment
     , appDbConn     :: ConnectionPool
-    , appKafkaClientId  :: Text
+    , appKafkaClientId  :: KafkaClientId
     , appKafkaPartition :: Partition
     , kafkaState        :: KafkaState
     , pollInterval      :: Int -- ^ microsecs
@@ -30,7 +30,7 @@ mkAppConfig =  do
     env <- read <$> getEnv "ENV"
     kState <- mkKafkaState
     pInterval <- read <$> getEnv "POLL_INTERVAL"
-    kClientId <- T.pack <$> getEnv "KAFKA_CLIENT_ID"
+    kClientId <- KafkaClientId . T.pack <$> getEnv "KAFKA_CLIENT_ID"
     kPartition <- Partition . read <$> getEnv "KAFKA_PARTITION"
     dbPool    <- mkPool env
     return AppConfig

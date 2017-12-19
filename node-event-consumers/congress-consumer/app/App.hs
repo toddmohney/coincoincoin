@@ -12,10 +12,11 @@ import           Control.Monad.IO.Class (MonadIO, liftIO)
 import           Control.Monad.Logger   (LoggingT (..), MonadLogger)
 import           Control.Monad.Reader   (MonadReader, ReaderT (..), asks, runReaderT)
 import qualified Database.Persist.Postgresql as Sql
-import           Network.Kafka          (KafkaClientError)
+import           Network.Kafka          (KafkaClientError, TopicAndMessage)
+import Network.Kafka.Protocol (Offset, ProduceResponse)
 
 import           AppConfig (AppConfig(..), mkAppConfig)
-import           CoinCoinCoin.Class (MonadDbReader(..), MonadDbWriter(..))
+import           CoinCoinCoin.Class (MonadDbReader(..), MonadDbWriter(..), MonadTime(..))
 import qualified CoinCoinCoin.Database.KafkaOffsets.Query as KQ
 import           CoinCoinCoin.Database.Models
     ( SqlPersistT
@@ -26,7 +27,7 @@ import           CoinCoinCoin.Database.Models
     , Partition
     , TopicName
     )
-import           CoinCoinCoin.MessageQueue (MonadMessageQueue(..))
+import           CoinCoinCoin.MessageQueue (MonadMessageQueue(..), Enqueueable, Job)
 import           CoinCoinCoin.MessageQueue.Adapters.Kafka (runKafkaT)
 import           CoinCoinCoin.Logging (runLogging)
 
@@ -47,7 +48,11 @@ runAppT cfg appT =
     runExceptT . runLogging False (appEnv cfg) $
         runReaderT (unAppT appT) cfg
 
+instance MonadIO m => MonadTime (AppT m) where
+    getCurrentTime = liftIO getCurrentTime
+
 instance MonadIO m => MonadMessageQueue (AppT m) where
+    produceMessages :: (Enqueueable a) => [Job a] -> AppT m [ProduceResponse]
     produceMessages jobs = do
         kState <- asks kafkaState
         result <- runKafkaT kState (produceMessages jobs)
@@ -55,6 +60,7 @@ instance MonadIO m => MonadMessageQueue (AppT m) where
             Left err -> throwError err
             Right resps -> return resps
 
+    getEarliestOffset :: TopicName -> Partition -> AppT m Offset
     getEarliestOffset kTopic kPartition = do
         kState <- asks kafkaState
         result <- runKafkaT kState (getEarliestOffset kTopic kPartition)
@@ -62,6 +68,7 @@ instance MonadIO m => MonadMessageQueue (AppT m) where
             Left err -> throwError err
             Right offset -> return offset
 
+    consumeMessages :: TopicName -> Partition -> Offset -> AppT m [TopicAndMessage]
     consumeMessages kTopic kPartition offset = do
         kState <- asks kafkaState
         result <- runKafkaT kState (consumeMessages kTopic kPartition offset)
