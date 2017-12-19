@@ -44,6 +44,8 @@ library:
   exposed-modules:
   - CoinCoinCoin.Class
   - CoinCoinCoin.Database.Config
+  - CoinCoinCoin.Database.KafkaOffsets.Query
+  - CoinCoinCoin.Database.Models
   - CoinCoinCoin.Environment
   - CoinCoinCoin.Errors
   - CoinCoinCoin.Logging
@@ -58,6 +60,7 @@ library:
   - network
   - persistent
   - persistent-postgresql
+  - persistent-template
   - uuid
 
 tests:

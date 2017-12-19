@@ -627,7 +627,7 @@ const getEvents = () => {
 }
 
 const produceCongressContractMessage = (producer, event) => {
-  const topic = 'CongressContractEvent;
+  const topic = 'CongressContractEventReceived;
   const partition = 1;
   const message = new Buffer(JSON.stringify(event))
   const partitionKey = event.address;

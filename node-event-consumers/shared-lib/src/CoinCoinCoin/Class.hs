@@ -1,15 +1,25 @@
+{-# LANGUAGE ConstraintKinds #-}
+
 module CoinCoinCoin.Class
-    ( MonadStats(..)
+    ( MonadDb
+    , MonadDbReader(..)
+    , MonadDbWriter(..)
     , MonadTime(..)
     , UTCTime
-    , module CoinCoinCoin.StatsD
     ) where
 
-import Control.Monad.IO.Class (MonadIO)
 import Data.Time.Clock (UTCTime)
 import qualified Data.Time.Clock as Time
 
-import CoinCoinCoin.StatsD
+import CoinCoinCoin.Database.Models
+    ( SqlPersistT
+    , Entity
+    , KafkaOffset
+    , KafkaOffsetId
+    , KafkaClientId
+    , Partition
+    , TopicName
+    )
 
 class (Monad m) => MonadTime m where
     getCurrentTime :: m UTCTime
@@ -17,6 +27,20 @@ class (Monad m) => MonadTime m where
 instance MonadTime IO where
     getCurrentTime = Time.getCurrentTime
 
-class (MonadIO m) => MonadStats m where
-    recordStats :: [Stat] -> m ()
-    recordTiming :: Bucket -> IO a -> m a
+type MonadDb m = (MonadDbReader m, MonadDbWriter m)
+
+class (Monad m) => MonadDbReader m where
+    runDbReader :: SqlPersistT IO a -> m a
+
+    getAllKafkaOffsets :: m [Entity KafkaOffset]
+
+    getKafkaOffset :: KafkaClientId -> TopicName -> Partition -> m (Maybe (Entity KafkaOffset))
+
+class (Monad m) => MonadDbWriter m where
+    runDbWriter :: SqlPersistT IO a -> m a
+
+    createKafkaOffset :: KafkaOffset -> m KafkaOffsetId
+
+    updateKafkaOffset :: KafkaOffsetId -> KafkaOffset -> m ()
+
+    incrementKafkaOffset :: KafkaOffsetId -> m ()

@@ -58,6 +58,7 @@ executables:
     dependencies:
     - congress-consumer
     - milena
+    - persistent-postgresql
     - shared-lib
 
 tests:

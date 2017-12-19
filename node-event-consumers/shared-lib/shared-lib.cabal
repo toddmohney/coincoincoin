@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8e973e8f03a0626a68047ef7a98c597905a401bfc8e1c81fb1e526c7d2b84bb4
+-- hash: aa4111848d19299e3f4badaddbfd789ad4b13867f371885c1bab2029a12312b6
 
 name:           shared-lib
 version:        0.1.0.0
@@ -42,12 +42,15 @@ library
     , network
     , persistent
     , persistent-postgresql
+    , persistent-template
     , text
     , time
     , uuid
   exposed-modules:
       CoinCoinCoin.Class
       CoinCoinCoin.Database.Config
+      CoinCoinCoin.Database.KafkaOffsets.Query
+      CoinCoinCoin.Database.Models
       CoinCoinCoin.Environment
       CoinCoinCoin.Errors
       CoinCoinCoin.Logging
