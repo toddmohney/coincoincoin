@@ -6,19 +6,14 @@ module CoinCoinCoin.Database.Config
 import Control.Monad.Logger (runNoLoggingT)
 import Data.ByteString.Char8 (pack)
 import Database.Persist.Postgresql
-    (ConnectionPool, ConnectionString, createPostgresqlPool)
+    ( ConnectionPool
+    , ConnectionString
+    , createPostgresqlPool
+    )
 import System.Environment (getEnv)
 
 import CoinCoinCoin.Environment
 import CoinCoinCoin.Logging (runLogging)
-
-data DbConnectionString =
-  DbConnectionString { dbname   :: String
-                     , user     :: String
-                     , password :: String
-                     , host     :: String
-                     , port     :: Int
-                     } deriving (Show)
 
 mkPool :: Environment -> IO ConnectionPool
 mkPool Test = do
@@ -30,25 +25,4 @@ mkPool env = do
     runLogging False env $ createPostgresqlPool connStr poolSize
 
 dbConnectionString :: IO ConnectionString
-dbConnectionString =
-    (pack . toStr) <$> buildDBConnectionFromEnv
-
-toStr :: DbConnectionString -> String
-toStr cStr =
-    unwords
-        [ "dbname=" ++ dbname cStr
-        , "user=" ++ user cStr
-        , "password=" ++ password cStr
-        , "host=" ++ host cStr
-        , "port=" ++ show (port cStr)
-        ]
-
-buildDBConnectionFromEnv :: IO DbConnectionString
-buildDBConnectionFromEnv =
-    DbConnectionString
-        <$> getEnv "DB_NAME"
-        <*> getEnv "DB_USER"
-        <*> getEnv "DB_PASS"
-        <*> getEnv "DB_HOST"
-        <*> (read <$> getEnv "DB_PORT")
-
+dbConnectionString = pack <$> getEnv "DATABASE_URL"
