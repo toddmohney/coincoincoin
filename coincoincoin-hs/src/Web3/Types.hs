@@ -3,14 +3,39 @@ module Web3.Types
     , Event(..)
     , EventId(..)
     , Hash(..)
+    , Voted(..)
+    , VotedReturnValues(..)
     ) where
 
-import Data.Aeson (FromJSON(..), (.:))
+import Control.Monad (mzero)
+import Data.Aeson (FromJSON(..), Value(..), (.:))
 import qualified Data.Aeson as AE
 import Data.String (IsString(..))
 import Data.Text (Text)
 import qualified Data.Text as T
+import qualified Data.Text.Lazy as TL
 import GHC.Generics (Generic)
+
+data Voted = Voted
+    deriving (Show, Eq, Generic)
+
+instance FromJSON Voted where
+    parseJSON (String s) =
+        case TL.unpack (TL.fromStrict s) of
+            "Voted" -> return Voted
+            _ -> mzero
+    parseJSON _ = mzero
+
+
+data VotedReturnValues = VotedReturnValues
+    { proposalID :: Text
+    , position :: Bool
+    , voter :: Address
+    , justification :: Text
+    } deriving (Show, Eq, Generic)
+
+instance FromJSON VotedReturnValues
+
 
 data Event a b = Event
     { eventAddress :: Address

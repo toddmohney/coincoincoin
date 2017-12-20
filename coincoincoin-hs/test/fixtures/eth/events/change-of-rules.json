@@ -1,0 +1,24 @@
+{
+	"address": "0x321d5513c291De3a2fB63bf4B6E711c34F57bA28",
+	"blockNumber": 38,
+	"transactionHash": "0xd51ed46defe58aace1e893ff8f42d2826139ff3db24c510ef0a5afad56828602",
+	"transactionIndex": 0,
+	"blockHash": "0x6f8971f77a3e199a36d80ec6d834e71eb08a6af5df611b707290bf552da80155",
+	"logIndex": 0,
+	"removed": false,
+	"id": "log_61cf1a4a",
+	"returnValues": {
+		"0": "0",
+		"1": "0",
+		"2": "0",
+		"newMinimumQuorum": "0",
+		"newDebatingPeriodInMinutes": "0",
+		"newMajorityMargin": "0"
+	},
+	"event": "ChangeOfRules",
+	"signature": "0xa439d3fa452be5e0e1e24a8145e715f4fd8b9c08c96a42fd82a855a85e5d57de",
+	"raw": {
+		"data": "0x000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+		"topics": ["0xa439d3fa452be5e0e1e24a8145e715f4fd8b9c08c96a42fd82a855a85e5d57de"]
+	}
+}

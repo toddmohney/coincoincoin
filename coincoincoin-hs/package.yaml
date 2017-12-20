@@ -1,4 +1,4 @@
-name:                congress-consumer
+name:                coincoincoin-hs
 version:             0.1.0.0
 
 author:              Todd Mohney
@@ -46,6 +46,28 @@ dependencies:
 
 library:
   source-dirs: src
+  exposed-modules:
+  - CoinCoinCoin.Class
+  - CoinCoinCoin.Database.Config
+  - CoinCoinCoin.Database.KafkaOffsets.Query
+  - CoinCoinCoin.Database.Models
+  - CoinCoinCoin.Environment
+  - CoinCoinCoin.Errors
+  - CoinCoinCoin.Logging
+  - CoinCoinCoin.MessageQueue
+  - CoinCoinCoin.MessageQueue.Adapters.Kafka
+  - CoinCoinCoin.Time
+  - Web3.Types
+  dependencies:
+  - aeson
+  - exceptions
+  - hstatsd
+  - milena
+  - network
+  - persistent
+  - persistent-postgresql
+  - persistent-template
+  - uuid
 
 executables:
   congress-consumer:
@@ -56,10 +78,9 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - congress-consumer
+    - coincoincoin-hs
     - milena
     - persistent-postgresql
-    - shared-lib
 
 tests:
   congress-consumer-test:
@@ -70,4 +91,6 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - congress-consumer
+    - coincoincoin-hs
+    - file-embed
+    - hspec

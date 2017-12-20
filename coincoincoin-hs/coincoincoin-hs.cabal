@@ -2,28 +2,30 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 788e5871742f008e4687f2bed30384eed50d2cbfacf93a7dc86f59b462816221
+-- hash: 471a8f59afc3253f5b10667107bbb7701b06d17f80531c3a9e07d20d6689e840
 
-name:           shared-lib
+name:           coincoincoin-hs
 version:        0.1.0.0
-synopsis:       Shared library
-description:    Shared library
-category:       Web
-homepage:       https://github.com/toddmohney/servant-template#readme
-bug-reports:    https://github.com/toddmohney/servant-template/issues
+synopsis:       Example blockchain application
+description:    Example blockchain application
+category:       Blockchain
+homepage:       https://github.com/toddmohney/coincoincoin#readme
+bug-reports:    https://github.com/toddmohney/coincoincoin/issues
 author:         Todd Mohney
 maintainer:     toddmohney@gmail.com
 copyright:      2017 Todd Mohney
 license:        MIT
+license-file:   LICENSE
 build-type:     Simple
 cabal-version:  >= 1.10
 
 extra-source-files:
+    ChangeLog.md
     README.md
 
 source-repository head
   type: git
-  location: https://github.com/toddmohney/servant-template
+  location: https://github.com/toddmohney/coincoincoin
 
 library
   hs-source-dirs:
@@ -34,6 +36,7 @@ library
       aeson
     , base >=4.7 && <5
     , bytestring
+    , containers
     , exceptions
     , hstatsd
     , milena
@@ -64,26 +67,55 @@ library
       CoinCoinCoin.MessageQueue.Types
       CoinCoinCoin.StatsD
       CoinCoinCoin.UUID
-      Paths_shared_lib
+      Paths_coincoincoin_hs
   default-language: Haskell2010
 
-test-suite shared-lib-test
+executable congress-consumer
+  main-is: Main.hs
+  hs-source-dirs:
+      apps/congress-consumer
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , coincoincoin-hs
+    , containers
+    , exceptions
+    , milena
+    , monad-logger
+    , mtl
+    , persistent-postgresql
+    , text
+    , time
+  other-modules:
+      App
+      AppConfig
+      Paths_coincoincoin_hs
+  default-language: Haskell2010
+
+test-suite congress-consumer-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   hs-source-dirs:
       test
   default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
-  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches -fno-warn-orphans -threaded -rtsopts -with-rtsopts=-N
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      base >=4.7 && <5
+      aeson
+    , base >=4.7 && <5
     , bytestring
+    , coincoincoin-hs
+    , containers
+    , exceptions
+    , file-embed
     , hspec
     , monad-logger
     , mtl
-    , shared-lib
     , text
     , time
   other-modules:
       Web3.TypesSpec
-      Paths_shared_lib
+      Paths_coincoincoin_hs
   default-language: Haskell2010

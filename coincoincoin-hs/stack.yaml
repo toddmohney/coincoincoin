@@ -1,8 +1,7 @@
 resolver: lts-9.18
 
 packages:
-- congress-consumer
-- shared-lib
+- .
 
 extra-deps:
 - milena-0.5.1.0

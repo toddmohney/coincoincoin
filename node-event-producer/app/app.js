@@ -620,6 +620,7 @@ const getEvents = () => {
   .then((events) => {
     _.forEach(events, (evt) => {
       console.log(evt);
+      console.log(JSON.stringify(evt));
       produceCongressContractMessage(producer, evt);
       blockNum = events[events.length - 1].blockNumber + 1;
     });
