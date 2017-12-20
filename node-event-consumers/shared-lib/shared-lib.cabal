@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: aa4111848d19299e3f4badaddbfd789ad4b13867f371885c1bab2029a12312b6
+-- hash: 788e5871742f008e4687f2bed30384eed50d2cbfacf93a7dc86f59b462816221
 
 name:           shared-lib
 version:        0.1.0.0
@@ -57,6 +57,7 @@ library
       CoinCoinCoin.MessageQueue
       CoinCoinCoin.MessageQueue.Adapters.Kafka
       CoinCoinCoin.Time
+      Web3.Types
   other-modules:
       CoinCoinCoin.MessageQueue.Class
       CoinCoinCoin.MessageQueue.Job
@@ -83,5 +84,6 @@ test-suite shared-lib-test
     , text
     , time
   other-modules:
+      Web3.TypesSpec
       Paths_shared_lib
   default-language: Haskell2010
