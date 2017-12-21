@@ -8,15 +8,15 @@ module CoinCoinCoin.Congress.Events.Types
     , VotedReturnValues(..)
     ) where
 
-import Control.Applicative ((<|>))
-import Data.Aeson (FromJSON(..), Object, Value(..), (.:))
-import Data.Aeson.Types (Parser)
+import           Control.Applicative ((<|>))
+import           Data.Aeson (FromJSON(..), Object, Value(..), (.:))
+import           Data.Aeson.Types (Parser)
 import qualified Data.Aeson.Types as AE
-import Data.Text (Text)
+import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Lazy as TL
-import GHC.Generics (Generic)
-import Text.Read (readMaybe)
+import           GHC.Generics (Generic)
+import           Text.Read (readMaybe)
 
 import Web3.Types (Address(..))
 
@@ -42,9 +42,9 @@ instance FromJSON CongressEvent where
 
 
 data ChangeOfRulesReturnValues = ChangeOfRulesReturnValues
-    { newMinimumQuorum :: Int
+    { newMinimumQuorum           :: Int
     , newDebatingPeriodInMinutes :: Int
-    , newMajorityMargin :: Int
+    , newMajorityMargin          :: Int
     } deriving (Show, Eq, Generic)
 
 instance FromJSON ChangeOfRulesReturnValues where
@@ -56,7 +56,7 @@ instance FromJSON ChangeOfRulesReturnValues where
 
 
 data MembershipChangedReturnValues = MembershipChangedReturnValues
-    { member :: Address
+    { member   :: Address
     , isMember :: Bool
     } deriving (Show, Eq, Generic)
 
@@ -64,9 +64,9 @@ instance FromJSON MembershipChangedReturnValues
 
 
 data ProposalAddedReturnValues = ProposalAddedReturnValues
-    { proposalAddedProposalID :: Int
-    , proposalAddedRecipient :: Address
-    , proposalAddedAmount :: Integer
+    { proposalAddedProposalID  :: Int
+    , proposalAddedRecipient   :: Address
+    , proposalAddedAmount      :: Integer
     , proposalAddedDescription :: Text
     } deriving (Show, Eq, Generic)
 
@@ -81,9 +81,9 @@ instance FromJSON ProposalAddedReturnValues where
 
 data ProposalTalliedReturnValues = ProposalTalliedReturnValues
     { proposalTalliedProposalID :: Int
-    , proposalTalliedResult :: Int
-    , proposalTalliedQuorum :: Int
-    , proposalTalliedActive :: Bool
+    , proposalTalliedResult     :: Int
+    , proposalTalliedQuorum     :: Int
+    , proposalTalliedActive     :: Bool
     } deriving (Show, Eq, Generic)
 
 instance FromJSON ProposalTalliedReturnValues where
@@ -108,9 +108,9 @@ instance FromJSON ReceivedEtherReturnValues where
 
 
 data VotedReturnValues = VotedReturnValues
-    { proposalID :: Int
-    , position :: Bool
-    , voter :: Address
+    { proposalID    :: Int
+    , position      :: Bool
+    , voter         :: Address
     , justification :: Text
     } deriving (Show, Eq, Generic)
 

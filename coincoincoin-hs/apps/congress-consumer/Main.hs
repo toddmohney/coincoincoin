@@ -1,23 +1,27 @@
 module Main where
 
-import           Control.Concurrent     (threadDelay)
-import           Control.Monad          (forever, void)
-import           Control.Monad.IO.Class (MonadIO)
-import           Control.Monad.Reader (MonadReader, asks)
+import Control.Concurrent (threadDelay)
+import Control.Monad (forever, void)
+import Control.Monad.IO.Class (MonadIO)
+import Control.Monad.Reader (MonadReader, asks)
 import Network.Kafka (TopicAndMessage)
 
-import App (AppConfig(..))
+import           App (AppConfig(..))
 import qualified App
-import CoinCoinCoin.Class (MonadDbReader(..), MonadTime(..))
-import CoinCoinCoin.Database.Models
+import           CoinCoinCoin.Class (MonadDbReader(..), MonadTime(..))
+import           CoinCoinCoin.Database.Models
     ( Entity(..)
-    , KafkaOffset(..)
     , KafkaClientId
+    , KafkaOffset(..)
     , Partition
     , TopicName
     )
 import qualified CoinCoinCoin.Database.Models as M
-import CoinCoinCoin.MessageQueue (MonadMessageQueue(..), Topic(..), mkTopic, mkTopic, mkTopic, mkTopic, mkTopic, mkTopic, mkTopic, mkTopic, mkTopic)
+import           CoinCoinCoin.MessageQueue
+    ( MonadMessageQueue(..)
+    , Topic(..)
+    , mkTopic
+    )
 
 main :: IO ()
 main = do

@@ -3,21 +3,25 @@ module AppConfig
     , mkAppConfig
     ) where
 
-import qualified Data.ByteString.Char8  as BS
-import qualified Data.Text          as T
-import           Network.Kafka          (KafkaState)
-import qualified Network.Kafka          as K
-import           Network.Kafka.Protocol (Host (..), KafkaString (..),
-                                         Partition (..), Port (..))
+import qualified Data.ByteString.Char8 as BS
+import qualified Data.Text as T
+import           Network.Kafka (KafkaState)
+import qualified Network.Kafka as K
+import           Network.Kafka.Protocol
+    ( Host(..)
+    , KafkaString(..)
+    , Partition(..)
+    , Port(..)
+    )
 import           System.Environment (getEnv)
 
 import CoinCoinCoin.Database.Config (ConnectionPool, mkPool)
 import CoinCoinCoin.Database.Models (KafkaClientId(..))
-import CoinCoinCoin.Environment     (Environment (..))
+import CoinCoinCoin.Environment (Environment(..))
 
 data AppConfig = AppConfig
-    { appEnv        :: Environment
-    , appDbConn     :: ConnectionPool
+    { appEnv            :: Environment
+    , appDbConn         :: ConnectionPool
     , appKafkaClientId  :: KafkaClientId
     , appKafkaPartition :: Partition
     , kafkaState        :: KafkaState

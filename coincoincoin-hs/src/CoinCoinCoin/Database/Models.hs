@@ -1,12 +1,12 @@
 {-# OPTIONS_GHC -fno-warn-orphans #-}
-{-# LANGUAGE FlexibleContexts           #-}
-{-# LANGUAGE FlexibleInstances          #-}
-{-# LANGUAGE GADTs                      #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE GADTs #-}
 {-# LANGUAGE GeneralizedNewtypeDeriving #-}
-{-# LANGUAGE MultiParamTypeClasses      #-}
-{-# LANGUAGE QuasiQuotes                #-}
-{-# LANGUAGE TemplateHaskell            #-}
-{-# LANGUAGE TypeFamilies               #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE QuasiQuotes #-}
+{-# LANGUAGE TemplateHaskell #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module CoinCoinCoin.Database.Models
     ( module CoinCoinCoin.Database.Models
@@ -19,36 +19,36 @@ module CoinCoinCoin.Database.Models
     , fromSqlKey
     ) where
 
-import           Data.Monoid                 ((<>))
-import           Data.String                 (IsString (..))
-import           Data.Text                   (Text)
-import qualified Data.Text                   as T
-import qualified Data.Text.Encoding          as T
-import           Data.Time.Clock             (UTCTime)
-import           Data.Typeable               (Typeable)
+import           Data.Monoid ((<>))
+import           Data.String (IsString(..))
+import           Data.Text (Text)
+import qualified Data.Text as T
+import qualified Data.Text.Encoding as T
+import           Data.Time.Clock (UTCTime)
+import           Data.Typeable (Typeable)
 import           Database.Persist.Postgresql
     ( ConnectionPool
-    , Entity (..)
-    , PersistField (..)
-    , PersistValue (..)
+    , Entity(..)
+    , PersistField(..)
+    , PersistValue(..)
     , SqlPersistT
     , runMigration
     , runSqlPool
     )
 import           Database.Persist.Sql
-    ( Key (..)
+    ( Key(..)
     , SqlBackend
     , ToBackendKey
     , fromSqlKey
     , toSqlKey
     )
 import           Database.Persist.TH
-import           GHC.Generics                (Generic)
+import           GHC.Generics (Generic)
 import           Network.Kafka.Protocol
-    ( KafkaString (..)
-    , Offset (..)
-    , Partition (..)
-    , TopicName (..)
+    ( KafkaString(..)
+    , Offset(..)
+    , Partition(..)
+    , TopicName(..)
     )
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|

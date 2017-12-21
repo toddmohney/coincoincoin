@@ -1,14 +1,14 @@
 ---
 steps:
   - simple_align:
-      cases: false
-      top_level_patterns: false
-      records: false
+      cases: true
+      top_level_patterns: true
+      records: true
   - imports:
-      align: none
+      align: group
       list_align: after_alias
       pad_module_names: false
-      long_list_align: new_line_multiline
+      long_list_align: multiline
       empty_list_align: right_after
       list_padding: 4
       separate_lists: false
@@ -20,3 +20,17 @@ steps:
   - trailing_whitespace: {}
 columns: 80
 newline: native
+language_extensions:
+   - TemplateHaskell
+   - QuasiQuotes
+   - TypeApplications
+   - TypeFamilies
+   - TypeOperators
+   - DataKinds
+   - PolyKinds
+   - MultiParamTypeClasses
+   - ScopedTypeVariables
+   - FlexibleContexts
+   - FlexibleInstances
+   - RecordWildCards
+   - LambdaCase

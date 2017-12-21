@@ -7,29 +7,47 @@ module App
     ) where
 
 import           Control.Monad.Catch (MonadCatch, MonadThrow)
-import           Control.Monad.Except   (ExceptT (..), MonadError, runExceptT, throwError)
+import           Control.Monad.Except
+    ( ExceptT(..)
+    , MonadError
+    , runExceptT
+    , throwError
+    )
 import           Control.Monad.IO.Class (MonadIO, liftIO)
-import           Control.Monad.Logger   (LoggingT (..), MonadLogger)
-import           Control.Monad.Reader   (MonadReader, ReaderT (..), asks, runReaderT)
+import           Control.Monad.Logger (LoggingT(..), MonadLogger)
+import           Control.Monad.Reader
+    ( MonadReader
+    , ReaderT(..)
+    , asks
+    , runReaderT
+    )
 import qualified Database.Persist.Postgresql as Sql
-import           Network.Kafka          (KafkaClientError, TopicAndMessage)
-import Network.Kafka.Protocol (Offset, ProduceResponse)
+import           Network.Kafka (KafkaClientError, TopicAndMessage)
+import           Network.Kafka.Protocol (Offset, ProduceResponse)
 
 import           AppConfig (AppConfig(..), mkAppConfig)
-import           CoinCoinCoin.Class (MonadDbReader(..), MonadDbWriter(..), MonadTime(..))
+import           CoinCoinCoin.Class
+    ( MonadDbReader(..)
+    , MonadDbWriter(..)
+    , MonadTime(..)
+    )
 import qualified CoinCoinCoin.Database.KafkaOffsets.Query as KQ
 import           CoinCoinCoin.Database.Models
-    ( SqlPersistT
-    , Entity
+    ( Entity
+    , KafkaClientId
     , KafkaOffset
     , KafkaOffsetId
-    , KafkaClientId
     , Partition
+    , SqlPersistT
     , TopicName
     )
-import           CoinCoinCoin.MessageQueue (MonadMessageQueue(..), Enqueueable, Job)
-import           CoinCoinCoin.MessageQueue.Adapters.Kafka (runKafkaT)
 import           CoinCoinCoin.Logging (runLogging)
+import           CoinCoinCoin.MessageQueue
+    ( Enqueueable
+    , Job
+    , MonadMessageQueue(..)
+    )
+import           CoinCoinCoin.MessageQueue.Adapters.Kafka (runKafkaT)
 
 newtype AppT m a = AppT { unAppT :: ReaderT AppConfig (LoggingT (ExceptT KafkaClientError m)) a }
     deriving ( Functor
@@ -57,7 +75,7 @@ instance MonadIO m => MonadMessageQueue (AppT m) where
         kState <- asks kafkaState
         result <- runKafkaT kState (produceMessages jobs)
         case result of
-            Left err -> throwError err
+            Left err    -> throwError err
             Right resps -> return resps
 
     getEarliestOffset :: TopicName -> Partition -> AppT m Offset
@@ -65,7 +83,7 @@ instance MonadIO m => MonadMessageQueue (AppT m) where
         kState <- asks kafkaState
         result <- runKafkaT kState (getEarliestOffset kTopic kPartition)
         case result of
-            Left err -> throwError err
+            Left err     -> throwError err
             Right offset -> return offset
 
     consumeMessages :: TopicName -> Partition -> Offset -> AppT m [TopicAndMessage]
@@ -73,7 +91,7 @@ instance MonadIO m => MonadMessageQueue (AppT m) where
         kState <- asks kafkaState
         result <- runKafkaT kState (consumeMessages kTopic kPartition offset)
         case result of
-            Left err -> throwError err
+            Left err   -> throwError err
             Right resp -> return resp
 
 instance (MonadIO m) => MonadDbReader (AppT m) where

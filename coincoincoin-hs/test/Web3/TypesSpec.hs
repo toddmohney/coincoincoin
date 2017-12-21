@@ -2,12 +2,15 @@
 
 module Web3.TypesSpec (main, spec) where
 
-import qualified Data.Aeson      as AE
-import Data.ByteString.Char8 (ByteString)
-import Data.FileEmbed  (embedFile)
-import Test.Hspec
+import qualified Data.Aeson as AE
+import           Data.ByteString.Char8 (ByteString)
+import           Data.FileEmbed (embedFile)
+import           Test.Hspec
 
-import CoinCoinCoin.Congress.Events.Types (CongressEvent(..), VotedReturnValues(..))
+import CoinCoinCoin.Congress.Events.Types
+    ( CongressEvent(..)
+    , VotedReturnValues(..)
+    )
 import Web3.Types
 
 main :: IO ()

@@ -9,15 +9,15 @@ module CoinCoinCoin.StatsD
     , withStatsDTimed
     ) where
 
-import Control.Exception (bracket)
-import Control.Monad.Reader
-import Data.Monoid ((<>))
-import Data.String (IsString(..))
+import           Control.Exception (bracket)
+import           Control.Monad.Reader
+import           Data.Monoid ((<>))
+import           Data.String (IsString(..))
 import qualified Data.Text.Lazy as LT
-import Data.Time.Clock (diffUTCTime, getCurrentTime)
-import Network.Socket (HostName, ServiceName)
+import           Data.Time.Clock (diffUTCTime, getCurrentTime)
+import           Network.Socket (HostName, ServiceName)
 import qualified Network.StatsD as SD
-import Numeric.Natural
+import           Numeric.Natural
 
 data StatsDConfig = StatsDConfig
     { hostName    :: HostName

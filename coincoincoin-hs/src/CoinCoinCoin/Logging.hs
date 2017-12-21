@@ -3,11 +3,11 @@ module CoinCoinCoin.Logging
     , runLogging'
     ) where
 
-import Control.Monad.IO.Class (MonadIO)
-import Control.Monad.Logger (LogLevel(..), LogSource, LoggingT(..))
+import           Control.Monad.IO.Class (MonadIO)
+import           Control.Monad.Logger (LogLevel(..), LogSource, LoggingT(..))
 import qualified Control.Monad.Logger as L
-import Data.Monoid ((<>))
-import Data.Time.Clock (getCurrentTime)
+import           Data.Monoid ((<>))
+import           Data.Time.Clock (getCurrentTime)
 
 import CoinCoinCoin.Environment (Environment(..))
 

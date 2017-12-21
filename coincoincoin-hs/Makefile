@@ -23,9 +23,9 @@ test: ## Builds, tests, lints
 
 .PHONY: stylish-haskell
 stylish-haskell: ## Runs a Haskell auto-formatter across source code directories
-	find ./*/test -name "*.hs" | xargs stylish-haskell -c .stylish-haskell.yaml -i
-	find ./*/src -name "*.hs" | xargs stylish-haskell -c .stylish-haskell.yaml -i
-	find ./*/app -name "*.hs" | xargs stylish-haskell -c .stylish-haskell.yaml -i
+	find ./test -name "*.hs" | xargs stylish-haskell -c .stylish-haskell.yaml -i
+	find ./src -name "*.hs" | xargs stylish-haskell -c .stylish-haskell.yaml -i
+	find ./apps -name "*.hs" | xargs stylish-haskell -c .stylish-haskell.yaml -i
 
 .PHONY: lint
 lint:

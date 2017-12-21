@@ -2,10 +2,10 @@
 
 module CoinCoinCoin.Congress.Events.TypesSpec (main, spec) where
 
-import qualified Data.Aeson      as AE
-import Data.ByteString.Char8 (ByteString)
-import Data.FileEmbed  (embedFile)
-import Test.Hspec
+import qualified Data.Aeson as AE
+import           Data.ByteString.Char8 (ByteString)
+import           Data.FileEmbed (embedFile)
+import           Test.Hspec
 
 import CoinCoinCoin.Congress.Events.Types
 import Web3.Types

@@ -5,26 +5,26 @@ module Web3.Types
     , Hash(..)
     ) where
 
-import Data.Aeson (FromJSON(..), (.:))
+import           Data.Aeson (FromJSON(..), (.:))
 import qualified Data.Aeson as AE
-import Data.String (IsString(..))
-import Data.Text (Text)
+import           Data.String (IsString(..))
+import           Data.Text (Text)
 import qualified Data.Text as T
-import GHC.Generics (Generic)
+import           GHC.Generics (Generic)
 
 
 data Event a b = Event
-    { eventAddress :: Address
-    , eventBlockNumber :: Int
-    , eventTransactionHash :: Hash
+    { eventAddress          :: Address
+    , eventBlockNumber      :: Int
+    , eventTransactionHash  :: Hash
     , eventTransactionIndex :: Int
-    , eventBlockHash :: Hash
-    , eventLogIndex :: Int
-    , eventRemoved :: Bool
-    , eventId :: EventId
-    , eventReturnValues :: b
-    , eventEvent :: a
-    , eventSignature :: Hash
+    , eventBlockHash        :: Hash
+    , eventLogIndex         :: Int
+    , eventRemoved          :: Bool
+    , eventId               :: EventId
+    , eventReturnValues     :: b
+    , eventEvent            :: a
+    , eventSignature        :: Hash
     } deriving (Show, Generic)
 
 instance (FromJSON a, FromJSON b) => FromJSON (Event a b) where

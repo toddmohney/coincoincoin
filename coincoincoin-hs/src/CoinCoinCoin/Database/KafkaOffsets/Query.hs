@@ -6,10 +6,10 @@ module CoinCoinCoin.Database.KafkaOffsets.Query
     , incrementKafkaOffset
     ) where
 
-import Control.Monad.IO.Class      (liftIO)
-import Data.Time.Clock             (getCurrentTime)
+import Control.Monad.IO.Class (liftIO)
+import Data.Time.Clock (getCurrentTime)
 import Database.Persist.Postgresql
-import Network.Kafka.Protocol      (Partition, TopicName)
+import Network.Kafka.Protocol (Partition, TopicName)
 
 import CoinCoinCoin.Database.Models
 

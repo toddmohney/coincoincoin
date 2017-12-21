@@ -8,16 +8,16 @@ module CoinCoinCoin.Class
     , UTCTime
     ) where
 
-import Data.Time.Clock (UTCTime)
+import           Data.Time.Clock (UTCTime)
 import qualified Data.Time.Clock as Time
 
 import CoinCoinCoin.Database.Models
-    ( SqlPersistT
-    , Entity
+    ( Entity
+    , KafkaClientId
     , KafkaOffset
     , KafkaOffsetId
-    , KafkaClientId
     , Partition
+    , SqlPersistT
     , TopicName
     )
 

@@ -7,15 +7,15 @@ module CoinCoinCoin.MessageQueue.Job
     , mkTopic
     ) where
 
-import Data.Aeson (FromJSON, ToJSON)
-import Data.ByteString (ByteString)
+import           Data.Aeson (FromJSON, ToJSON)
+import           Data.ByteString (ByteString)
 import qualified Data.ByteString.Char8 as BS
-import Data.Time.Clock (UTCTime, getCurrentTime)
-import GHC.Generics (Generic)
+import           Data.Time.Clock (UTCTime, getCurrentTime)
+import           GHC.Generics (Generic)
 import qualified Network.Kafka.Protocol as K
 
-import CoinCoinCoin.MessageQueue.Types (Topic(..))
-import CoinCoinCoin.UUID (UUID)
+import           CoinCoinCoin.MessageQueue.Types (Topic(..))
+import           CoinCoinCoin.UUID (UUID)
 import qualified CoinCoinCoin.UUID as UUID
 
 class (ToJSON a, FromJSON a) => Enqueueable a where
