@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 471a8f59afc3253f5b10667107bbb7701b06d17f80531c3a9e07d20d6689e840
+-- hash: 3fa988e844e778fd408dc487b59ba0ef52f2228cf984162a197897f00051a483
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -51,6 +51,7 @@ library
     , uuid
   exposed-modules:
       CoinCoinCoin.Class
+      CoinCoinCoin.Congress.Events.Types
       CoinCoinCoin.Database.Config
       CoinCoinCoin.Database.KafkaOffsets.Query
       CoinCoinCoin.Database.Models

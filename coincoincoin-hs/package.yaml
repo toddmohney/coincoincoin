@@ -48,6 +48,7 @@ library:
   source-dirs: src
   exposed-modules:
   - CoinCoinCoin.Class
+  - CoinCoinCoin.Congress.Events.Types
   - CoinCoinCoin.Database.Config
   - CoinCoinCoin.Database.KafkaOffsets.Query
   - CoinCoinCoin.Database.Models
