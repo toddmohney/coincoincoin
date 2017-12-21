@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3fa988e844e778fd408dc487b59ba0ef52f2228cf984162a197897f00051a483
+-- hash: aec1fe5688abd96c2206f31c54002faec9b9cd0d221cf3c4ef4b71a470373211
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -117,6 +117,7 @@ test-suite congress-consumer-test
     , text
     , time
   other-modules:
+      CoinCoinCoin.Congress.Events.TypesSpec
       Web3.TypesSpec
       Paths_coincoincoin_hs
   default-language: Haskell2010
