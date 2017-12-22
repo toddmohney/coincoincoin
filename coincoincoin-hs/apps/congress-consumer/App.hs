@@ -6,6 +6,7 @@ module App
     , module AppConfig
     ) where
 
+import           Control.Monad (void)
 import           Control.Monad.Catch (MonadCatch, MonadThrow)
 import           Control.Monad.Except
     ( ExceptT(..)
@@ -33,9 +34,9 @@ import           CoinCoinCoin.Class
     )
 import qualified CoinCoinCoin.Database.KafkaOffsets.Query as KQ
 import           CoinCoinCoin.Database.Models
-    ( Entity
+    ( Entity(..)
     , KafkaClientId
-    , KafkaOffset
+    , KafkaOffset(..)
     , KafkaOffsetId
     , Partition
     , SqlPersistT
@@ -122,6 +123,12 @@ instance (MonadIO m) => MonadDbWriter (AppT m) where
     updateKafkaOffset kId offset =
         runDbWriter $ KQ.updateKafkaOffset kId offset
 
-    incrementKafkaOffset :: KafkaOffsetId -> AppT m ()
-    incrementKafkaOffset =
-        runDbWriter . KQ.incrementKafkaOffset
+    incrementKafkaOffset :: KafkaOffset -> AppT m ()
+    incrementKafkaOffset kOffset = do
+        mOffset <- getKafkaOffset (kafkaOffsetClientId kOffset) (kafkaOffsetTopic kOffset) (kafkaOffsetPartition kOffset)
+        case mOffset of
+            Nothing ->
+                let nextOffset = kafkaOffsetOffset kOffset + 1
+                in void $ createKafkaOffset (kOffset { kafkaOffsetOffset = nextOffset })
+            (Just (Entity offsetId _)) ->
+                runDbWriter $ KQ.incrementKafkaOffset offsetId

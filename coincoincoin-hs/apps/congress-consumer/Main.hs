@@ -1,15 +1,27 @@
 module Main where
 
 import Control.Concurrent (threadDelay)
-import Control.Monad (forever, void)
-import Control.Monad.IO.Class (MonadIO)
+import Control.Monad (forM_, forever, void)
+import Control.Monad.Catch    (MonadCatch, MonadThrow, catch, throwM)
+import Control.Monad.IO.Class (MonadIO, liftIO)
+import Control.Monad.Logger (MonadLogger, logErrorN)
 import Control.Monad.Reader (MonadReader, asks)
+import qualified Data.Aeson as AE
+import qualified Data.ByteString.Char8  as C8
+import qualified Data.Text              as T
 import Network.Kafka (TopicAndMessage)
+import qualified Network.Kafka          as K
 
-import           App (AppConfig(..))
+import App (AppConfig(..))
 import qualified App
-import           CoinCoinCoin.Class (MonadDbReader(..), MonadTime(..))
-import           CoinCoinCoin.Database.Models
+import CoinCoinCoin.Class
+    ( MonadDb
+    , MonadDbReader(..)
+    , MonadDbWriter(..)
+    , MonadTime(..)
+    )
+import CoinCoinCoin.Congress.Events.Types (CongressEvent(..))
+import CoinCoinCoin.Database.Models
     ( Entity(..)
     , KafkaClientId
     , KafkaOffset(..)
@@ -17,7 +29,8 @@ import           CoinCoinCoin.Database.Models
     , TopicName
     )
 import qualified CoinCoinCoin.Database.Models as M
-import           CoinCoinCoin.MessageQueue
+import CoinCoinCoin.Errors (ParseError(..))
+import CoinCoinCoin.MessageQueue
     ( MonadMessageQueue(..)
     , Topic(..)
     , mkTopic
@@ -26,27 +39,53 @@ import           CoinCoinCoin.MessageQueue
 main :: IO ()
 main = do
     cfg <- App.mkAppConfig
+    M.runMigrations $ App.appDbConn cfg
     forever $ do
         void $ App.runAppT cfg doIt
         threadDelay (pollInterval cfg)
 
 doIt :: ( MonadIO m
-        , MonadDbReader m
+        , MonadDb m
+        , MonadLogger m
         , MonadMessageQueue m
         , MonadReader AppConfig m
         , MonadTime m
+        , MonadCatch m
+        , MonadThrow m
         ) => m ()
 doIt = do
     partition <- asks appKafkaPartition
     clientId <- asks appKafkaClientId
     offset <- getLatestOffset clientId topic partition
     events <- consumeMessages topic partition (M.kafkaOffsetOffset offset)
-    mapM_ processEvent events
+    processEvents offset events
     where
         topic = mkTopic CongressContractEventReceived
 
-processEvent :: (MonadIO m) => TopicAndMessage -> m ()
-processEvent = undefined
+processEvents :: ( MonadIO m
+                 , MonadDbWriter m
+                 , MonadLogger m
+                 , MonadCatch m
+                 , MonadThrow m
+                 ) => KafkaOffset -> [TopicAndMessage] -> m ()
+processEvents kOffset msgs =
+    forM_ (map K.tamPayload msgs) $ \msg -> do
+        evt <- catch (parseMessage msg) logAndReThrowParseFailure
+        liftIO $ print evt
+        void $ incrementKafkaOffset kOffset
+
+parseMessage :: (MonadThrow m) => C8.ByteString -> m CongressEvent
+parseMessage msg =
+    case AE.eitherDecodeStrict msg :: Either String CongressEvent of
+        (Left err) -> throwM . JSONParseError $ T.pack err
+        (Right evt) -> pure evt
+
+logAndReThrowParseFailure :: ( MonadLogger m
+                             , MonadThrow m
+                             ) => ParseError -> m a
+logAndReThrowParseFailure err = do
+    logErrorN . T.pack $ show err
+    throwM err
 
 getLatestOffset :: ( MonadIO m
                    , MonadDbReader m

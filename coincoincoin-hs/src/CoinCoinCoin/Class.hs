@@ -43,4 +43,4 @@ class (Monad m) => MonadDbWriter m where
 
     updateKafkaOffset :: KafkaOffsetId -> KafkaOffset -> m ()
 
-    incrementKafkaOffset :: KafkaOffsetId -> m ()
+    incrementKafkaOffset :: KafkaOffset -> m ()

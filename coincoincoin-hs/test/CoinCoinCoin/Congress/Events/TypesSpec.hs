@@ -17,36 +17,37 @@ spec :: Spec
 spec = do
     describe "ChangeOfRules event and return value" $
         it "implements FromJSON" $ do
-            let (Right e) = AE.eitherDecodeStrict changeOfRulesEventPayload :: Either String (Event CongressEvent ChangeOfRulesReturnValues)
+            let (Right (ChangeOfRulesEvt e)) = AE.eitherDecodeStrict changeOfRulesEventPayload :: Either String CongressEvent
             eventReturnValues e `shouldBe` expectedChangeOfRulesReturnValues
+            eventEvent e `shouldBe` ChangeOfRules
 
     describe "MembershipChanged event and return value" $
         it "implements FromJSON" $ do
-            let (Right e) = AE.eitherDecodeStrict membershipChangedEventPayload :: Either String (Event CongressEvent MembershipChangedReturnValues)
+            let (Right (MembershipChangedEvt e)) = AE.eitherDecodeStrict membershipChangedEventPayload :: Either String CongressEvent
             eventReturnValues e `shouldBe` expectedMembershipChangedReturnValues
             eventEvent e `shouldBe` MembershipChanged
 
     describe "ProposalAdded event and return value" $
         it "implements FromJSON" $ do
-            let (Right e) = AE.eitherDecodeStrict proposalAddedEventPayload :: Either String (Event CongressEvent ProposalAddedReturnValues)
+            let (Right (ProposalAddedEvt e)) = AE.eitherDecodeStrict proposalAddedEventPayload :: Either String CongressEvent
             eventReturnValues e `shouldBe` expectedProposalAddedReturnValues
             eventEvent e `shouldBe` ProposalAdded
 
     describe "ProposalTallied event and return value" $
         it "implements FromJSON" $ do
-            let (Right e) = AE.eitherDecodeStrict proposalTalliedEventPayload :: Either String (Event CongressEvent ProposalTalliedReturnValues)
+            let (Right (ProposalTalliedEvt e)) = AE.eitherDecodeStrict proposalTalliedEventPayload :: Either String CongressEvent
             eventReturnValues e `shouldBe` expectedProposalTalliedReturnValues
             eventEvent e `shouldBe` ProposalTallied
 
     describe "ReceivedEther event and return value" $
         it "implements FromJSON" $ do
-            let (Right e) = AE.eitherDecodeStrict receivedEtherEventPayload :: Either String (Event CongressEvent ReceivedEtherReturnValues)
+            let (Right (ReceivedEtherEvt e)) = AE.eitherDecodeStrict receivedEtherEventPayload :: Either String CongressEvent
             eventReturnValues e `shouldBe` expectedReceivedEtherReturnValues
             eventEvent e `shouldBe` ReceivedEther
 
     describe "Voted event and return value" $
         it "implements FromJSON" $ do
-            let (Right e) = AE.eitherDecodeStrict votedEventPayload :: Either String (Event CongressEvent VotedReturnValues)
+            let (Right (VotedEvt e)) = AE.eitherDecodeStrict votedEventPayload :: Either String CongressEvent
             eventReturnValues e `shouldBe` expectedVotedReturnValues
             eventEvent e `shouldBe` Voted
 
@@ -74,47 +75,47 @@ votedEventPayload :: ByteString
 votedEventPayload =
     $(embedFile "test/fixtures/eth/events/voted.json")
 
-expectedVotedReturnValues :: VotedReturnValues
+expectedVotedReturnValues :: VotedValues
 expectedVotedReturnValues =
-    VotedReturnValues
+    VotedValues
         { proposalID = 1
         , position = True
         , voter = Address "0xb3ED286C1D088016589B5d2B0729A73A1e24f8A7"
         , justification = "Gimme!"
         }
 
-expectedMembershipChangedReturnValues :: MembershipChangedReturnValues
+expectedMembershipChangedReturnValues :: MembershipChangedValues
 expectedMembershipChangedReturnValues =
-    MembershipChangedReturnValues
+    MembershipChangedValues
         { member = "0x0000000000000000000000000000000000000000"
         , isMember = True
         }
 
-expectedChangeOfRulesReturnValues :: ChangeOfRulesReturnValues
+expectedChangeOfRulesReturnValues :: ChangeOfRulesValues
 expectedChangeOfRulesReturnValues =
-    ChangeOfRulesReturnValues 0 0 0
+    ChangeOfRulesValues 0 0 0
 
-expectedProposalAddedReturnValues :: ProposalAddedReturnValues
+expectedProposalAddedReturnValues :: ProposalAddedValues
 expectedProposalAddedReturnValues =
-    ProposalAddedReturnValues
+    ProposalAddedValues
         { proposalAddedProposalID = 0
         , proposalAddedRecipient = "0xb3ED286C1D088016589B5d2B0729A73A1e24f8A7"
         , proposalAddedAmount = 300000000000000000000
         , proposalAddedDescription = "Cuz expensive"
         }
 
-expectedProposalTalliedReturnValues :: ProposalTalliedReturnValues
+expectedProposalTalliedReturnValues :: ProposalTalliedValues
 expectedProposalTalliedReturnValues =
-    ProposalTalliedReturnValues
+    ProposalTalliedValues
         { proposalTalliedProposalID = 1
         , proposalTalliedResult = 1
         , proposalTalliedQuorum = 1
         , proposalTalliedActive = True
         }
 
-expectedReceivedEtherReturnValues :: ReceivedEtherReturnValues
+expectedReceivedEtherReturnValues :: ReceivedEtherValues
 expectedReceivedEtherReturnValues =
-    ReceivedEtherReturnValues
+    ReceivedEtherValues
         { receivedEtherSender = "0xb3ED286C1D088016589B5d2B0729A73A1e24f8A7"
         , receivedEtherAmount = 200000000000000000000
         }
