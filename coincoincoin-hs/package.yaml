@@ -1,0 +1,98 @@
+name:                coincoincoin-hs
+version:             0.1.0.0
+
+author:              Todd Mohney
+category:            Blockchain
+copyright:           2017 Todd Mohney
+description:         Example blockchain application
+github:              toddmohney/coincoincoin
+license:             MIT
+maintainer:          toddmohney@gmail.com
+synopsis:            Example blockchain application
+
+extra-source-files:
+- README.md
+- ChangeLog.md
+
+default-extensions:
+- DeriveGeneric
+- FlexibleContexts
+- FlexibleInstances
+- GeneralizedNewtypeDeriving
+- LambdaCase
+- OverloadedStrings
+- Rank2Types
+- RecordWildCards
+
+ghc-options:
+- -Wall
+- -Werror
+- -fno-warn-warnings-deprecations
+- -freverse-errors
+- -fwarn-unused-binds
+- -fwarn-unused-imports
+- -fwarn-unused-matches
+
+dependencies:
+- aeson
+- base >= 4.7 && < 5
+- bytestring
+- containers
+- exceptions
+- monad-logger
+- mtl
+- text
+- time
+
+library:
+  source-dirs: src
+  exposed-modules:
+  - CoinCoinCoin.Class
+  - CoinCoinCoin.Congress.Events.Types
+  - CoinCoinCoin.Database.Config
+  - CoinCoinCoin.Database.CongressMemberships.Query
+  - CoinCoinCoin.Database.KafkaOffsets.Query
+  - CoinCoinCoin.Database.Models
+  - CoinCoinCoin.Environment
+  - CoinCoinCoin.Errors
+  - CoinCoinCoin.Logging
+  - CoinCoinCoin.MessageQueue
+  - CoinCoinCoin.MessageQueue.Adapters.Kafka
+  - CoinCoinCoin.Time
+  - Web3.Types
+  dependencies:
+  - aeson
+  - exceptions
+  - hstatsd
+  - milena
+  - network
+  - persistent
+  - persistent-postgresql
+  - persistent-template
+  - uuid
+
+executables:
+  congress-consumer:
+    main:                Main.hs
+    source-dirs:         apps/congress-consumer
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - coincoincoin-hs
+    - milena
+    - persistent-postgresql
+
+tests:
+  congress-consumer-test:
+    main:                Spec.hs
+    source-dirs:         test
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - coincoincoin-hs
+    - file-embed
+    - hspec

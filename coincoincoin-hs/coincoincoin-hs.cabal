@@ -1,0 +1,125 @@
+-- This file has been generated from package.yaml by hpack version 0.20.0.
+--
+-- see: https://github.com/sol/hpack
+--
+-- hash: b0176c195d677f39d9255213d78775aa3c3e74a5d8bee58fb4bfa4d4a4e7853c
+
+name:           coincoincoin-hs
+version:        0.1.0.0
+synopsis:       Example blockchain application
+description:    Example blockchain application
+category:       Blockchain
+homepage:       https://github.com/toddmohney/coincoincoin#readme
+bug-reports:    https://github.com/toddmohney/coincoincoin/issues
+author:         Todd Mohney
+maintainer:     toddmohney@gmail.com
+copyright:      2017 Todd Mohney
+license:        MIT
+license-file:   LICENSE
+build-type:     Simple
+cabal-version:  >= 1.10
+
+extra-source-files:
+    ChangeLog.md
+    README.md
+
+source-repository head
+  type: git
+  location: https://github.com/toddmohney/coincoincoin
+
+library
+  hs-source-dirs:
+      src
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , containers
+    , exceptions
+    , hstatsd
+    , milena
+    , monad-logger
+    , mtl
+    , network
+    , persistent
+    , persistent-postgresql
+    , persistent-template
+    , text
+    , time
+    , uuid
+  exposed-modules:
+      CoinCoinCoin.Class
+      CoinCoinCoin.Congress.Events.Types
+      CoinCoinCoin.Database.Config
+      CoinCoinCoin.Database.CongressMemberships.Query
+      CoinCoinCoin.Database.KafkaOffsets.Query
+      CoinCoinCoin.Database.Models
+      CoinCoinCoin.Environment
+      CoinCoinCoin.Errors
+      CoinCoinCoin.Logging
+      CoinCoinCoin.MessageQueue
+      CoinCoinCoin.MessageQueue.Adapters.Kafka
+      CoinCoinCoin.Time
+      Web3.Types
+  other-modules:
+      CoinCoinCoin.MessageQueue.Class
+      CoinCoinCoin.MessageQueue.Job
+      CoinCoinCoin.MessageQueue.Types
+      CoinCoinCoin.StatsD
+      CoinCoinCoin.UUID
+      Paths_coincoincoin_hs
+  default-language: Haskell2010
+
+executable congress-consumer
+  main-is: Main.hs
+  hs-source-dirs:
+      apps/congress-consumer
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , coincoincoin-hs
+    , containers
+    , exceptions
+    , milena
+    , monad-logger
+    , mtl
+    , persistent-postgresql
+    , text
+    , time
+  other-modules:
+      App
+      AppConfig
+      Congress.Events.Processor
+      Paths_coincoincoin_hs
+  default-language: Haskell2010
+
+test-suite congress-consumer-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  hs-source-dirs:
+      test
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , coincoincoin-hs
+    , containers
+    , exceptions
+    , file-embed
+    , hspec
+    , monad-logger
+    , mtl
+    , text
+    , time
+  other-modules:
+      CoinCoinCoin.Congress.Events.TypesSpec
+      Web3.TypesSpec
+      Paths_coincoincoin_hs
+  default-language: Haskell2010

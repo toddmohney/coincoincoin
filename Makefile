@@ -33,7 +33,7 @@ console: ## Begins a Geth console session
 		docker-compose exec geth \
 		geth attach ipc:/home/coincoincoin/.ethereum/geth.ipc
 
-build: build-geth build-dapp build-node-event-producer build-block-explorer ## Builds all docker images
+build: build-geth build-dapp build-node-event-producer build-node-event-consumer build-block-explorer ## Builds all docker images
 
 build-geth:
 	GETH_USER=$(GETH_USER) \
@@ -51,6 +51,10 @@ build-block-explorer:
 
 build-node-event-producer:
 	docker-compose build node-event-producer
+
+build-node-event-consumer:
+	cd coincoincoin-hs && $(MAKE) image
+	docker-compose build congress-event-consumer
 
 sh: ## Starts a bash session inside of the geth container
 	GETH_USER=$(GETH_USER) \
@@ -74,3 +78,7 @@ unlock:
 		COINBASE=$(COINBASE) \
 		docker-compose run -u $(GETH_USER) --rm geth \
 		geth --unlock $(COINBASE)
+
+psql:
+	docker-compose exec postgres \
+		psql -U coincoincoin coincoincoin

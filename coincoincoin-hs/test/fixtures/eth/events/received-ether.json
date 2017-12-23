@@ -1,0 +1,22 @@
+{
+	"address": "0x321d5513c291De3a2fB63bf4B6E711c34F57bA28",
+	"blockNumber": 99,
+	"transactionHash": "0xdd727b0b3ea3c6a3a89a7fee115a546771455dafa58719528d297bc5d7dd9ecf",
+	"transactionIndex": 0,
+	"blockHash": "0xa2049dc2fd348adae4fe01c52574eb6ade70dc43bd79965d537108121364eae4",
+	"logIndex": 0,
+	"removed": false,
+	"id": "log_06ff0628",
+	"returnValues": {
+		"0": "0xb3ED286C1D088016589B5d2B0729A73A1e24f8A7",
+		"1": "200000000000000000000",
+		"sender": "0xb3ED286C1D088016589B5d2B0729A73A1e24f8A7",
+		"amount": "200000000000000000000"
+	},
+	"event": "receivedEther",
+	"signature": "0xa398b89ba344a0b23a0b9de53db298b2a1a868b396c1878b7e9dcbafecd49b13",
+	"raw": {
+		"data": "0x000000000000000000000000b3ed286c1d088016589b5d2b0729a73a1e24f8a700000000000000000000000000000000000000000000000ad78ebc5ac6200000",
+		"topics": ["0xa398b89ba344a0b23a0b9de53db298b2a1a868b396c1878b7e9dcbafecd49b13"]
+	}
+}
