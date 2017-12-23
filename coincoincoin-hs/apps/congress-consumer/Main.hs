@@ -31,7 +31,7 @@ import CoinCoinCoin.Database.Models
 import qualified CoinCoinCoin.Database.Models as M
 import CoinCoinCoin.Errors (ParseError(..))
 import CoinCoinCoin.MessageQueue
-    ( MonadMessageQueue(..)
+    ( MonadMessageConsumer(..)
     , Topic(..)
     , mkTopic
     )
@@ -48,7 +48,7 @@ main = do
 
 doIt :: ( MonadDb m
         , MonadLogger m
-        , MonadMessageQueue m
+        , MonadMessageConsumer m
         , MonadReader AppConfig m
         , MonadTime m
         , MonadCatch m
@@ -90,7 +90,7 @@ logAndReThrowParseFailure err = do
     throwM err
 
 getLatestOffset :: ( MonadDbReader m
-                   , MonadMessageQueue m
+                   , MonadMessageConsumer m
                    , MonadTime m
                    ) => KafkaClientId -> TopicName -> Partition -> m KafkaOffset
 getLatestOffset clientId topic partition =

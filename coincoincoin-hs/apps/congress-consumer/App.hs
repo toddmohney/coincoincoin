@@ -50,7 +50,8 @@ import           CoinCoinCoin.Logging (runLogging)
 import           CoinCoinCoin.MessageQueue
     ( Enqueueable
     , Job
-    , MonadMessageQueue(..)
+    , MonadMessageConsumer(..)
+    , MonadMessageProducer(..)
     )
 import           CoinCoinCoin.MessageQueue.Adapters.Kafka (runKafkaT)
 
@@ -74,7 +75,7 @@ runAppT cfg appT =
 instance MonadIO m => MonadTime (AppT m) where
     getCurrentTime = liftIO getCurrentTime
 
-instance MonadIO m => MonadMessageQueue (AppT m) where
+instance MonadIO m => MonadMessageProducer (AppT m) where
     produceMessages :: (Enqueueable a) => [Job a] -> AppT m [ProduceResponse]
     produceMessages jobs = do
         kState <- asks kafkaState
@@ -83,6 +84,7 @@ instance MonadIO m => MonadMessageQueue (AppT m) where
             Left err    -> throwError err
             Right resps -> return resps
 
+instance (MonadIO m) => MonadMessageConsumer (AppT m) where
     getEarliestOffset :: TopicName -> Partition -> AppT m Offset
     getEarliestOffset kTopic kPartition = do
         kState <- asks kafkaState

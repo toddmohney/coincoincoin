@@ -43,7 +43,7 @@ newtype KafkaT m a = KafkaT { unKafkaT :: ReaderT KafkaState (ExceptT KafkaClien
 runKafkaT :: (Monad m) => KafkaState -> KafkaT m a -> m (Either KafkaClientError a)
 runKafkaT kState f = runExceptT $ runReaderT (unKafkaT f) kState
 
-instance (MonadIO m) => MonadMessageQueue (KafkaT m) where
+instance (MonadIO m) => MonadMessageProducer (KafkaT m) where
     produceMessages jobs =
         ask >>= \kState -> do
             result <- liftIO $ produceMessages' jobs kState
@@ -51,6 +51,7 @@ instance (MonadIO m) => MonadMessageQueue (KafkaT m) where
                 Left err    -> throwError err
                 Right resps -> return resps
 
+instance (MonadIO m) => MonadMessageConsumer (KafkaT m) where
     getEarliestOffset kTopic kPartition =
         ask >>= \kState -> do
             result <- liftIO $ K.runKafka kState (K.getLastOffset K.EarliestTime kPartition kTopic)
