@@ -1,4 +1,5 @@
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module App
     ( AppT(..)
@@ -99,6 +100,8 @@ instance MonadIO m => MonadMessageQueue (AppT m) where
             Right resp -> return resp
 
 instance (MonadIO m) => MonadDbReader (AppT m) where
+    type DbReaderType (AppT m) = SqlPersistT IO
+
     runDbReader :: SqlPersistT IO a -> AppT m a
     runDbReader query = do
         conn <- asks appDbConn
@@ -117,6 +120,8 @@ instance (MonadIO m) => MonadDbReader (AppT m) where
         runDbReader $ KQ.getKafkaOffset kId tName part
 
 instance (MonadIO m) => MonadDbWriter (AppT m) where
+    type DbWriterType (AppT m) = SqlPersistT IO
+
     runDbWriter :: SqlPersistT IO a -> AppT m a
     runDbWriter query = do
         conn <- asks appDbConn

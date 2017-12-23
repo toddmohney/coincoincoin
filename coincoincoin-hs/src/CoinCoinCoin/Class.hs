@@ -1,4 +1,5 @@
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module CoinCoinCoin.Class
     ( MonadDb
@@ -20,7 +21,6 @@ import CoinCoinCoin.Database.Models
     , KafkaOffset
     , KafkaOffsetId
     , Partition
-    , SqlPersistT
     , TopicName
     )
 
@@ -33,7 +33,9 @@ instance MonadTime IO where
 type MonadDb m = (MonadDbReader m, MonadDbWriter m)
 
 class (Monad m) => MonadDbReader m where
-    runDbReader :: SqlPersistT IO a -> m a
+    type DbReaderType m :: * -> *
+
+    runDbReader :: (DbReaderType m) a -> m a
 
     getCongressMembership :: Address -> m (Maybe (Entity CongressMembership))
 
@@ -42,7 +44,9 @@ class (Monad m) => MonadDbReader m where
     getKafkaOffset :: KafkaClientId -> TopicName -> Partition -> m (Maybe (Entity KafkaOffset))
 
 class (Monad m) => MonadDbWriter m where
-    runDbWriter :: SqlPersistT IO a -> m a
+    type DbWriterType m :: * -> *
+
+    runDbWriter :: (DbWriterType m) a -> m a
 
     upsertCongressMembership :: CongressMembership -> m CongressMembershipId
 
