@@ -25,7 +25,11 @@ data Event a b = Event
     , eventReturnValues     :: b
     , eventEvent            :: a
     , eventSignature        :: Hash
-    } deriving (Show, Generic)
+    } deriving (Show, Eq, Generic)
+
+instance (Eq a, Eq b) => Ord (Event a b) where
+    compare e1 e2 =
+        eventBlockNumber e1 `compare` eventBlockNumber e2
 
 instance (FromJSON a, FromJSON b) => FromJSON (Event a b) where
     parseJSON = AE.withObject "Event" $ \o ->

@@ -50,6 +50,7 @@ library:
   - CoinCoinCoin.Class
   - CoinCoinCoin.Congress.Events.Types
   - CoinCoinCoin.Database.Config
+  - CoinCoinCoin.Database.CongressMemberships.Query
   - CoinCoinCoin.Database.KafkaOffsets.Query
   - CoinCoinCoin.Database.Models
   - CoinCoinCoin.Environment

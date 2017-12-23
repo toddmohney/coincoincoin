@@ -5,7 +5,6 @@ module App
     , runAppT
     , module AppConfig
     ) where
-
 import           Control.Monad (void)
 import           Control.Monad.Catch (MonadCatch, MonadThrow)
 import           Control.Monad.Except
@@ -32,9 +31,13 @@ import           CoinCoinCoin.Class
     , MonadDbWriter(..)
     , MonadTime(..)
     )
+import qualified CoinCoinCoin.Database.CongressMemberships.Query as CMQ
 import qualified CoinCoinCoin.Database.KafkaOffsets.Query as KQ
 import           CoinCoinCoin.Database.Models
-    ( Entity(..)
+    ( Address(..)
+    , Entity(..)
+    , CongressMembership(..)
+    , CongressMembershipId
     , KafkaClientId
     , KafkaOffset(..)
     , KafkaOffsetId
@@ -101,6 +104,10 @@ instance (MonadIO m) => MonadDbReader (AppT m) where
         conn <- asks appDbConn
         liftIO $ Sql.runSqlPool query conn
 
+    getCongressMembership :: Address -> AppT m (Maybe (Entity CongressMembership))
+    getCongressMembership =
+        runDbReader . CMQ.getCongressMembership
+
     getAllKafkaOffsets :: AppT m [Entity KafkaOffset]
     getAllKafkaOffsets =
         runDbReader KQ.getAllKafkaOffsets
@@ -114,6 +121,16 @@ instance (MonadIO m) => MonadDbWriter (AppT m) where
     runDbWriter query = do
         conn <- asks appDbConn
         liftIO $ Sql.runSqlPool query conn
+
+    upsertCongressMembership :: CongressMembership -> AppT m CongressMembershipId
+    upsertCongressMembership mem = do
+        mResult <- getCongressMembership $ congressMembershipMember mem
+        case mResult of
+            Nothing ->
+                runDbWriter $ CMQ.createCongressMembership mem
+            (Just (Entity memberId _)) -> do
+                runDbWriter $ CMQ.updateCongressMembership memberId mem
+                return memberId
 
     createKafkaOffset :: KafkaOffset -> AppT m KafkaOffsetId
     createKafkaOffset =

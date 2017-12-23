@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: aec1fe5688abd96c2206f31c54002faec9b9cd0d221cf3c4ef4b71a470373211
+-- hash: b0176c195d677f39d9255213d78775aa3c3e74a5d8bee58fb4bfa4d4a4e7853c
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -53,6 +53,7 @@ library
       CoinCoinCoin.Class
       CoinCoinCoin.Congress.Events.Types
       CoinCoinCoin.Database.Config
+      CoinCoinCoin.Database.CongressMemberships.Query
       CoinCoinCoin.Database.KafkaOffsets.Query
       CoinCoinCoin.Database.Models
       CoinCoinCoin.Environment
@@ -93,6 +94,7 @@ executable congress-consumer
   other-modules:
       App
       AppConfig
+      Congress.Events.Processor
       Paths_coincoincoin_hs
   default-language: Haskell2010
 

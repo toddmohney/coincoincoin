@@ -10,6 +10,7 @@
 
 module CoinCoinCoin.Database.Models
     ( module CoinCoinCoin.Database.Models
+    , Address(..)
     , ConnectionPool
     , Entity(..)
     , Partition
@@ -51,7 +52,17 @@ import           Network.Kafka.Protocol
     , TopicName(..)
     )
 
+import Web3.Types (Address(..))
+
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
+    CongressMembership sql congress_memberships
+        member Address sqltype=text
+        isMember Bool sqltype=boolean
+        created UTCTime default=now()
+        updated UTCTime default=now()
+        UniqueMemberAddress member
+        deriving Show Eq Typeable Generic
+
     KafkaOffset sql=kafka_offsets
         topic TopicName sqltype=text
         partition Partition sqltype=int
@@ -65,6 +76,11 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 
 newtype KafkaClientId = KafkaClientId Text
     deriving (Show, Eq, IsString)
+
+instance PersistField Address where
+  toPersistValue (Address addr) = PersistText addr
+  fromPersistValue (PersistText addr) = Right (Address addr)
+  fromPersistValue addr = Left ("Not PersistText " <> T.pack (show addr))
 
 instance PersistField Offset where
   toPersistValue = PersistInt64 . fromIntegral

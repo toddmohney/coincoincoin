@@ -12,7 +12,10 @@ import           Data.Time.Clock (UTCTime)
 import qualified Data.Time.Clock as Time
 
 import CoinCoinCoin.Database.Models
-    ( Entity
+    ( Address
+    , Entity
+    , CongressMembership
+    , CongressMembershipId
     , KafkaClientId
     , KafkaOffset
     , KafkaOffsetId
@@ -32,12 +35,16 @@ type MonadDb m = (MonadDbReader m, MonadDbWriter m)
 class (Monad m) => MonadDbReader m where
     runDbReader :: SqlPersistT IO a -> m a
 
+    getCongressMembership :: Address -> m (Maybe (Entity CongressMembership))
+
     getAllKafkaOffsets :: m [Entity KafkaOffset]
 
     getKafkaOffset :: KafkaClientId -> TopicName -> Partition -> m (Maybe (Entity KafkaOffset))
 
 class (Monad m) => MonadDbWriter m where
     runDbWriter :: SqlPersistT IO a -> m a
+
+    upsertCongressMembership :: CongressMembership -> m CongressMembershipId
 
     createKafkaOffset :: KafkaOffset -> m KafkaOffsetId
 

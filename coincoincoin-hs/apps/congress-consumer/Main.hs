@@ -3,11 +3,11 @@ module Main where
 import Control.Concurrent (threadDelay)
 import Control.Monad (forM_, forever, void)
 import Control.Monad.Catch    (MonadCatch, MonadThrow, catch, throwM)
-import Control.Monad.IO.Class (MonadIO, liftIO)
 import Control.Monad.Logger (MonadLogger, logErrorN)
 import Control.Monad.Reader (MonadReader, asks)
 import qualified Data.Aeson as AE
 import qualified Data.ByteString.Char8  as C8
+import qualified Data.List              as L
 import qualified Data.Text              as T
 import Network.Kafka (TopicAndMessage)
 import qualified Network.Kafka          as K
@@ -36,6 +36,8 @@ import CoinCoinCoin.MessageQueue
     , mkTopic
     )
 
+import qualified Congress.Events.Processor as P
+
 main :: IO ()
 main = do
     cfg <- App.mkAppConfig
@@ -44,8 +46,7 @@ main = do
         void $ App.runAppT cfg doIt
         threadDelay (pollInterval cfg)
 
-doIt :: ( MonadIO m
-        , MonadDb m
+doIt :: ( MonadDb m
         , MonadLogger m
         , MonadMessageQueue m
         , MonadReader AppConfig m
@@ -62,17 +63,18 @@ doIt = do
     where
         topic = mkTopic CongressContractEventReceived
 
-processEvents :: ( MonadIO m
-                 , MonadDbWriter m
+processEvents :: ( MonadDbWriter m
                  , MonadLogger m
                  , MonadCatch m
                  , MonadThrow m
+                 , MonadTime m
                  ) => KafkaOffset -> [TopicAndMessage] -> m ()
 processEvents kOffset msgs =
-    forM_ (map K.tamPayload msgs) $ \msg -> do
+    forM_ (L.sort (map K.tamPayload msgs)) $ \msg -> do
         evt <- catch (parseMessage msg) logAndReThrowParseFailure
-        liftIO $ print evt
+        P.processEvent evt
         void $ incrementKafkaOffset kOffset
+
 
 parseMessage :: (MonadThrow m) => C8.ByteString -> m CongressEvent
 parseMessage msg =
@@ -87,8 +89,7 @@ logAndReThrowParseFailure err = do
     logErrorN . T.pack $ show err
     throwM err
 
-getLatestOffset :: ( MonadIO m
-                   , MonadDbReader m
+getLatestOffset :: ( MonadDbReader m
                    , MonadMessageQueue m
                    , MonadTime m
                    ) => KafkaClientId -> TopicName -> Partition -> m KafkaOffset
