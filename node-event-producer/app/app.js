@@ -605,6 +605,8 @@ let producerIsReady = false;
 const getEvents = () => {
   if (!producerIsReady) {
     console.log("Waiting for producer to be ready.");
+    producer.disconnect();
+    producer.connect();
     return;
   }
 
@@ -629,7 +631,7 @@ const getEvents = () => {
 
 const produceCongressContractMessage = (producer, event) => {
   const topic = 'CongressContractEventReceived';
-  const partition = 1;
+  const partition = 0;
   const message = new Buffer(JSON.stringify(event))
   const partitionKey = event.address;
 

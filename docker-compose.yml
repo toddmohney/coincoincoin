@@ -40,7 +40,7 @@ services:
     image: coincoincoin/coincoincoin
     command: congress-consumer
     env_file:
-    - node-event-consumers/congress-consumer/env/development.env
+    - coincoincoin-hs/env/development.env
     links:
     - kafka
     - postgres

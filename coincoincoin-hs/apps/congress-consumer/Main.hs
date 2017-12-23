@@ -3,10 +3,11 @@ module Main where
 import Control.Concurrent (threadDelay)
 import Control.Monad (forM_, forever, void)
 import Control.Monad.Catch    (MonadCatch, MonadThrow, catch, throwM)
-import Control.Monad.Logger (MonadLogger, logErrorN)
+import Control.Monad.Logger (MonadLogger, logInfoN, logErrorN)
 import Control.Monad.Reader (MonadReader, asks)
 import qualified Data.Aeson as AE
 import qualified Data.ByteString.Char8  as C8
+import Data.Monoid ((<>))
 import qualified Data.List              as L
 import qualified Data.Text              as T
 import Network.Kafka (TopicAndMessage)
@@ -30,6 +31,7 @@ import CoinCoinCoin.Database.Models
     )
 import qualified CoinCoinCoin.Database.Models as M
 import CoinCoinCoin.Errors (ParseError(..))
+import CoinCoinCoin.Logging as Log
 import CoinCoinCoin.MessageQueue
     ( MonadMessageConsumer(..)
     , Topic(..)
@@ -43,7 +45,9 @@ main = do
     cfg <- App.mkAppConfig
     M.runMigrations $ App.appDbConn cfg
     forever $ do
-        void $ App.runAppT cfg doIt
+        App.runAppT cfg doIt >>= \case
+            Left err -> Log.runLogging' (logErrorN . T.pack $ show err)
+            Right _ -> Log.runLogging' (logInfoN . T.pack $ "Success!")
         threadDelay (pollInterval cfg)
 
 doIt :: ( MonadDb m
@@ -58,10 +62,16 @@ doIt = do
     partition <- asks appKafkaPartition
     clientId <- asks appKafkaClientId
     offset <- getLatestOffset clientId topic partition
+    logConsumerDetails offset
     events <- consumeMessages topic partition (M.kafkaOffsetOffset offset)
     processEvents offset events
     where
         topic = mkTopic CongressContractEventReceived
+        logConsumerDetails offset = do
+            logInfoN "Fetching messages..."
+            logInfoN . T.pack $ "Topic: " <> show (kafkaOffsetTopic offset)
+            logInfoN . T.pack $ "Partition: " <> show (kafkaOffsetPartition offset)
+            logInfoN . T.pack $ "Offset: " <> show (kafkaOffsetOffset offset)
 
 processEvents :: ( MonadDbWriter m
                  , MonadLogger m
