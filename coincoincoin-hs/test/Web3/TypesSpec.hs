@@ -5,6 +5,7 @@ module Web3.TypesSpec (main, spec) where
 import qualified Data.Aeson as AE
 import           Data.ByteString.Char8 (ByteString)
 import           Data.FileEmbed (embedFile)
+import           Data.Monoid ((<>))
 import           Test.Hspec
 
 import CoinCoinCoin.Congress.Events.Types
@@ -14,7 +15,17 @@ main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec =
+spec = do
+    describe "Event's Ord instance" $
+        it "orders events by block number" $ do
+            let earlier = testEvent { eventBlockNumber = 1 }
+            let later = testEvent { eventBlockNumber = 2 }
+            let later' = testEvent { eventBlockNumber = 2 }
+
+            compare earlier later `shouldBe` LT
+            compare later earlier `shouldBe` GT
+            compare later later' `shouldBe` EQ
+
     describe "Event's FromJSON instance" $
         it "decodes Event JSON" $ do
             let (Right (VotedEvt evt)) = AE.eitherDecodeStrict votedEventPayload :: Either String CongressEvent
@@ -42,3 +53,10 @@ expectedReturnValues =
         , voter = Address "0xb3ED286C1D088016589B5d2B0729A73A1e24f8A7"
         , justification = "Gimme!"
         }
+
+testEvent :: Event Voted VotedValues
+testEvent =
+    case AE.eitherDecodeStrict votedEventPayload :: Either String CongressEvent of
+        Left err -> error err
+        Right (VotedEvt evt) -> evt
+        Right congressEvt -> error $ "Unexpected event: " <> show congressEvt
