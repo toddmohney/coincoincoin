@@ -10242,7 +10242,7 @@
     "5777": {
       "events": {},
       "links": {},
-      "address": "0x8f0483125fcb9aaaefa9209d8e9d7b9c8b9fb90f"
+      "address": "0xcb152a2aa90055a0d255ca7dbaeb85edfdc86096"
     },
     "1510244584447": {
       "events": {},
@@ -10266,5 +10266,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2018-01-04T15:53:51.176Z"
+  "updatedAt": "2018-01-04T18:30:29.310Z"
 }

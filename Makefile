@@ -65,10 +65,13 @@ sh: ## Starts a bash session inside of the geth container
 start-test-rpc-server:
 	testrpc --port 8555 --gasPrice 1 --networkId 16
 
-test:
+test: deploy
 	cd hello/contracts && \
-		truffle migrate --network $(TRUFFLE_NETWORK_TARGET) && \
 		truffle test --network $(TRUFFLE_NETWORK_TARGET)
+
+reset-network:
+	cd hello/contracts && \
+		truffle migrate --reset --network $(TRUFFLE_NETWORK_TARGET)
 
 deploy:
 	cd hello/contracts && \
