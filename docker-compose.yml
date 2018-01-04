@@ -32,6 +32,8 @@ services:
       context: ./node-event-producer
       dockerfile: Dockerfile
     command: "node app.js"
+    environment:
+      GETH_NODE_URL: "http://geth:8545"
     depends_on:
       - geth
       - kafka

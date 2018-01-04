@@ -596,7 +596,8 @@ const congressContractAbi = [
   }
 ];
 
-const web3 = new Web3(new Web3.providers.HttpProvider('http://geth:8545'));
+const nodeUrl = process.env.GETH_NODE_URL;
+const web3 = new Web3(new Web3.providers.HttpProvider(nodeUrl));
 const congressContract = new web3.eth.Contract(congressContractAbi, congressContractAddr);
 
 let blockNum = 0;
