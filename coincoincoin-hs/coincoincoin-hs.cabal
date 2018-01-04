@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b0176c195d677f39d9255213d78775aa3c3e74a5d8bee58fb4bfa4d4a4e7853c
+-- hash: bbb1124f389eb551174c76347e0b1628b044d153fe0f4d7ef9506e81649653a7
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -95,6 +95,31 @@ executable congress-consumer
       App
       AppConfig
       Congress.Events.Processor
+      Paths_coincoincoin_hs
+  default-language: Haskell2010
+
+executable contract-importer
+  main-is: Main.hs
+  hs-source-dirs:
+      apps/contract-importer
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , bytestring
+    , coincoincoin-hs
+    , containers
+    , exceptions
+    , filepath
+    , monad-logger
+    , mtl
+    , optparse-applicative
+    , persistent-postgresql
+    , text
+    , time
+  other-modules:
+      AppConfig
       Paths_coincoincoin_hs
   default-language: Haskell2010
 

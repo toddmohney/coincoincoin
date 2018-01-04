@@ -12,6 +12,7 @@ module CoinCoinCoin.Database.Models
     ( module CoinCoinCoin.Database.Models
     , Address(..)
     , ConnectionPool
+    , ConnectionString
     , Entity(..)
     , Partition
     , SqlPersistT
@@ -29,6 +30,7 @@ import           Data.Time.Clock (UTCTime)
 import           Data.Typeable (Typeable)
 import           Database.Persist.Postgresql
     ( ConnectionPool
+    , ConnectionString
     , Entity(..)
     , PersistField(..)
     , PersistValue(..)

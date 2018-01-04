@@ -1,5 +1,7 @@
 module CoinCoinCoin.Database.Config
   ( ConnectionPool
+  , dbConnectionString
+  , dbConnectionString'
   , mkPool
   ) where
 
@@ -10,7 +12,7 @@ import Database.Persist.Postgresql
     , ConnectionString
     , createPostgresqlPool
     )
-import System.Environment (getEnv)
+import System.Environment (getEnv, lookupEnv)
 
 import CoinCoinCoin.Environment
 import CoinCoinCoin.Logging (runLogging)
@@ -26,3 +28,6 @@ mkPool env = do
 
 dbConnectionString :: IO ConnectionString
 dbConnectionString = pack <$> getEnv "DATABASE_URL"
+
+dbConnectionString' :: IO (Maybe ConnectionString)
+dbConnectionString' = fmap pack <$> lookupEnv "DATABASE_URL"
