@@ -1,5 +1,6 @@
 module Main where
 
+import qualified Control.Concurrent.Async as A
 import qualified Control.Monad as M
 import qualified Data.Aeson as AE
 import Data.ByteString (ByteString)
@@ -11,8 +12,6 @@ import qualified System.FilePath as FP
 import Truffle.Types (BuildArtifact)
 
 import AppConfig (AppConfig(..), loadConfig)
-
-data FileType = File | Directory
 
 main :: IO ()
 main = do
@@ -28,6 +27,6 @@ loadBuildArtifacts path = do
     if isDir
     then do
         files <- fmap (path FP.</>) <$> D.listDirectory path
-        M.foldM (\acc f -> (acc ++) <$> loadBuildArtifacts f) [] files
+        M.join <$> A.mapConcurrently loadBuildArtifacts files
     else
         (:[]) <$> BS.readFile path

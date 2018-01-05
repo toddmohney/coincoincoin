@@ -95,6 +95,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
+    - async
     - coincoincoin-hs
     - directory
     - filepath
