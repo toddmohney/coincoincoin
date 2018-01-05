@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: bbb1124f389eb551174c76347e0b1628b044d153fe0f4d7ef9506e81649653a7
+-- hash: 5577250e9c89b34efbc787e5e06d67c1ce8a5120b83e7a71f972ed91db4a5b02
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -38,6 +38,7 @@ library
     , bytestring
     , containers
     , exceptions
+    , hashable
     , hstatsd
     , milena
     , monad-logger
@@ -48,6 +49,7 @@ library
     , persistent-template
     , text
     , time
+    , unordered-containers
     , uuid
   exposed-modules:
       CoinCoinCoin.Class
@@ -62,6 +64,7 @@ library
       CoinCoinCoin.MessageQueue
       CoinCoinCoin.MessageQueue.Adapters.Kafka
       CoinCoinCoin.Time
+      Truffle.Types
       Web3.Types
   other-modules:
       CoinCoinCoin.MessageQueue.Class
@@ -143,8 +146,10 @@ test-suite congress-consumer-test
     , mtl
     , text
     , time
+    , unordered-containers
   other-modules:
       CoinCoinCoin.Congress.Events.TypesSpec
+      Truffle.TypesSpec
       Web3.TypesSpec
       Paths_coincoincoin_hs
   default-language: Haskell2010

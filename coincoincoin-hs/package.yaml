@@ -59,16 +59,19 @@ library:
   - CoinCoinCoin.MessageQueue
   - CoinCoinCoin.MessageQueue.Adapters.Kafka
   - CoinCoinCoin.Time
+  - Truffle.Types
   - Web3.Types
   dependencies:
   - aeson
   - exceptions
+  - hashable
   - hstatsd
   - milena
   - network
   - persistent
   - persistent-postgresql
   - persistent-template
+  - unordered-containers
   - uuid
 
 executables:
@@ -109,3 +112,4 @@ tests:
     - coincoincoin-hs
     - file-embed
     - hspec
+    - unordered-containers
