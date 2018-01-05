@@ -3,39 +3,40 @@ module AppConfig
     , loadConfig
     ) where
 
+import qualified Data.ByteString.Char8 as C8
 import Options.Applicative
 import Data.Monoid ((<>))
 
-import CoinCoinCoin.Database.Config as DB
 import CoinCoinCoin.Database.Models (ConnectionString)
 
-newtype AppConfig = AppConfig
-    { contractsPath :: FilePath
+data AppConfig = AppConfig
+    { dbConnectionString :: ConnectionString
+    , contractsPath :: FilePath
     } deriving (Show)
 
-{- Load configuation information from either the environment
- - or supplied command line arguments.
- - Command line arguments take precedence over environment configuration.
- -}
 loadConfig :: IO AppConfig
-loadConfig = do
-    dbConn <- DB.dbConnectionString'
-    execParser $ programOpts dbConn
+loadConfig = execParser programOpts
 
-programOpts :: Maybe ConnectionString -> ParserInfo AppConfig
-programOpts dbConn =
+programOpts :: ParserInfo AppConfig
+programOpts =
     info
-        (optsParser dbConn <**> helper)
+        (optsParser <**> helper)
         ( fullDesc
             <> progDesc "Import solidity build artifacts"
             <> header "contract-importer - A Solidity Build Artifact Importer"
         )
 
-optsParser :: Maybe ConnectionString -> Parser AppConfig
-optsParser _ =
+optsParser :: Parser AppConfig
+optsParser =
     AppConfig
-        <$> argument str filepathParser
+        <$> (C8.pack <$> strOption connectionStringParser)
+        <*> argument str filepathParser
 
     where
+        connectionStringParser =
+            long "connection-string"
+                <> short 'c'
+                <> help "Connection to Postgresql database"
+
         filepathParser =
             metavar "SOURCE"

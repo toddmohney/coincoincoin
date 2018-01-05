@@ -21,13 +21,13 @@ module CoinCoinCoin.Database.Models
     , fromSqlKey
     ) where
 
+import           Data.ByteString (ByteString)
 import           Data.Monoid ((<>))
 import           Data.String (IsString(..))
 import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import           Data.Time.Clock (UTCTime)
-import           Data.Typeable (Typeable)
 import           Database.Persist.Postgresql
     ( ConnectionPool
     , ConnectionString
@@ -54,6 +54,7 @@ import           Network.Kafka.Protocol
     , TopicName(..)
     )
 
+import qualified Truffle.Types as T
 import Web3.Types (Address(..))
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
@@ -63,7 +64,20 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
         created UTCTime default=now()
         updated UTCTime default=now()
         UniqueMemberAddress member
-        deriving Show Eq Typeable Generic
+        deriving Show Eq Generic
+
+    Contract sql contracts
+        name Text sqltype=text
+        abi ByteString sqltype=bytea
+        updatedAt UTCTime default=now()
+        deriving Show Eq Generic
+
+    Network sql networks
+        networkId T.NetworkId sqltype=text
+        contractId ContractId sqltype=int
+        address Address sqltype=text
+        UniqueNetworkIdAndContractId networkId contractId
+        deriving Show Eq Generic
 
     KafkaOffset sql=kafka_offsets
         topic TopicName sqltype=text
@@ -73,11 +87,16 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
         created UTCTime default=now()
         updated UTCTime default=now()
         UniqueKafkaOffsetsTopicPartition topic partition clientId
-        deriving Show Eq Typeable Generic
+        deriving Show Eq Generic
 |]
 
 newtype KafkaClientId = KafkaClientId Text
     deriving (Show, Eq, IsString)
+
+instance PersistField T.NetworkId where
+  toPersistValue (T.NetworkId networkId) = PersistText networkId
+  fromPersistValue (PersistText networkId) = Right (T.NetworkId networkId)
+  fromPersistValue networkId = Left ("Not PersistText " <> T.pack (show networkId))
 
 instance PersistField Address where
   toPersistValue (Address addr) = PersistText addr
