@@ -96,6 +96,7 @@ executables:
     - -with-rtsopts=-N
     dependencies:
     - coincoincoin-hs
+    - directory
     - filepath
     - persistent-postgresql
     - optparse-applicative

@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 5577250e9c89b34efbc787e5e06d67c1ce8a5120b83e7a71f972ed91db4a5b02
+-- hash: d72e73f6540807f643fd8c05131c46d4d098d258c15f854dcd5b7c2068872e0f
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -113,6 +113,7 @@ executable contract-importer
     , bytestring
     , coincoincoin-hs
     , containers
+    , directory
     , exceptions
     , filepath
     , monad-logger
