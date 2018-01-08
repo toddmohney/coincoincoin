@@ -6,10 +6,12 @@ import Control.Monad (void)
 import Control.Monad.Logger (MonadLogger, logInfoN)
 import qualified Data.Text as T
 
-import CoinCoinCoin.Class (MonadDbWriter(..), MonadTime(..))
+import CoinCoinCoin.Class (MonadTime(..))
 import CoinCoinCoin.Congress.Events.Types
 import CoinCoinCoin.Database.Models (CongressMembership(..))
 import Web3.Types (Event(..))
+
+import App (MonadDbWriter(..))
 
 processEvent :: ( MonadLogger m
                 , MonadDbWriter m
