@@ -73,9 +73,14 @@ reset-network:
 	cd contracts && \
 		truffle migrate --reset --network $(TRUFFLE_NETWORK_TARGET)
 
-deploy:
+deploy: deploy-contracts import-contracts
+
+deploy-contracts:
 	cd contracts && \
 		truffle migrate --network $(TRUFFLE_NETWORK_TARGET)
+
+import-contracts:
+	contract-importer -c postgres://coincoincoin:coincoincoin@localhost:5432/coincoincoin ./contracts/build/contracts
 
 unlock:
 	GETH_USER=$(GETH_USER) \

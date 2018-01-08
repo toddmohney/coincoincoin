@@ -63,6 +63,7 @@ library:
   - Web3.Types
   dependencies:
   - aeson
+  - directory
   - exceptions
   - hashable
   - hstatsd

@@ -1,32 +1,37 @@
 module Main where
 
+import Control.Monad.IO.Class (MonadIO, liftIO)
 import qualified Control.Concurrent.Async as A
 import qualified Control.Monad as M
+import Control.Monad.Logger (logInfoN)
 import qualified Data.Aeson as AE
 import Data.ByteString (ByteString)
-import qualified Data.ByteString as BS
 import qualified Data.Either as E
-import qualified System.Directory as D
+import qualified Data.Text as T
+import Prelude hiding (readFile)
 import qualified System.FilePath as FP
 
+import CoinCoinCoin.Class (MonadFileReader(..))
 import Truffle.Types (BuildArtifact)
 
+import App (AppT, runAppT)
 import AppConfig (AppConfig(..), loadConfig)
 
 main :: IO ()
 main = do
     config <- loadConfig
-    buildArtifacts <- fmap AE.eitherDecodeStrict <$> loadBuildArtifacts (contractsPath config) :: IO [Either String BuildArtifact]
-    print config
-    print . length $ E.lefts buildArtifacts
-    print . length $ E.rights buildArtifacts
+    runAppT config $ do
+        buildArtifacts <- fmap AE.eitherDecodeStrict <$> loadBuildArtifacts (contractsPath config) :: AppT IO [Either String BuildArtifact]
+        logInfoN . T.pack $ show config
+        logInfoN . T.pack . show . length $ E.rights buildArtifacts
+        logInfoN . T.pack . show . length $ E.lefts buildArtifacts
 
-loadBuildArtifacts :: FilePath -> IO [ByteString]
+loadBuildArtifacts :: (MonadIO m, MonadFileReader m) => FilePath -> m [ByteString]
 loadBuildArtifacts path = do
-    isDir <- D.doesDirectoryExist path
+    isDir <- doesDirectoryExist path
     if isDir
     then do
-        files <- fmap (path FP.</>) <$> D.listDirectory path
-        M.join <$> A.mapConcurrently loadBuildArtifacts files
+        files <- fmap (path FP.</>) <$> listDirectory path
+        M.join <$> liftIO (A.mapConcurrently loadBuildArtifacts files)
     else
-        (:[]) <$> BS.readFile path
+        (:[]) <$> readFile path

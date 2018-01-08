@@ -1,16 +1,21 @@
 {-# LANGUAGE ConstraintKinds #-}
+{-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module CoinCoinCoin.Class
     ( MonadDb
     , MonadDbReader(..)
     , MonadDbWriter(..)
+    , MonadFileReader(..)
     , MonadTime(..)
     , UTCTime
     ) where
 
+import Data.ByteString (ByteString)
+import qualified Data.ByteString as BS
 import           Data.Time.Clock (UTCTime)
 import qualified Data.Time.Clock as Time
+import qualified System.Directory as D
 
 import CoinCoinCoin.Database.Models
     ( Address
@@ -55,3 +60,20 @@ class (Monad m) => MonadDbWriter m where
     updateKafkaOffset :: KafkaOffsetId -> KafkaOffset -> m ()
 
     incrementKafkaOffset :: KafkaOffset -> m ()
+
+class (Monad m) => MonadFileReader m where
+    doesDirectoryExist :: FilePath -> m Bool
+
+    listDirectory :: FilePath -> m [FilePath]
+
+    readFile :: FilePath -> m ByteString
+
+instance MonadFileReader IO where
+    doesDirectoryExist :: FilePath -> IO Bool
+    doesDirectoryExist = D.doesDirectoryExist
+
+    listDirectory :: FilePath -> IO [FilePath]
+    listDirectory = D.listDirectory
+
+    readFile :: FilePath -> IO ByteString
+    readFile = BS.readFile

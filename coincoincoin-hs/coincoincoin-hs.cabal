@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4ee113798b9ba536f2a6011879d024857b2567b3d2564a59234e6a43c0e4bfbc
+-- hash: 587a49db96559d99a0ae655904684bf23bf9bcfd0864612758b5de5ac7a11c2b
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -37,6 +37,7 @@ library
     , base >=4.7 && <5
     , bytestring
     , containers
+    , directory
     , exceptions
     , hashable
     , hstatsd
@@ -124,6 +125,7 @@ executable contract-importer
     , text
     , time
   other-modules:
+      App
       AppConfig
       Paths_coincoincoin_hs
   default-language: Haskell2010
