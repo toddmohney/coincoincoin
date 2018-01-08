@@ -7,17 +7,28 @@ import qualified Data.ByteString.Char8 as C8
 import Options.Applicative
 import Data.Monoid ((<>))
 
+import CoinCoinCoin.Database.Config (ConnectionPool, mkPool')
 import CoinCoinCoin.Database.Models (ConnectionString)
 
 data AppConfig = AppConfig
+    { appDbConn :: ConnectionPool
+    , appContractsPath :: FilePath
+    } deriving (Show)
+
+data CLIOpts = CLIOpts
     { dbConnectionString :: ConnectionString
     , contractsPath :: FilePath
     } deriving (Show)
 
 loadConfig :: IO AppConfig
-loadConfig = execParser programOpts
+loadConfig = execParser programOpts >>= mkAppConfig
 
-programOpts :: ParserInfo AppConfig
+mkAppConfig :: CLIOpts -> IO AppConfig
+mkAppConfig CLIOpts{..} = do
+    dbPool <- mkPool' dbConnectionString
+    return $ AppConfig dbPool contractsPath
+
+programOpts :: ParserInfo CLIOpts
 programOpts =
     info
         (optsParser <**> helper)
@@ -26,9 +37,9 @@ programOpts =
             <> header "contract-importer - A Solidity Build Artifact Importer"
         )
 
-optsParser :: Parser AppConfig
+optsParser :: Parser CLIOpts
 optsParser =
-    AppConfig
+    CLIOpts
         <$> (C8.pack <$> strOption connectionStringParser)
         <*> argument str filepathParser
 

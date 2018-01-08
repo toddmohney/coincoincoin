@@ -7,6 +7,7 @@ import Control.Monad.Logger (logInfoN)
 import qualified Data.Aeson as AE
 import Data.ByteString (ByteString)
 import qualified Data.Either as E
+import qualified Data.List as L
 import qualified Data.Text as T
 import Prelude hiding (readFile)
 import qualified System.FilePath as FP
@@ -21,10 +22,11 @@ main :: IO ()
 main = do
     config <- loadConfig
     runAppT config $ do
-        buildArtifacts <- fmap AE.eitherDecodeStrict <$> loadBuildArtifacts (contractsPath config) :: AppT IO [Either String BuildArtifact]
+        buildArtifacts <- fmap AE.eitherDecodeStrict <$> loadBuildArtifacts (appContractsPath config) :: AppT IO [Either String BuildArtifact]
+        let (lefts, rights) = L.partition E.isRight buildArtifacts
         logInfoN . T.pack $ show config
-        logInfoN . T.pack . show . length $ E.rights buildArtifacts
-        logInfoN . T.pack . show . length $ E.lefts buildArtifacts
+        logInfoN . T.pack . show $ length lefts
+        logInfoN . T.pack . show $ length rights
 
 loadBuildArtifacts :: (MonadIO m, MonadFileReader m) => FilePath -> m [ByteString]
 loadBuildArtifacts path = do
