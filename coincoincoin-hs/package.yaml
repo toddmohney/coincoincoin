@@ -117,4 +117,5 @@ tests:
     - coincoincoin-hs
     - file-embed
     - hspec
+    - persistent-postgresql
     - unordered-containers

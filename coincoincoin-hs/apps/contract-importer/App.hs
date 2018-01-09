@@ -27,8 +27,8 @@ import           CoinCoinCoin.Class
 import           CoinCoinCoin.Logging (runLogging')
 import           CoinCoinCoin.Database.Models
     ( SqlPersistT
+    , Entity
     , Contract(..)
-    , ContractId
     )
 import qualified CoinCoinCoin.Database.Contracts.Query as Q
 
@@ -39,7 +39,7 @@ class (Monad m) => MonadDbWriter m where
 
     runDbWriter :: (DbWriterType m) a -> m a
 
-    upsertContract :: Contract -> m ContractId
+    upsertContract :: Contract -> m (Entity Contract)
 
 newtype AppT m a = AppT { unAppT :: ReaderT AppConfig (LoggingT m) a }
     deriving ( Functor
@@ -78,5 +78,5 @@ instance (MonadIO m) => MonadDbWriter (AppT m) where
         conn <- asks appDbConn
         liftIO $ Sql.runSqlPool query conn
 
-    upsertContract :: Contract -> AppT m ContractId
+    upsertContract :: Contract -> AppT m (Entity Contract)
     upsertContract = runDbWriter . Q.upsertContract
