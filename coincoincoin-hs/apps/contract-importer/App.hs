@@ -4,8 +4,6 @@
 
 module App
     ( AppT(..)
-    , MonadDb
-    , MonadDbReader(..)
     , MonadDbWriter(..)
     , runAppT
     ) where
@@ -29,21 +27,22 @@ import           CoinCoinCoin.Class
 import           CoinCoinCoin.Logging (runLogging')
 import           CoinCoinCoin.Database.Models
     ( SqlPersistT
+    , Contract(..)
+    , ContractId
+    , NetworkBuilder
     )
+import qualified CoinCoinCoin.Database.Contracts.Query as Q
 
 import           AppConfig (AppConfig(..))
-
-type MonadDb m = (MonadDbReader m, MonadDbWriter m)
-
-class (Monad m) => MonadDbReader m where
-    type DbReaderType m :: * -> *
-
-    runDbReader :: (DbReaderType m) a -> m a
 
 class (Monad m) => MonadDbWriter m where
     type DbWriterType m :: * -> *
 
     runDbWriter :: (DbWriterType m) a -> m a
+
+    upsertContract :: Contract -> m ContractId
+
+    upsertContract' :: (Contract, [NetworkBuilder]) -> m ContractId
 
 newtype AppT m a = AppT { unAppT :: ReaderT AppConfig (LoggingT m) a }
     deriving ( Functor
@@ -74,14 +73,6 @@ instance MonadIO m => MonadFileReader (AppT m) where
     readFile :: FilePath -> AppT m ByteString
     readFile = liftIO . readFile
 
-instance (MonadIO m) => MonadDbReader (AppT m) where
-    type DbReaderType (AppT m) = SqlPersistT IO
-
-    runDbReader :: SqlPersistT IO a -> AppT m a
-    runDbReader query = do
-        conn <- asks appDbConn
-        liftIO $ Sql.runSqlPool query conn
-
 instance (MonadIO m) => MonadDbWriter (AppT m) where
     type DbWriterType (AppT m) = SqlPersistT IO
 
@@ -89,3 +80,12 @@ instance (MonadIO m) => MonadDbWriter (AppT m) where
     runDbWriter query = do
         conn <- asks appDbConn
         liftIO $ Sql.runSqlPool query conn
+
+    upsertContract :: Contract -> AppT m ContractId
+    upsertContract = runDbWriter . Q.upsertContract
+
+    upsertContract' :: (Contract, [NetworkBuilder]) -> AppT m ContractId
+    upsertContract' (c, nbs) = do
+        cId <- runDbWriter $ Q.upsertContract c
+        mapM_ ((runDbWriter . Q.upsertNetwork) . (\nb -> nb cId)) nbs
+        return cId

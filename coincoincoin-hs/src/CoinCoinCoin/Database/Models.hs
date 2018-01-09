@@ -58,7 +58,7 @@ import qualified Truffle.Types as T
 import Web3.Types (Address(..))
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
-    CongressMembership sql congress_memberships
+    CongressMembership sql=congress_memberships
         member Address sqltype=text
         isMember Bool sqltype=boolean
         created UTCTime default=now()
@@ -66,13 +66,14 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
         UniqueMemberAddress member
         deriving Show Eq Generic
 
-    Contract sql contracts
+    Contract sql=contracts
         name Text sqltype=text
         abi ByteString sqltype=bytea
         updatedAt UTCTime default=now()
+        UniqueContractName name
         deriving Show Eq Generic
 
-    Network sql networks
+    Network sql=networks
         networkId T.NetworkId sqltype=text
         contractId ContractId sqltype=int
         address Address sqltype=text
@@ -89,6 +90,8 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
         UniqueKafkaOffsetsTopicPartition topic partition clientId
         deriving Show Eq Generic
 |]
+
+type NetworkBuilder = ContractId -> Network
 
 newtype KafkaClientId = KafkaClientId Text
     deriving (Show, Eq, IsString)

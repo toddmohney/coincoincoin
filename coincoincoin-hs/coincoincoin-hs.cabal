@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 587a49db96559d99a0ae655904684bf23bf9bcfd0864612758b5de5ac7a11c2b
+-- hash: 154211841aa5d5c205dce333452c63cce3888d792208ccbd26353fb5b0f8c062
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -57,6 +57,7 @@ library
       CoinCoinCoin.Congress.Events.Types
       CoinCoinCoin.Database.Config
       CoinCoinCoin.Database.CongressMemberships.Query
+      CoinCoinCoin.Database.Contracts.Query
       CoinCoinCoin.Database.KafkaOffsets.Query
       CoinCoinCoin.Database.Models
       CoinCoinCoin.Environment
@@ -124,6 +125,7 @@ executable contract-importer
     , persistent-postgresql
     , text
     , time
+    , unordered-containers
   other-modules:
       App
       AppConfig
