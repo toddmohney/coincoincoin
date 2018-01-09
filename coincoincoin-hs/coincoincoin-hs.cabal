@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b0176c195d677f39d9255213d78775aa3c3e74a5d8bee58fb4bfa4d4a4e7853c
+-- hash: 154211841aa5d5c205dce333452c63cce3888d792208ccbd26353fb5b0f8c062
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -37,7 +37,9 @@ library
     , base >=4.7 && <5
     , bytestring
     , containers
+    , directory
     , exceptions
+    , hashable
     , hstatsd
     , milena
     , monad-logger
@@ -48,12 +50,14 @@ library
     , persistent-template
     , text
     , time
+    , unordered-containers
     , uuid
   exposed-modules:
       CoinCoinCoin.Class
       CoinCoinCoin.Congress.Events.Types
       CoinCoinCoin.Database.Config
       CoinCoinCoin.Database.CongressMemberships.Query
+      CoinCoinCoin.Database.Contracts.Query
       CoinCoinCoin.Database.KafkaOffsets.Query
       CoinCoinCoin.Database.Models
       CoinCoinCoin.Environment
@@ -62,6 +66,7 @@ library
       CoinCoinCoin.MessageQueue
       CoinCoinCoin.MessageQueue.Adapters.Kafka
       CoinCoinCoin.Time
+      Truffle.Types
       Web3.Types
   other-modules:
       CoinCoinCoin.MessageQueue.Class
@@ -98,6 +103,35 @@ executable congress-consumer
       Paths_coincoincoin_hs
   default-language: Haskell2010
 
+executable contract-importer
+  main-is: Main.hs
+  hs-source-dirs:
+      apps/contract-importer
+  default-extensions: DeriveGeneric FlexibleContexts FlexibleInstances GeneralizedNewtypeDeriving LambdaCase OverloadedStrings Rank2Types RecordWildCards
+  ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , async
+    , base >=4.7 && <5
+    , bytestring
+    , coincoincoin-hs
+    , containers
+    , directory
+    , exceptions
+    , filepath
+    , monad-logger
+    , mtl
+    , optparse-applicative
+    , persistent-postgresql
+    , text
+    , time
+    , unordered-containers
+  other-modules:
+      App
+      AppConfig
+      Paths_coincoincoin_hs
+  default-language: Haskell2010
+
 test-suite congress-consumer-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
@@ -118,8 +152,10 @@ test-suite congress-consumer-test
     , mtl
     , text
     , time
+    , unordered-containers
   other-modules:
       CoinCoinCoin.Congress.Events.TypesSpec
+      Truffle.TypesSpec
       Web3.TypesSpec
       Paths_coincoincoin_hs
   default-language: Haskell2010

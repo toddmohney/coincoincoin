@@ -4,6 +4,8 @@
 GETH_USER ?= "coincoincoin"
 GETH_NETWORK_ID ?= 15
 
+TRUFFLE_NETWORK_TARGET ?= "ganache"
+
 # you're going to want to override this with your own address
 COINBASE ?= "b3ed286c1d088016589b5d2b0729a73a1e24f8a7"
 
@@ -61,16 +63,24 @@ sh: ## Starts a bash session inside of the geth container
 		docker-compose run -u $(GETH_USER) --rm geth bash
 
 start-test-rpc-server:
-	testrpc --port 8555 --gasPrice 1
+	testrpc --port 8555 --gasPrice 1 --networkId 16
 
-test:
-	cd hello/contracts && \
-		truffle migrate --network test && \
-		truffle test --network test
+test: deploy
+	cd contracts && \
+		truffle test --network $(TRUFFLE_NETWORK_TARGET)
 
-deploy:
-	cd hello/contracts && \
-		truffle migrate --network development
+reset-network:
+	cd contracts && \
+		truffle migrate --reset --network $(TRUFFLE_NETWORK_TARGET)
+
+deploy: deploy-contracts import-contracts
+
+deploy-contracts:
+	cd contracts && \
+		truffle migrate --network $(TRUFFLE_NETWORK_TARGET)
+
+import-contracts:
+	contract-importer -c postgres://coincoincoin:coincoincoin@localhost:5432/coincoincoin ./contracts/build/contracts
 
 unlock:
 	GETH_USER=$(GETH_USER) \

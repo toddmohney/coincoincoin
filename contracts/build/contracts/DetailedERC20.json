@@ -1,0 +1,696 @@
+{
+  "contractName": "DetailedERC20",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "name",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "approve",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "totalSupply",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transferFrom",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "decimals",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "who",
+          "type": "address"
+        }
+      ],
+      "name": "balanceOf",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "symbol",
+      "outputs": [
+        {
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "transfer",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "name": "spender",
+          "type": "address"
+        }
+      ],
+      "name": "allowance",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "name": "_name",
+          "type": "string"
+        },
+        {
+          "name": "_symbol",
+          "type": "string"
+        },
+        {
+          "name": "_decimals",
+          "type": "uint8"
+        }
+      ],
+      "payable": false,
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "owner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "spender",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Approval",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "name": "from",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "name": "to",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "name": "value",
+          "type": "uint256"
+        }
+      ],
+      "name": "Transfer",
+      "type": "event"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "sourceMap": "",
+  "deployedSourceMap": "",
+  "source": "pragma solidity ^0.4.18;\n\nimport './ERC20.sol';\n\ncontract DetailedERC20 is ERC20 {\n  string public name;\n  string public symbol;\n  uint8 public decimals;\n\n  function DetailedERC20(string _name, string _symbol, uint8 _decimals) public {\n    name = _name;\n    symbol = _symbol;\n    decimals = _decimals;\n  }\n}\n",
+  "sourcePath": "/home/toddmohney/workspace/personal/coincoincoin/hello/contracts/contracts/token/DetailedERC20.sol",
+  "ast": {
+    "attributes": {
+      "absolutePath": "/home/toddmohney/workspace/personal/coincoincoin/hello/contracts/contracts/token/DetailedERC20.sol",
+      "exportedSymbols": {
+        "DetailedERC20": [
+          684
+        ]
+      }
+    },
+    "children": [
+      {
+        "attributes": {
+          "literals": [
+            "solidity",
+            "^",
+            "0.4",
+            ".18"
+          ]
+        },
+        "id": 652,
+        "name": "PragmaDirective",
+        "src": "0:24:7"
+      },
+      {
+        "attributes": {
+          "SourceUnit": 728,
+          "absolutePath": "/home/toddmohney/workspace/personal/coincoincoin/hello/contracts/contracts/token/ERC20.sol",
+          "file": "./ERC20.sol",
+          "scope": 685,
+          "symbolAliases": [
+            null
+          ],
+          "unitAlias": ""
+        },
+        "id": 653,
+        "name": "ImportDirective",
+        "src": "26:21:7"
+      },
+      {
+        "attributes": {
+          "contractDependencies": [
+            727,
+            756
+          ],
+          "contractKind": "contract",
+          "documentation": null,
+          "fullyImplemented": false,
+          "linearizedBaseContracts": [
+            684,
+            727,
+            756
+          ],
+          "name": "DetailedERC20",
+          "scope": 685
+        },
+        "children": [
+          {
+            "attributes": {
+              "arguments": [
+                null
+              ]
+            },
+            "children": [
+              {
+                "attributes": {
+                  "contractScope": null,
+                  "name": "ERC20",
+                  "referencedDeclaration": 727,
+                  "type": "contract ERC20"
+                },
+                "id": 654,
+                "name": "UserDefinedTypeName",
+                "src": "75:5:7"
+              }
+            ],
+            "id": 655,
+            "name": "InheritanceSpecifier",
+            "src": "75:5:7"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "name": "name",
+              "scope": 684,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "string storage ref",
+              "value": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "string",
+                  "type": "string storage pointer"
+                },
+                "id": 656,
+                "name": "ElementaryTypeName",
+                "src": "85:6:7"
+              }
+            ],
+            "id": 657,
+            "name": "VariableDeclaration",
+            "src": "85:18:7"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "name": "symbol",
+              "scope": 684,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "string storage ref",
+              "value": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "string",
+                  "type": "string storage pointer"
+                },
+                "id": 658,
+                "name": "ElementaryTypeName",
+                "src": "107:6:7"
+              }
+            ],
+            "id": 659,
+            "name": "VariableDeclaration",
+            "src": "107:20:7"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "name": "decimals",
+              "scope": 684,
+              "stateVariable": true,
+              "storageLocation": "default",
+              "type": "uint8",
+              "value": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "attributes": {
+                  "name": "uint8",
+                  "type": "uint8"
+                },
+                "id": 660,
+                "name": "ElementaryTypeName",
+                "src": "131:5:7"
+              }
+            ],
+            "id": 661,
+            "name": "VariableDeclaration",
+            "src": "131:21:7"
+          },
+          {
+            "attributes": {
+              "constant": false,
+              "implemented": true,
+              "isConstructor": true,
+              "modifiers": [
+                null
+              ],
+              "name": "DetailedERC20",
+              "payable": false,
+              "scope": 684,
+              "stateMutability": "nonpayable",
+              "superFunction": null,
+              "visibility": "public"
+            },
+            "children": [
+              {
+                "children": [
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_name",
+                      "scope": 683,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "string memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string storage pointer"
+                        },
+                        "id": 662,
+                        "name": "ElementaryTypeName",
+                        "src": "180:6:7"
+                      }
+                    ],
+                    "id": 663,
+                    "name": "VariableDeclaration",
+                    "src": "180:12:7"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_symbol",
+                      "scope": 683,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "string memory",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "string",
+                          "type": "string storage pointer"
+                        },
+                        "id": 664,
+                        "name": "ElementaryTypeName",
+                        "src": "194:6:7"
+                      }
+                    ],
+                    "id": 665,
+                    "name": "VariableDeclaration",
+                    "src": "194:14:7"
+                  },
+                  {
+                    "attributes": {
+                      "constant": false,
+                      "name": "_decimals",
+                      "scope": 683,
+                      "stateVariable": false,
+                      "storageLocation": "default",
+                      "type": "uint8",
+                      "value": null,
+                      "visibility": "internal"
+                    },
+                    "children": [
+                      {
+                        "attributes": {
+                          "name": "uint8",
+                          "type": "uint8"
+                        },
+                        "id": 666,
+                        "name": "ElementaryTypeName",
+                        "src": "210:5:7"
+                      }
+                    ],
+                    "id": 667,
+                    "name": "VariableDeclaration",
+                    "src": "210:15:7"
+                  }
+                ],
+                "id": 668,
+                "name": "ParameterList",
+                "src": "179:47:7"
+              },
+              {
+                "attributes": {
+                  "parameters": [
+                    null
+                  ]
+                },
+                "children": [],
+                "id": 669,
+                "name": "ParameterList",
+                "src": "234:0:7"
+              },
+              {
+                "children": [
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "string storage ref"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 657,
+                              "type": "string storage ref",
+                              "value": "name"
+                            },
+                            "id": 670,
+                            "name": "Identifier",
+                            "src": "240:4:7"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 663,
+                              "type": "string memory",
+                              "value": "_name"
+                            },
+                            "id": 671,
+                            "name": "Identifier",
+                            "src": "247:5:7"
+                          }
+                        ],
+                        "id": 672,
+                        "name": "Assignment",
+                        "src": "240:12:7"
+                      }
+                    ],
+                    "id": 673,
+                    "name": "ExpressionStatement",
+                    "src": "240:12:7"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "string storage ref"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 659,
+                              "type": "string storage ref",
+                              "value": "symbol"
+                            },
+                            "id": 674,
+                            "name": "Identifier",
+                            "src": "258:6:7"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 665,
+                              "type": "string memory",
+                              "value": "_symbol"
+                            },
+                            "id": 675,
+                            "name": "Identifier",
+                            "src": "267:7:7"
+                          }
+                        ],
+                        "id": 676,
+                        "name": "Assignment",
+                        "src": "258:16:7"
+                      }
+                    ],
+                    "id": 677,
+                    "name": "ExpressionStatement",
+                    "src": "258:16:7"
+                  },
+                  {
+                    "children": [
+                      {
+                        "attributes": {
+                          "argumentTypes": null,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "operator": "=",
+                          "type": "uint8"
+                        },
+                        "children": [
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 661,
+                              "type": "uint8",
+                              "value": "decimals"
+                            },
+                            "id": 678,
+                            "name": "Identifier",
+                            "src": "280:8:7"
+                          },
+                          {
+                            "attributes": {
+                              "argumentTypes": null,
+                              "overloadedDeclarations": [
+                                null
+                              ],
+                              "referencedDeclaration": 667,
+                              "type": "uint8",
+                              "value": "_decimals"
+                            },
+                            "id": 679,
+                            "name": "Identifier",
+                            "src": "291:9:7"
+                          }
+                        ],
+                        "id": 680,
+                        "name": "Assignment",
+                        "src": "280:20:7"
+                      }
+                    ],
+                    "id": 681,
+                    "name": "ExpressionStatement",
+                    "src": "280:20:7"
+                  }
+                ],
+                "id": 682,
+                "name": "Block",
+                "src": "234:71:7"
+              }
+            ],
+            "id": 683,
+            "name": "FunctionDefinition",
+            "src": "157:148:7"
+          }
+        ],
+        "id": 684,
+        "name": "ContractDefinition",
+        "src": "49:258:7"
+      }
+    ],
+    "id": 685,
+    "name": "SourceUnit",
+    "src": "0:308:7"
+  },
+  "compiler": {
+    "name": "solc",
+    "version": "0.4.18+commit.9cf6e910.Emscripten.clang"
+  },
+  "networks": {},
+  "schemaVersion": "1.0.1",
+  "updatedAt": "2018-01-04T15:53:50.424Z"
+}

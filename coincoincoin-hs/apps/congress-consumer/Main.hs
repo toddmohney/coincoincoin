@@ -13,13 +13,15 @@ import qualified Data.Text              as T
 import Network.Kafka (TopicAndMessage)
 import qualified Network.Kafka          as K
 
-import App (AppConfig(..))
-import qualified App
-import CoinCoinCoin.Class
-    ( MonadDb
+import App
+    ( AppConfig(..)
+    , MonadDb
     , MonadDbReader(..)
     , MonadDbWriter(..)
-    , MonadTime(..)
+    )
+import qualified App
+import CoinCoinCoin.Class
+    ( MonadTime(..)
     )
 import CoinCoinCoin.Congress.Events.Types (CongressEvent(..))
 import CoinCoinCoin.Database.Models

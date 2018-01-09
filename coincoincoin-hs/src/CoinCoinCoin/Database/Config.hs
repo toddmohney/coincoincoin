@@ -1,6 +1,9 @@
 module CoinCoinCoin.Database.Config
   ( ConnectionPool
+  , dbConnectionString
+  , dbConnectionString'
   , mkPool
+  , mkPool'
   ) where
 
 import Control.Monad.Logger (runNoLoggingT)
@@ -10,7 +13,7 @@ import Database.Persist.Postgresql
     , ConnectionString
     , createPostgresqlPool
     )
-import System.Environment (getEnv)
+import System.Environment (getEnv, lookupEnv)
 
 import CoinCoinCoin.Environment
 import CoinCoinCoin.Logging (runLogging)
@@ -24,5 +27,12 @@ mkPool env = do
     poolSize <- read <$> getEnv "DB_POOL_SIZE"
     runLogging False env $ createPostgresqlPool connStr poolSize
 
+mkPool' :: ConnectionString -> IO ConnectionPool
+mkPool' connStr =
+    runLogging False Production $ createPostgresqlPool connStr 5
+
 dbConnectionString :: IO ConnectionString
 dbConnectionString = pack <$> getEnv "DATABASE_URL"
+
+dbConnectionString' :: IO (Maybe ConnectionString)
+dbConnectionString' = fmap pack <$> lookupEnv "DATABASE_URL"

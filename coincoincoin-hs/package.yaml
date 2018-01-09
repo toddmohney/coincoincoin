@@ -51,6 +51,7 @@ library:
   - CoinCoinCoin.Congress.Events.Types
   - CoinCoinCoin.Database.Config
   - CoinCoinCoin.Database.CongressMemberships.Query
+  - CoinCoinCoin.Database.Contracts.Query
   - CoinCoinCoin.Database.KafkaOffsets.Query
   - CoinCoinCoin.Database.Models
   - CoinCoinCoin.Environment
@@ -59,16 +60,20 @@ library:
   - CoinCoinCoin.MessageQueue
   - CoinCoinCoin.MessageQueue.Adapters.Kafka
   - CoinCoinCoin.Time
+  - Truffle.Types
   - Web3.Types
   dependencies:
   - aeson
+  - directory
   - exceptions
+  - hashable
   - hstatsd
   - milena
   - network
   - persistent
   - persistent-postgresql
   - persistent-template
+  - unordered-containers
   - uuid
 
 executables:
@@ -84,6 +89,22 @@ executables:
     - milena
     - persistent-postgresql
 
+  contract-importer:
+    main:                Main.hs
+    source-dirs:         apps/contract-importer
+    ghc-options:
+    - -threaded
+    - -rtsopts
+    - -with-rtsopts=-N
+    dependencies:
+    - async
+    - coincoincoin-hs
+    - directory
+    - filepath
+    - persistent-postgresql
+    - optparse-applicative
+    - unordered-containers
+
 tests:
   congress-consumer-test:
     main:                Spec.hs
@@ -96,3 +117,4 @@ tests:
     - coincoincoin-hs
     - file-embed
     - hspec
+    - unordered-containers

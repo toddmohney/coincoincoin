@@ -44,15 +44,15 @@
       "type": "function"
     }
   ],
-  "bytecode": "0x6060604052341561000f57600080fd5b6101c08061001e6000396000f300606060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806365bb031f1461005c578063ef5fb05b14610085578063f1c95bba1461009a575b600080fd5b341561006757600080fd5b61006f6100e7565b6040518082815260200191505060405180910390f35b341561009057600080fd5b61009861012d565b005b34156100a557600080fd5b6100d1600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190505061017c565b6040518082815260200191505060405180910390f35b60008060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054905090565b60016000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008282540192505081905550565b600060205280600052604060002060009150905054815600a165627a7a72305820dc6b60c56c2721e9be56d587423d1eb2fb08c2924d2fb059563d430c0f231e210029",
-  "deployedBytecode": "0x606060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806365bb031f1461005c578063ef5fb05b14610085578063f1c95bba1461009a575b600080fd5b341561006757600080fd5b61006f6100e7565b6040518082815260200191505060405180910390f35b341561009057600080fd5b61009861012d565b005b34156100a557600080fd5b6100d1600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190505061017c565b6040518082815260200191505060405180910390f35b60008060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054905090565b60016000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008282540192505081905550565b600060205280600052604060002060009150905054815600a165627a7a72305820dc6b60c56c2721e9be56d587423d1eb2fb08c2924d2fb059563d430c0f231e210029",
+  "bytecode": "0x6060604052341561000f57600080fd5b6101c08061001e6000396000f300606060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806365bb031f1461005c578063ef5fb05b14610085578063f1c95bba1461009a575b600080fd5b341561006757600080fd5b61006f6100e7565b6040518082815260200191505060405180910390f35b341561009057600080fd5b61009861012d565b005b34156100a557600080fd5b6100d1600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190505061017c565b6040518082815260200191505060405180910390f35b60008060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054905090565b60016000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008282540192505081905550565b600060205280600052604060002060009150905054815600a165627a7a72305820e91353e8a97c7a69a9d7ddb8c42ac06a4244c66c8e81065d9e3af8336c4fc6290029",
+  "deployedBytecode": "0x606060405260043610610057576000357c0100000000000000000000000000000000000000000000000000000000900463ffffffff16806365bb031f1461005c578063ef5fb05b14610085578063f1c95bba1461009a575b600080fd5b341561006757600080fd5b61006f6100e7565b6040518082815260200191505060405180910390f35b341561009057600080fd5b61009861012d565b005b34156100a557600080fd5b6100d1600480803573ffffffffffffffffffffffffffffffffffffffff1690602001909190505061017c565b6040518082815260200191505060405180910390f35b60008060003373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002054905090565b60016000803373ffffffffffffffffffffffffffffffffffffffff1673ffffffffffffffffffffffffffffffffffffffff16815260200190815260200160002060008282540192505081905550565b600060205280600052604060002060009150905054815600a165627a7a72305820e91353e8a97c7a69a9d7ddb8c42ac06a4244c66c8e81065d9e3af8336c4fc6290029",
   "sourceMap": "26:217:1:-;;;;;;;;;;;;;;;;;",
   "deployedSourceMap": "26:217:1:-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;155:86;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;90:61;;;;;;;;;;;;;;46:39;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;155:86;197:4;218:6;:18;225:10;218:18;;;;;;;;;;;;;;;;211:25;;155:86;:::o;90:61::-;145:1;123:6;:18;130:10;123:18;;;;;;;;;;;;;;;;:23;;;;;;;;;;;90:61::o;46:39::-;;;;;;;;;;;;;;;;;:::o",
   "source": "pragma solidity ^0.4.18;\n\ncontract Hellos {\n  mapping (address => uint) public hellos;\n\n  function sayHello() public {\n    hellos[msg.sender] += 1;\n  }\n\n  function getHellos() public view returns (uint) {\n      return hellos[msg.sender];\n  }\n}\n",
-  "sourcePath": "/home/toddmohney/workspace/personal/coincoincoin/hello/contracts/contracts/Hellos.sol",
+  "sourcePath": "/home/toddmohney/workspace/personal/coincoincoin/contracts/contracts/Hellos.sol",
   "ast": {
     "attributes": {
-      "absolutePath": "/home/toddmohney/workspace/personal/coincoincoin/hello/contracts/contracts/Hellos.sol",
+      "absolutePath": "/home/toddmohney/workspace/personal/coincoincoin/contracts/contracts/Hellos.sol",
       "exportedSymbols": {
         "Hellos": [
           734
@@ -231,7 +231,7 @@
                                       "overloadedDeclarations": [
                                         null
                                       ],
-                                      "referencedDeclaration": 803,
+                                      "referencedDeclaration": 1929,
                                       "type": "msg",
                                       "value": "msg"
                                     },
@@ -395,7 +395,7 @@
                                   "overloadedDeclarations": [
                                     null
                                   ],
-                                  "referencedDeclaration": 803,
+                                  "referencedDeclaration": 1929,
                                   "type": "msg",
                                   "value": "msg"
                                 },
@@ -453,6 +453,11 @@
       "links": {},
       "address": "0x9b24481161d616539e6f80827ea4315801027bb2"
     },
+    "5777": {
+      "events": {},
+      "links": {},
+      "address": "0x4a5cd58b24e3bf04360b06bfeaf45a39aa8035b6"
+    },
     "1509652525609": {
       "events": {},
       "links": {},
@@ -495,5 +500,5 @@
     }
   },
   "schemaVersion": "1.0.1",
-  "updatedAt": "2017-12-05T19:13:13.773Z"
+  "updatedAt": "2018-01-04T18:54:12.665Z"
 }

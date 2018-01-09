@@ -1,0 +1,16 @@
+{
+  "name": "Contracts",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Contracts",
+  "repository": "https://github.com/toddmohney/coincoincoin",
+  "license": "MIT",
+  "devDependencies": {
+    "q": "^1.5.1",
+    "ramda": "^0.25.0"
+  },
+  "scripts": {},
+  "dependencies": {
+    "web3": "^1.0.0-beta.24"
+  }
+}

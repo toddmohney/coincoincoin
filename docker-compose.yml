@@ -34,9 +34,12 @@ services:
     command: "node app.js"
     environment:
       GETH_NODE_URL: "http://geth:8545"
+      GETH_NETWORK_ID: "${GETH_NETWORK_ID}"
+      DATABASE_URL: "postgres://coincoincoin:coincoincoin@postgres:5432/coincoincoin"
     depends_on:
       - geth
       - kafka
+      - postgres
 
   congress-event-consumer:
     image: coincoincoin/coincoincoin

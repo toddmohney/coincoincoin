@@ -1,8 +1,12 @@
+{-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE InstanceSigs #-}
 {-# LANGUAGE TypeFamilies #-}
 
 module App
     ( AppT(..)
+    , MonadDb
+    , MonadDbReader(..)
+    , MonadDbWriter(..)
     , runAppT
     , module AppConfig
     ) where
@@ -28,9 +32,7 @@ import           Network.Kafka.Protocol (Offset, ProduceResponse)
 
 import           AppConfig (AppConfig(..), mkAppConfig)
 import           CoinCoinCoin.Class
-    ( MonadDbReader(..)
-    , MonadDbWriter(..)
-    , MonadTime(..)
+    ( MonadTime(..)
     )
 import qualified CoinCoinCoin.Database.CongressMemberships.Query as CMQ
 import qualified CoinCoinCoin.Database.KafkaOffsets.Query as KQ
@@ -54,6 +56,32 @@ import           CoinCoinCoin.MessageQueue
     , MonadMessageProducer(..)
     )
 import           CoinCoinCoin.MessageQueue.Adapters.Kafka (runKafkaT)
+
+type MonadDb m = (MonadDbReader m, MonadDbWriter m)
+
+class (Monad m) => MonadDbReader m where
+    type DbReaderType m :: * -> *
+
+    runDbReader :: (DbReaderType m) a -> m a
+
+    getCongressMembership :: Address -> m (Maybe (Entity CongressMembership))
+
+    getAllKafkaOffsets :: m [Entity KafkaOffset]
+
+    getKafkaOffset :: KafkaClientId -> TopicName -> Partition -> m (Maybe (Entity KafkaOffset))
+
+class (Monad m) => MonadDbWriter m where
+    type DbWriterType m :: * -> *
+
+    runDbWriter :: (DbWriterType m) a -> m a
+
+    upsertCongressMembership :: CongressMembership -> m CongressMembershipId
+
+    createKafkaOffset :: KafkaOffset -> m KafkaOffsetId
+
+    updateKafkaOffset :: KafkaOffsetId -> KafkaOffset -> m ()
+
+    incrementKafkaOffset :: KafkaOffset -> m ()
 
 newtype AppT m a = AppT { unAppT :: ReaderT AppConfig (LoggingT (ExceptT KafkaClientError m)) a }
     deriving ( Functor

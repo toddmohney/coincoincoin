@@ -12,6 +12,7 @@ module CoinCoinCoin.Database.Models
     ( module CoinCoinCoin.Database.Models
     , Address(..)
     , ConnectionPool
+    , ConnectionString
     , Entity(..)
     , Partition
     , SqlPersistT
@@ -20,15 +21,16 @@ module CoinCoinCoin.Database.Models
     , fromSqlKey
     ) where
 
+import           Data.ByteString (ByteString)
 import           Data.Monoid ((<>))
 import           Data.String (IsString(..))
 import           Data.Text (Text)
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import           Data.Time.Clock (UTCTime)
-import           Data.Typeable (Typeable)
 import           Database.Persist.Postgresql
     ( ConnectionPool
+    , ConnectionString
     , Entity(..)
     , PersistField(..)
     , PersistValue(..)
@@ -52,16 +54,26 @@ import           Network.Kafka.Protocol
     , TopicName(..)
     )
 
+import qualified Truffle.Types as T
 import Web3.Types (Address(..))
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
-    CongressMembership sql congress_memberships
+    CongressMembership sql=congress_memberships
         member Address sqltype=text
         isMember Bool sqltype=boolean
         created UTCTime default=now()
         updated UTCTime default=now()
         UniqueMemberAddress member
-        deriving Show Eq Typeable Generic
+        deriving Show Eq Generic
+
+    Contract sql=contracts
+        name Text sqltype=text
+        networkId T.NetworkId sqltype=text
+        address Address sqltype=text
+        abi ByteString sqltype=bytea
+        updatedAt UTCTime default=now()
+        UniqueContractAddressAndNetwork address networkId
+        deriving Show Eq Generic
 
     KafkaOffset sql=kafka_offsets
         topic TopicName sqltype=text
@@ -71,11 +83,16 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
         created UTCTime default=now()
         updated UTCTime default=now()
         UniqueKafkaOffsetsTopicPartition topic partition clientId
-        deriving Show Eq Typeable Generic
+        deriving Show Eq Generic
 |]
 
 newtype KafkaClientId = KafkaClientId Text
     deriving (Show, Eq, IsString)
+
+instance PersistField T.NetworkId where
+  toPersistValue (T.NetworkId networkId) = PersistText networkId
+  fromPersistValue (PersistText networkId) = Right (T.NetworkId networkId)
+  fromPersistValue networkId = Left ("Not PersistText " <> T.pack (show networkId))
 
 instance PersistField Address where
   toPersistValue (Address addr) = PersistText addr
