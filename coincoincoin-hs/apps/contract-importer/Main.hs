@@ -16,7 +16,6 @@ import qualified System.FilePath as FP
 import CoinCoinCoin.Class (MonadFileReader(..))
 import CoinCoinCoin.Database.Models
     ( Contract(..)
-    , NetworkBuilder
     )
 import qualified CoinCoinCoin.Database.Models as M
 import Truffle.Types (BuildArtifact)
@@ -39,21 +38,22 @@ main = do
         upsertBuildArtifacts buildArtifacts
 
 upsertBuildArtifacts :: (MonadDbWriter m) => [BuildArtifact] -> m ()
-upsertBuildArtifacts =
-    mapM_ (upsertContract' . mkContract)
+upsertBuildArtifacts artifacts =
+    let contracts = concatMap mkContracts artifacts
+    in mapM_ upsertContract contracts
 
-mkContract :: BuildArtifact -> (Contract, [NetworkBuilder])
-mkContract a =
-    ( Contract
+mkContracts :: BuildArtifact -> [Contract]
+mkContracts a =
+    HM.foldrWithKey (\k v acc -> acc ++ [mkContract a k v]) [] (TT.networks a)
+
+mkContract :: BuildArtifact -> TT.NetworkId -> TT.Network -> Contract
+mkContract a nId n =
+    Contract
         (TT.contractName a)
+        nId
+        (TT.address n)
         (LBS.toStrict . AE.encode $ TT.abi a)
         (TT.updatedAt a)
-    , HM.foldrWithKey (\k v acc -> acc ++ [mkNetworkBuilder k v]) [] (TT.networks a)
-    )
-
-mkNetworkBuilder :: TT.NetworkId -> TT.Network -> NetworkBuilder
-mkNetworkBuilder nId n cId =
-    M.Network nId cId (TT.address n)
 
 loadBuildArtifacts :: (MonadIO m, MonadFileReader m) => FilePath -> m [ByteString]
 loadBuildArtifacts path = do

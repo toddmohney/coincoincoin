@@ -29,7 +29,6 @@ import           CoinCoinCoin.Database.Models
     ( SqlPersistT
     , Contract(..)
     , ContractId
-    , NetworkBuilder
     )
 import qualified CoinCoinCoin.Database.Contracts.Query as Q
 
@@ -41,8 +40,6 @@ class (Monad m) => MonadDbWriter m where
     runDbWriter :: (DbWriterType m) a -> m a
 
     upsertContract :: Contract -> m ContractId
-
-    upsertContract' :: (Contract, [NetworkBuilder]) -> m ContractId
 
 newtype AppT m a = AppT { unAppT :: ReaderT AppConfig (LoggingT m) a }
     deriving ( Functor
@@ -83,9 +80,3 @@ instance (MonadIO m) => MonadDbWriter (AppT m) where
 
     upsertContract :: Contract -> AppT m ContractId
     upsertContract = runDbWriter . Q.upsertContract
-
-    upsertContract' :: (Contract, [NetworkBuilder]) -> AppT m ContractId
-    upsertContract' (c, nbs) = do
-        cId <- runDbWriter $ Q.upsertContract c
-        mapM_ ((runDbWriter . Q.upsertNetwork) . (\nb -> nb cId)) nbs
-        return cId

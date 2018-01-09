@@ -1,34 +1,21 @@
 module CoinCoinCoin.Database.Contracts.Query
     ( upsertContract
-    , upsertNetwork
     ) where
 
-import Data.Text (Text)
 import Database.Persist.Postgresql
 
 import CoinCoinCoin.Database.Models
-import qualified Truffle.Types as TT
+import Truffle.Types (NetworkId)
+import Web3.Types (Address)
 
-findContractByName :: Text -> SqlPersistT IO (Maybe (Entity Contract))
-findContractByName name =
-    getBy (UniqueContractName name)
-
-findNetwork :: TT.NetworkId -> ContractId -> SqlPersistT IO (Maybe (Entity Network))
-findNetwork nId cId =
-    getBy (UniqueNetworkIdAndContractId nId cId)
+findContract :: Address -> NetworkId -> SqlPersistT IO (Maybe (Entity Contract))
+findContract addr networkId =
+    getBy (UniqueContractAddressAndNetwork addr networkId)
 
 upsertContract :: Contract -> SqlPersistT IO ContractId
 upsertContract c =
-    findContractByName (contractName c) >>= \case
+    findContract (contractAddress c) (contractNetworkId c) >>= \case
         Nothing -> insert c
         (Just (Entity contractId _)) -> do
             replace contractId c
             return contractId
-
-upsertNetwork :: Network -> SqlPersistT IO NetworkId
-upsertNetwork n =
-    findNetwork (networkNetworkId n) (networkContractId n) >>= \case
-        Nothing -> insert n
-        (Just (Entity networkId _)) -> do
-            replace networkId n
-            return networkId

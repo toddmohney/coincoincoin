@@ -68,16 +68,11 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
 
     Contract sql=contracts
         name Text sqltype=text
+        networkId T.NetworkId sqltype=text
+        address Address sqltype=text
         abi ByteString sqltype=bytea
         updatedAt UTCTime default=now()
-        UniqueContractName name
-        deriving Show Eq Generic
-
-    Network sql=networks
-        networkId T.NetworkId sqltype=text
-        contractId ContractId sqltype=int
-        address Address sqltype=text
-        UniqueNetworkIdAndContractId networkId contractId
+        UniqueContractAddressAndNetwork address networkId
         deriving Show Eq Generic
 
     KafkaOffset sql=kafka_offsets
@@ -90,8 +85,6 @@ share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
         UniqueKafkaOffsetsTopicPartition topic partition clientId
         deriving Show Eq Generic
 |]
-
-type NetworkBuilder = ContractId -> Network
 
 newtype KafkaClientId = KafkaClientId Text
     deriving (Show, Eq, IsString)
