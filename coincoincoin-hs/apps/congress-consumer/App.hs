@@ -43,7 +43,6 @@ import           CoinCoinCoin.Database.Models
     , CongressMembershipId
     , KafkaClientId
     , KafkaOffset(..)
-    , KafkaOffsetId
     , Partition
     , SqlPersistT
     , TopicName
@@ -76,10 +75,6 @@ class (Monad m) => MonadDbWriter m where
     runDbWriter :: (DbWriterType m) a -> m a
 
     upsertCongressMembership :: CongressMembership -> m CongressMembershipId
-
-    createKafkaOffset :: KafkaOffset -> m KafkaOffsetId
-
-    updateKafkaOffset :: KafkaOffsetId -> KafkaOffset -> m ()
 
     incrementKafkaOffset :: KafkaOffset -> m ()
 
@@ -167,20 +162,6 @@ instance (MonadIO m) => MonadDbWriter (AppT m) where
                 runDbWriter $ CMQ.updateCongressMembershipStatus memberId mem
                 return memberId
 
-    createKafkaOffset :: KafkaOffset -> AppT m KafkaOffsetId
-    createKafkaOffset =
-        runDbWriter . KQ.createKafkaOffset
-
-    updateKafkaOffset :: KafkaOffsetId -> KafkaOffset -> AppT m ()
-    updateKafkaOffset kId offset =
-        runDbWriter $ KQ.updateKafkaOffset kId offset
-
     incrementKafkaOffset :: KafkaOffset -> AppT m ()
-    incrementKafkaOffset kOffset = do
-        mOffset <- getKafkaOffset (kafkaOffsetClientId kOffset) (kafkaOffsetTopic kOffset) (kafkaOffsetPartition kOffset)
-        case mOffset of
-            Nothing ->
-                let nextOffset = kafkaOffsetOffset kOffset + 1
-                in void $ createKafkaOffset (kOffset { kafkaOffsetOffset = nextOffset })
-            (Just (Entity offsetId _)) ->
-                runDbWriter $ KQ.incrementKafkaOffset offsetId
+    incrementKafkaOffset kOffset =
+        void . runDbWriter $ KQ.incrementKafkaOffset kOffset

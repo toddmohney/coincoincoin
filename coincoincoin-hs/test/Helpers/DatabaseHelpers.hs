@@ -1,11 +1,21 @@
 module Helpers.DatabaseHelpers
-    ( setupTestDatabase
+    ( prepDb
+    , setupTestDatabase
     , truncateDatabase
     ) where
 
 import Control.Monad (void)
+import Database.Persist.Postgresql (ConnectionPool)
 import qualified Database.Persist.Postgresql  as DB
-import           CoinCoinCoin.Database.Models (runMigrations')
+
+import CoinCoinCoin.Database.Config
+import CoinCoinCoin.Database.Models (runMigrations')
+
+prepDb :: IO ConnectionPool
+prepDb = do
+    dbPool <- mkPool' "postgres://coincoincoin:coincoincoin@localhost:5432/coincoincoin_test"
+    setupTestDatabase dbPool
+    return dbPool
 
 setupTestDatabase :: DB.ConnectionPool -> IO ()
 setupTestDatabase pool = do

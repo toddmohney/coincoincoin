@@ -6,21 +6,14 @@ import Test.Hspec
 
 import Helpers.DatabaseHelpers
 
-import CoinCoinCoin.Database.Config
 import CoinCoinCoin.Database.Models
 import qualified CoinCoinCoin.Database.Contracts.Query as Q
-
-doSetup :: IO ConnectionPool
-doSetup = do
-    dbPool <- mkPool' "postgres://coincoincoin:coincoincoin@localhost:5432/coincoincoin_test"
-    setupTestDatabase dbPool
-    return dbPool
 
 main :: IO ()
 main = hspec spec
 
 spec :: Spec
-spec = before doSetup $
+spec = before prepDb $
     describe "upsertContract" $ do
         it "inserts a new record when a record matching the unique key is not found" $ \dbPool -> do
             now <- C.getCurrentTime

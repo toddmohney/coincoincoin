@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7f91144d7e5e1dbd102b8200a4a017deaf1c6b6561c988b5f0d25ae1e44857d0
+-- hash: 40bc84eeba99c1471f6f9930644cfecf89408795e9b37c4bd7aa9b6c588d34e5
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -157,6 +157,7 @@ test-suite congress-consumer-test
   other-modules:
       CoinCoinCoin.Congress.Events.TypesSpec
       CoinCoinCoin.Database.Contracts.QuerySpec
+      CoinCoinCoin.Database.KafkaOffsets.QuerySpec
       Helpers.DatabaseHelpers
       Truffle.TypesSpec
       Web3.TypesSpec
