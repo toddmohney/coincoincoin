@@ -1,7 +1,7 @@
 module CoinCoinCoin.Database.CongressMemberships.Query
     ( getCongressMembership
     , createCongressMembership
-    , updateCongressMembership
+    , updateCongressMembershipStatus
     ) where
 
 import Control.Monad.IO.Class (liftIO)
@@ -17,8 +17,8 @@ getCongressMembership addr =
 createCongressMembership :: CongressMembership -> SqlPersistT IO CongressMembershipId
 createCongressMembership = insert
 
-updateCongressMembership :: CongressMembershipId -> CongressMembership -> SqlPersistT IO ()
-updateCongressMembership membershipId membership = do
+updateCongressMembershipStatus :: CongressMembershipId -> CongressMembership -> SqlPersistT IO ()
+updateCongressMembershipStatus membershipId membership = do
     now <- liftIO getCurrentTime
     updateWhere [ CongressMembershipId ==. membershipId ]
         [ CongressMembershipIsMember =. congressMembershipIsMember membership

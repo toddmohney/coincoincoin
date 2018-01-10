@@ -31,19 +31,16 @@ import           Network.Kafka (KafkaClientError, TopicAndMessage)
 import           Network.Kafka.Protocol (Offset, ProduceResponse)
 
 import           AppConfig (AppConfig(..), mkAppConfig)
-import           CoinCoinCoin.Class
-    ( MonadTime(..)
-    )
+import           CoinCoinCoin.Class (MonadTime(..))
 import qualified CoinCoinCoin.Database.CongressMemberships.Query as CMQ
 import qualified CoinCoinCoin.Database.KafkaOffsets.Query as KQ
 import           CoinCoinCoin.Database.Models
     ( Address(..)
-    , Entity(..)
     , CongressMembership(..)
     , CongressMembershipId
+    , Entity(..)
     , KafkaClientId
     , KafkaOffset(..)
-    , KafkaOffsetId
     , Partition
     , SqlPersistT
     , TopicName
@@ -76,10 +73,6 @@ class (Monad m) => MonadDbWriter m where
     runDbWriter :: (DbWriterType m) a -> m a
 
     upsertCongressMembership :: CongressMembership -> m CongressMembershipId
-
-    createKafkaOffset :: KafkaOffset -> m KafkaOffsetId
-
-    updateKafkaOffset :: KafkaOffsetId -> KafkaOffset -> m ()
 
     incrementKafkaOffset :: KafkaOffset -> m ()
 
@@ -164,23 +157,9 @@ instance (MonadIO m) => MonadDbWriter (AppT m) where
             Nothing ->
                 runDbWriter $ CMQ.createCongressMembership mem
             (Just (Entity memberId _)) -> do
-                runDbWriter $ CMQ.updateCongressMembership memberId mem
+                runDbWriter $ CMQ.updateCongressMembershipStatus memberId mem
                 return memberId
 
-    createKafkaOffset :: KafkaOffset -> AppT m KafkaOffsetId
-    createKafkaOffset =
-        runDbWriter . KQ.createKafkaOffset
-
-    updateKafkaOffset :: KafkaOffsetId -> KafkaOffset -> AppT m ()
-    updateKafkaOffset kId offset =
-        runDbWriter $ KQ.updateKafkaOffset kId offset
-
     incrementKafkaOffset :: KafkaOffset -> AppT m ()
-    incrementKafkaOffset kOffset = do
-        mOffset <- getKafkaOffset (kafkaOffsetClientId kOffset) (kafkaOffsetTopic kOffset) (kafkaOffsetPartition kOffset)
-        case mOffset of
-            Nothing ->
-                let nextOffset = kafkaOffsetOffset kOffset + 1
-                in void $ createKafkaOffset (kOffset { kafkaOffsetOffset = nextOffset })
-            (Just (Entity offsetId _)) ->
-                runDbWriter $ KQ.incrementKafkaOffset offsetId
+    incrementKafkaOffset kOffset =
+        void . runDbWriter $ KQ.incrementKafkaOffset kOffset

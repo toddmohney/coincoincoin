@@ -13,26 +13,23 @@ import           Control.Monad.Logger (LoggingT(..), MonadLogger)
 import           Control.Monad.Reader
     ( MonadReader
     , ReaderT(..)
-    , runReaderT
     , asks
+    , runReaderT
     )
 import           Data.ByteString (ByteString)
 import qualified Database.Persist.Postgresql as Sql
 import           Prelude hiding (readFile)
 
-import           CoinCoinCoin.Class
-    ( MonadFileReader(..)
-    , MonadTime(..)
+import           CoinCoinCoin.Class (MonadFileReader(..), MonadTime(..))
+import qualified CoinCoinCoin.Database.Contracts.Query as Q
+import           CoinCoinCoin.Database.Models
+    ( Contract(..)
+    , Entity
+    , SqlPersistT
     )
 import           CoinCoinCoin.Logging (runLogging')
-import           CoinCoinCoin.Database.Models
-    ( SqlPersistT
-    , Entity
-    , Contract(..)
-    )
-import qualified CoinCoinCoin.Database.Contracts.Query as Q
 
-import           AppConfig (AppConfig(..))
+import AppConfig (AppConfig(..))
 
 class (Monad m) => MonadDbWriter m where
     type DbWriterType m :: * -> *

@@ -64,8 +64,10 @@ library:
   - Web3.Types
   dependencies:
   - aeson
+  - async
   - directory
   - exceptions
+  - filepath
   - hashable
   - hstatsd
   - milena

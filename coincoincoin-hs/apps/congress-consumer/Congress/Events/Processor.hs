@@ -2,8 +2,8 @@ module Congress.Events.Processor
     ( processEvent
     ) where
 
-import Control.Monad (void)
-import Control.Monad.Logger (MonadLogger, logInfoN)
+import           Control.Monad (void)
+import           Control.Monad.Logger (MonadLogger, logInfoN)
 import qualified Data.Text as T
 
 import CoinCoinCoin.Class (MonadTime(..))

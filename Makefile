@@ -92,3 +92,7 @@ unlock:
 psql:
 	docker-compose exec postgres \
 		psql -U coincoincoin coincoincoin
+
+init-test-db:
+	docker-compose exec postgres \
+		createdb -U coincoincoin coincoincoin_test || true

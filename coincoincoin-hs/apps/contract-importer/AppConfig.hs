@@ -4,20 +4,20 @@ module AppConfig
     ) where
 
 import qualified Data.ByteString.Char8 as C8
-import Options.Applicative
-import Data.Monoid ((<>))
+import           Data.Monoid ((<>))
+import           Options.Applicative
 
 import CoinCoinCoin.Database.Config (ConnectionPool, mkPool')
 import CoinCoinCoin.Database.Models (ConnectionString)
 
 data AppConfig = AppConfig
-    { appDbConn :: ConnectionPool
+    { appDbConn        :: ConnectionPool
     , appContractsPath :: FilePath
     } deriving (Show)
 
 data CLIOpts = CLIOpts
     { dbConnectionString :: ConnectionString
-    , contractsPath :: FilePath
+    , contractsPath      :: FilePath
     } deriving (Show)
 
 loadConfig :: IO AppConfig

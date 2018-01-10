@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7f91144d7e5e1dbd102b8200a4a017deaf1c6b6561c988b5f0d25ae1e44857d0
+-- hash: 936b55e732c76300412f5f6aa8ae3145a6140a4ec6f8a3570457cd789f65d1bb
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -34,11 +34,13 @@ library
   ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches
   build-depends:
       aeson
+    , async
     , base >=4.7 && <5
     , bytestring
     , containers
     , directory
     , exceptions
+    , filepath
     , hashable
     , hstatsd
     , milena
@@ -72,7 +74,6 @@ library
       CoinCoinCoin.MessageQueue.Class
       CoinCoinCoin.MessageQueue.Job
       CoinCoinCoin.MessageQueue.Types
-      CoinCoinCoin.StatsD
       CoinCoinCoin.UUID
       Paths_coincoincoin_hs
   default-language: Haskell2010
@@ -157,6 +158,7 @@ test-suite congress-consumer-test
   other-modules:
       CoinCoinCoin.Congress.Events.TypesSpec
       CoinCoinCoin.Database.Contracts.QuerySpec
+      CoinCoinCoin.Database.KafkaOffsets.QuerySpec
       Helpers.DatabaseHelpers
       Truffle.TypesSpec
       Web3.TypesSpec
