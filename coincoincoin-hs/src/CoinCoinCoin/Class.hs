@@ -6,7 +6,7 @@ module CoinCoinCoin.Class
     , UTCTime
     ) where
 
-import Data.ByteString (ByteString)
+import           Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import           Data.Time.Clock (UTCTime)
 import qualified Data.Time.Clock as Time

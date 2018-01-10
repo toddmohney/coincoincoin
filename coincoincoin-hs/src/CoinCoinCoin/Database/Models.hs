@@ -56,7 +56,7 @@ import           Network.Kafka.Protocol
     )
 
 import qualified Truffle.Types as T
-import Web3.Types (Address(..))
+import           Web3.Types (Address(..))
 
 share [mkPersist sqlSettings, mkMigrate "migrateAll"] [persistLowerCase|
     CongressMembership sql=congress_memberships

@@ -16,9 +16,9 @@ import Web3.Types (Address)
 
 data BuildArtifact = BuildArtifact
     { contractName :: Text
-    , abi :: Value
-    , networks :: HashMap NetworkId Network
-    , updatedAt :: UTCTime
+    , abi          :: Value
+    , networks     :: HashMap NetworkId Network
+    , updatedAt    :: UTCTime
     } deriving (Show, Eq, Generic)
 
 instance FromJSON BuildArtifact

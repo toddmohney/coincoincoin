@@ -1,30 +1,28 @@
 module Main where
 
-import Control.Concurrent (threadDelay)
-import Control.Monad (forM_, forever, void)
-import Control.Monad.Catch    (MonadCatch, MonadThrow, catch, throwM)
-import Control.Monad.Logger (MonadLogger, logInfoN, logErrorN)
-import Control.Monad.Reader (MonadReader, asks)
+import           Control.Concurrent (threadDelay)
+import           Control.Monad (forM_, forever, void)
+import           Control.Monad.Catch (MonadCatch, MonadThrow, catch, throwM)
+import           Control.Monad.Logger (MonadLogger, logErrorN, logInfoN)
+import           Control.Monad.Reader (MonadReader, asks)
 import qualified Data.Aeson as AE
-import qualified Data.ByteString.Char8  as C8
-import Data.Monoid ((<>))
-import qualified Data.List              as L
-import qualified Data.Text              as T
-import Network.Kafka (TopicAndMessage)
-import qualified Network.Kafka          as K
+import qualified Data.ByteString.Char8 as C8
+import qualified Data.List as L
+import           Data.Monoid ((<>))
+import qualified Data.Text as T
+import           Network.Kafka (TopicAndMessage)
+import qualified Network.Kafka as K
 
-import App
+import           App
     ( AppConfig(..)
     , MonadDb
     , MonadDbReader(..)
     , MonadDbWriter(..)
     )
 import qualified App
-import CoinCoinCoin.Class
-    ( MonadTime(..)
-    )
-import CoinCoinCoin.Congress.Events.Types (CongressEvent(..))
-import CoinCoinCoin.Database.Models
+import           CoinCoinCoin.Class (MonadTime(..))
+import           CoinCoinCoin.Congress.Events.Types (CongressEvent(..))
+import           CoinCoinCoin.Database.Models
     ( Entity(..)
     , KafkaClientId
     , KafkaOffset(..)
@@ -32,9 +30,9 @@ import CoinCoinCoin.Database.Models
     , TopicName
     )
 import qualified CoinCoinCoin.Database.Models as M
-import CoinCoinCoin.Errors (ParseError(..))
-import CoinCoinCoin.Logging as Log
-import CoinCoinCoin.MessageQueue
+import           CoinCoinCoin.Errors (ParseError(..))
+import           CoinCoinCoin.Logging as Log
+import           CoinCoinCoin.MessageQueue
     ( MonadMessageConsumer(..)
     , Topic(..)
     , mkTopic
@@ -91,7 +89,7 @@ processEvents kOffset msgs =
 parseMessage :: (MonadThrow m) => C8.ByteString -> m CongressEvent
 parseMessage msg =
     case AE.eitherDecodeStrict msg :: Either String CongressEvent of
-        (Left err) -> throwM . JSONParseError $ T.pack err
+        (Left err)  -> throwM . JSONParseError $ T.pack err
         (Right evt) -> pure evt
 
 logAndReThrowParseFailure :: ( MonadLogger m

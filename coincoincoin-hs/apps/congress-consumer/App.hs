@@ -31,16 +31,14 @@ import           Network.Kafka (KafkaClientError, TopicAndMessage)
 import           Network.Kafka.Protocol (Offset, ProduceResponse)
 
 import           AppConfig (AppConfig(..), mkAppConfig)
-import           CoinCoinCoin.Class
-    ( MonadTime(..)
-    )
+import           CoinCoinCoin.Class (MonadTime(..))
 import qualified CoinCoinCoin.Database.CongressMemberships.Query as CMQ
 import qualified CoinCoinCoin.Database.KafkaOffsets.Query as KQ
 import           CoinCoinCoin.Database.Models
     ( Address(..)
-    , Entity(..)
     , CongressMembership(..)
     , CongressMembershipId
+    , Entity(..)
     , KafkaClientId
     , KafkaOffset(..)
     , Partition

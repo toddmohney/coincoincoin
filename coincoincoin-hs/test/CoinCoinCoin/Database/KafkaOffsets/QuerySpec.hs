@@ -2,12 +2,12 @@ module CoinCoinCoin.Database.KafkaOffsets.QuerySpec (main, spec) where
 
 import qualified Data.Time.Clock as C
 import qualified Database.Persist.Postgresql as Sql
-import Test.Hspec
+import           Test.Hspec
 
 import Helpers.DatabaseHelpers
 
-import CoinCoinCoin.Database.Models
 import qualified CoinCoinCoin.Database.KafkaOffsets.Query as Q
+import           CoinCoinCoin.Database.Models
 
 main :: IO ()
 main = hspec spec

@@ -4,9 +4,9 @@ module Helpers.DatabaseHelpers
     , truncateDatabase
     ) where
 
-import Control.Monad (void)
-import Database.Persist.Postgresql (ConnectionPool)
-import qualified Database.Persist.Postgresql  as DB
+import           Control.Monad (void)
+import           Database.Persist.Postgresql (ConnectionPool)
+import qualified Database.Persist.Postgresql as DB
 
 import CoinCoinCoin.Database.Config
 import CoinCoinCoin.Database.Models (runMigrations')

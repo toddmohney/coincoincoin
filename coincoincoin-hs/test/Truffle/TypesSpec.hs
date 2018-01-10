@@ -5,8 +5,8 @@ module Truffle.TypesSpec (main, spec) where
 import           Control.Exception (throwIO)
 import qualified Data.Aeson as AE
 import           Data.ByteString.Char8 (ByteString)
-import qualified Data.HashMap.Strict as HM
 import           Data.FileEmbed (embedFile)
+import qualified Data.HashMap.Strict as HM
 import qualified Data.Text as T
 import           Test.Hspec
 
