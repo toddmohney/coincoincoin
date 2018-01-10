@@ -21,8 +21,14 @@ import           Prelude hiding (readFile)
 import qualified System.Directory as D
 import qualified System.FilePath as FP
 
-class (Monad m) => MonadTime m where
+class (MonadIO m) => MonadTime m where
     getCurrentTime :: m UTCTime
+
+    default getCurrentTime :: (MonadTrans t, MonadTime m1, m ~ t m1) => m UTCTime
+    getCurrentTime = liftIO getCurrentTime
+
+instance (MonadIO m, MonadTime m) => MonadTime (ReaderT s m)
+instance (MonadIO m, MonadTime m) => MonadTime (LoggingT m)
 
 instance MonadTime IO where
     getCurrentTime = Time.getCurrentTime

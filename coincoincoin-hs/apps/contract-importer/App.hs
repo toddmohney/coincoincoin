@@ -46,15 +46,13 @@ newtype AppT m a = AppT { unAppT :: ReaderT AppConfig (LoggingT m) a }
              , MonadReader AppConfig
              , MonadCatch
              , MonadThrow
+             , MonadTime
              )
 
 runAppT :: (MonadIO m) => AppConfig -> AppT m a -> m a
 runAppT cfg appT =
     runLogging' $
         runReaderT (unAppT appT) cfg
-
-instance MonadIO m => MonadTime (AppT m) where
-    getCurrentTime = liftIO getCurrentTime
 
 instance (MonadIO m) => MonadDbWriter (AppT m) where
     type DbWriterType (AppT m) = SqlPersistT IO
