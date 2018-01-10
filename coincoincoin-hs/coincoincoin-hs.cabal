@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 40bc84eeba99c1471f6f9930644cfecf89408795e9b37c4bd7aa9b6c588d34e5
+-- hash: 166a8a9a5ffe6fb7cfdc83756831d477f5e6fe18a2edec5d56c674c66ed8421b
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -72,7 +72,6 @@ library
       CoinCoinCoin.MessageQueue.Class
       CoinCoinCoin.MessageQueue.Job
       CoinCoinCoin.MessageQueue.Types
-      CoinCoinCoin.StatsD
       CoinCoinCoin.UUID
       Paths_coincoincoin_hs
   default-language: Haskell2010
