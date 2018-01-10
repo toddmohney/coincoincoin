@@ -3,12 +3,13 @@ module Helpers.DatabaseHelpers
     , truncateDatabase
     ) where
 
+import Control.Monad (void)
 import qualified Database.Persist.Postgresql  as DB
-import           CoinCoinCoin.Database.Models (runMigrations)
+import           CoinCoinCoin.Database.Models (runMigrations')
 
 setupTestDatabase :: DB.ConnectionPool -> IO ()
 setupTestDatabase pool = do
-    runMigrations pool
+    void $ runMigrations' pool
     truncateDatabase pool
 
 truncateDatabase :: DB.ConnectionPool -> IO ()

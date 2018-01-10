@@ -36,6 +36,7 @@ import           Database.Persist.Postgresql
     , PersistValue(..)
     , SqlPersistT
     , runMigration
+    , runMigrationSilent
     , runSqlPool
     )
 import           Database.Persist.Sql
@@ -122,6 +123,10 @@ instance PersistField TopicName where
 runMigrations :: ConnectionPool -> IO ()
 runMigrations =
     runSqlPool (runMigration migrateAll)
+
+runMigrations' :: ConnectionPool -> IO [Text]
+runMigrations' =
+    runSqlPool (runMigrationSilent migrateAll)
 
 toKey :: (Integral i, ToBackendKey SqlBackend record) => i -> Key record
 toKey = toSqlKey . fromIntegral
