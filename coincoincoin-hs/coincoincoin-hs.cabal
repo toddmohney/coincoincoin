@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 936b55e732c76300412f5f6aa8ae3145a6140a4ec6f8a3570457cd789f65d1bb
+-- hash: 343fb2db4081862edf1c5234a57d312070bd189e86a1957245ac3fe73ce13626
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -71,6 +71,8 @@ library
       Truffle.Types
       Web3.Types
   other-modules:
+      CoinCoinCoin.Classes.MonadFileReader
+      CoinCoinCoin.Classes.MonadTime
       CoinCoinCoin.MessageQueue.Class
       CoinCoinCoin.MessageQueue.Job
       CoinCoinCoin.MessageQueue.Types
