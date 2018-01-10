@@ -16,9 +16,7 @@ import           Control.Monad.Reader
     , asks
     , runReaderT
     )
-import           Data.ByteString (ByteString)
 import qualified Database.Persist.Postgresql as Sql
-import           Prelude hiding (readFile)
 
 import           CoinCoinCoin.Class (MonadFileReader(..), MonadTime(..))
 import qualified CoinCoinCoin.Database.Contracts.Query as Q
@@ -44,6 +42,7 @@ newtype AppT m a = AppT { unAppT :: ReaderT AppConfig (LoggingT m) a }
              , Monad
              , MonadIO
              , MonadLogger
+             , MonadFileReader
              , MonadReader AppConfig
              , MonadCatch
              , MonadThrow
@@ -56,16 +55,6 @@ runAppT cfg appT =
 
 instance MonadIO m => MonadTime (AppT m) where
     getCurrentTime = liftIO getCurrentTime
-
-instance MonadIO m => MonadFileReader (AppT m) where
-    doesDirectoryExist :: FilePath -> AppT m Bool
-    doesDirectoryExist = liftIO . doesDirectoryExist
-
-    listDirectory :: FilePath -> AppT m [FilePath]
-    listDirectory = liftIO . listDirectory
-
-    readFile :: FilePath -> AppT m ByteString
-    readFile = liftIO . readFile
 
 instance (MonadIO m) => MonadDbWriter (AppT m) where
     type DbWriterType (AppT m) = SqlPersistT IO

@@ -1,4 +1,6 @@
+{-# LANGUAGE DefaultSignatures #-}
 {-# LANGUAGE InstanceSigs #-}
+{-# LANGUAGE TypeFamilies #-}
 
 module CoinCoinCoin.Class
     ( MonadFileReader(..)
@@ -9,6 +11,8 @@ module CoinCoinCoin.Class
 import qualified Control.Concurrent.Async as A
 import qualified Control.Monad as M
 import           Control.Monad.IO.Class (MonadIO, liftIO)
+import           Control.Monad.Logger
+import           Control.Monad.Reader
 import           Data.ByteString (ByteString)
 import qualified Data.ByteString as BS
 import           Data.Time.Clock (UTCTime)
@@ -26,9 +30,21 @@ instance MonadTime IO where
 class (MonadIO m) => MonadFileReader m where
     doesDirectoryExist :: FilePath -> m Bool
 
+    -- | default implementation provided to reduce boilerplate
+    default doesDirectoryExist :: (MonadTrans t, MonadFileReader m1, m ~ t m1) => FilePath -> m Bool
+    doesDirectoryExist = liftIO . doesDirectoryExist
+
     listDirectory :: FilePath -> m [FilePath]
 
+    -- | default implementation provided to reduce boilerplate
+    default listDirectory :: (MonadTrans t, MonadFileReader m1, m ~ t m1) => FilePath -> m [FilePath]
+    listDirectory = liftIO . listDirectory
+
     readFile :: FilePath -> m ByteString
+
+    -- | default implementation provided to reduce boilerplate
+    default readFile :: (MonadTrans t, MonadFileReader m1, m ~ t m1) => FilePath -> m ByteString
+    readFile = liftIO . readFile
 
     readFilesRecursively :: FilePath -> m [ByteString]
     readFilesRecursively path = do
@@ -39,6 +55,9 @@ class (MonadIO m) => MonadFileReader m where
             M.join <$> liftIO (A.mapConcurrently readFilesRecursively files)
         else
             (:[]) <$> readFile path
+
+instance (MonadIO m, MonadFileReader m) => MonadFileReader (ReaderT s m)
+instance (MonadIO m, MonadFileReader m) => MonadFileReader (LoggingT m)
 
 instance MonadFileReader IO where
     doesDirectoryExist :: FilePath -> IO Bool
