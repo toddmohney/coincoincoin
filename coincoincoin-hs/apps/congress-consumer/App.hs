@@ -164,7 +164,7 @@ instance (MonadIO m) => MonadDbWriter (AppT m) where
             Nothing ->
                 runDbWriter $ CMQ.createCongressMembership mem
             (Just (Entity memberId _)) -> do
-                runDbWriter $ CMQ.updateCongressMembership memberId mem
+                runDbWriter $ CMQ.updateCongressMembershipStatus memberId mem
                 return memberId
 
     createKafkaOffset :: KafkaOffset -> AppT m KafkaOffsetId
