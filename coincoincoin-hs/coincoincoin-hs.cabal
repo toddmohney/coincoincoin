@@ -2,7 +2,7 @@
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 166a8a9a5ffe6fb7cfdc83756831d477f5e6fe18a2edec5d56c674c66ed8421b
+-- hash: 936b55e732c76300412f5f6aa8ae3145a6140a4ec6f8a3570457cd789f65d1bb
 
 name:           coincoincoin-hs
 version:        0.1.0.0
@@ -34,11 +34,13 @@ library
   ghc-options: -Wall -Werror -fno-warn-warnings-deprecations -freverse-errors -fwarn-unused-binds -fwarn-unused-imports -fwarn-unused-matches
   build-depends:
       aeson
+    , async
     , base >=4.7 && <5
     , bytestring
     , containers
     , directory
     , exceptions
+    , filepath
     , hashable
     , hstatsd
     , milena
