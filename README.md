@@ -69,18 +69,6 @@ In another terminal run
 make deploy
 ```
 
-The output of `make deploy` will display the contracts deployed to the blockchain via our migration runner. We'll need to record the addresses of our contracts in order to use them via our DApp.
-
-Watch the output for lines that look like
-
-```sh
-Running migration: 2_add_congress.js
-  Replacing Congress... ...(some hash)
-  Congress: 0x321d5513c291de3a2fb63bf4b6e711c34f57ba28
-```
-
-There are bits of our Javascript code that depend on knowing the location of the `Congress` contract so that our interface my interact with the contract. Open up `./hello/js/src/congressContract.js` and replace the value set for `congressContractAddr` with `0x321d5513c291de3a2fb63bf4b6e711c34f57ba28`.
-
 ## Testing
 
 We're using the [Truffle Framework](http://truffleframework.com/) and a test RPC client for testing.

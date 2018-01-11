@@ -35,7 +35,7 @@ console: ## Begins a Geth console session
 		docker-compose exec geth \
 		geth attach ipc:/home/coincoincoin/.ethereum/geth.ipc
 
-build: build-geth build-dapp build-node-event-producer build-node-event-consumer build-block-explorer ## Builds all docker images
+build: build-geth build-dapp build-node-event-producer build-node-event-consumer build-block-explorer install-importer ## Builds all docker images
 
 build-geth:
 	GETH_USER=$(GETH_USER) \
@@ -57,6 +57,9 @@ build-node-event-producer:
 build-node-event-consumer:
 	cd coincoincoin-hs && $(MAKE) image
 	docker-compose build congress-event-consumer
+
+install-importer:
+	cd coincoincoin-hs && stack install
 
 sh: ## Starts a bash session inside of the geth container
 	GETH_USER=$(GETH_USER) \

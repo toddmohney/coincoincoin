@@ -16,6 +16,8 @@
   },
   "scripts": {},
   "dependencies": {
+    "es6-promise": "^4.2.2",
+    "isomorphic-fetch": "^2.2.1",
     "web3": "^1.0.0-beta.24"
   }
 }
