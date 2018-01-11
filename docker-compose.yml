@@ -19,13 +19,13 @@ services:
     command: "geth --mine --minerthreads 2 --etherbase ${COINBASE} --rpc --rpcaddr '0.0.0.0' --rpcport 8545 --rpccorsdomain '*' --rpcapi 'eth,net,web3' --ws --wsapi 'eth,net,web3' --wsport 8546 --networkid ${GETH_NETWORK_ID}"
     cpus: 1.5
     ports:
-    - "8545-8546:8545-8546"
-    - "6060:6060"
-    - "30303:30303"
+      - "8545-8546:8545-8546"
+      - "6060:6060"
+      - "30303:30303"
     user: "${GETH_USER}"
     volumes:
-    - geth:/home/${GETH_USER}/.ethereum
-    - ethash:/home/${GETH_USER}/.ethash
+      - geth:/home/${GETH_USER}/.ethereum
+      - ethash:/home/${GETH_USER}/.ethash
 
   node-event-producer:
     build:
@@ -45,10 +45,10 @@ services:
     image: coincoincoin/coincoincoin
     command: congress-consumer
     env_file:
-    - coincoincoin-hs/env/development.env
+      - coincoincoin-hs/env/development.env
     links:
-    - kafka
-    - postgres
+      - kafka
+      - postgres
     restart: always
 
   dapp:
@@ -57,7 +57,9 @@ services:
       dockerfile: Dockerfile
     network_mode: "host"
     ports:
-    - "4567:4567"
+      - "4567:4567"
+    depends_on:
+      - postgres
 
   block-explorer:
     build:
@@ -69,22 +71,22 @@ services:
   zookeeper:
     image: wurstmeister/zookeeper:3.4.6
     ports:
-    - "2181:2181"
+      - "2181:2181"
     volumes:
-    - zookeeper_conf:/opt/zookeeper-3.4.9/conf"
-    - zookeeper_data:/opt/zookeeper-3.4.9/data
+      - zookeeper_conf:/opt/zookeeper-3.4.9/conf"
+      - zookeeper_data:/opt/zookeeper-3.4.9/data
 
   kafka:
     image: wurstmeister/kafka:1.0.0
     depends_on:
-    - zookeeper
+      - zookeeper
     ports:
-    - "9092-9094:9092-9094"
+      - "9092-9094:9092-9094"
     env_file:
-    - env/kafka.env
+      - env/kafka.env
     volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    - kafka:/kafka
+      - /var/run/docker.sock:/var/run/docker.sock
+      - kafka:/kafka
 
   postgres:
     image: postgres:9.5-alpine
@@ -92,6 +94,6 @@ services:
     volumes:
       - postgres:/var/lib/postgresql/data/pgdata
     env_file:
-    - env/postgres.env
+      - env/postgres.env
     ports:
       - 5432:5432

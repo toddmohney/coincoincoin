@@ -1,7 +1,11 @@
+require("es6-promise").polyfill;
+require("isomorphic-fetch");
+
 const Web3 = require("web3");
 const Q = require('q');
 
-const { congressContractAbi, congressContractAddr } = require("./congressContract.js");
+let congressContractAbi;
+let congressContractAddr;
 
 // web3 is injected into the page by MetaMask
 let w3;
@@ -18,6 +22,29 @@ const loadSession = (accts) => {
 }
 
 $(document).ready(() => {
+  loadContractData().
+    then(loadWeb3);
+});
+
+const loadContractData = () => {
+  return fetch('http://localhost:4567/contracts')
+    .then((response) => {
+      if(!(response.status >= 200 && response.status < 300)) {
+        console.log("Response", response);
+        throw new Error("Unable to load contract data");
+      }
+      return response.json();
+    })
+    .then((contract) => {
+      congressContractAddr = contract.address;
+      congressContractAbi = contract.abi;
+      console.log("congressContractAddr", congressContractAddr);
+      console.log("congressContractAbi", congressContractAbi);
+    });
+}
+
+const loadWeb3 = () => {
+  console.log("loading web3");
   // Checking if Web3 has been injected by the browser (Mist/MetaMask)
   if (typeof web3 !== 'undefined') {
     // Use the browser's ethereum provider
@@ -27,7 +54,7 @@ $(document).ready(() => {
   } else {
     console.log('No web3? You should consider trying MetaMask!')
   }
-});
+}
 
 const sendNodeDiagnostics = () => {
   Q.all([
