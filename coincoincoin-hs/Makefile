@@ -17,6 +17,9 @@ setup: ## Installs project dependencies
 devel: ## Continuously builds/test on file change
 	stack test --file-watch --exec="$(MAKE) lint"
 
+devel-fast:
+	stack test --file-watch --ghc-options="-fforce-recomp -fno-code" --exec="$(MAKE) lint"
+
 .PHONY: test
 test: ## Builds, tests, lints
 	stack test --exec="$(MAKE) lint"
