@@ -4,7 +4,7 @@
 GETH_USER ?= "coincoincoin"
 GETH_NETWORK_ID ?= 15
 
-TRUFFLE_NETWORK_TARGET ?= "ganache"
+TRUFFLE_NETWORK_TARGET ?= "development"
 
 # you're going to want to override this with your own address
 COINBASE ?= "b3ed286c1d088016589b5d2b0729a73a1e24f8a7"
@@ -70,7 +70,7 @@ start-test-rpc-server:
 
 test: deploy
 	cd contracts && \
-		truffle test --network $(TRUFFLE_NETWORK_TARGET)
+		truffle test --network ganache
 
 reset-network:
 	cd contracts && \
@@ -99,3 +99,6 @@ psql:
 init-test-db:
 	docker-compose exec postgres \
 		createdb -U coincoincoin coincoincoin_test || true
+
+# copy-abi:
+	# cat contracts/build/contracts/CoinCoinCoinToken.json | jq '.abi' | xclip
