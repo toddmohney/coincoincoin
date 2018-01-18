@@ -4,7 +4,7 @@
 GETH_USER ?= "coincoincoin"
 GETH_NETWORK_ID ?= 15
 
-TRUFFLE_NETWORK_TARGET ?= "development"
+TRUFFLE_NETWORK_TARGET ?= "ganache"
 
 # you're going to want to override this with your own address
 COINBASE ?= "b3ed286c1d088016589b5d2b0729a73a1e24f8a7"
